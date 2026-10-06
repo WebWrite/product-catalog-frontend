@@ -2,7 +2,6 @@ import { Segmented } from "antd";
 import { useState } from "react";
 import BuyerRegister from "../components/buyerRegister";
 import SellerRegister from "../components/sellerRegister";
-import { useSelector } from "react-redux";
 
 function Register() {
   let [userType, setUserType] = useState("Buyer");
