@@ -1,6 +1,7 @@
-import { Avatar, Button, Dropdown, Input } from "antd";
+import { Avatar, Badge, Button, Dropdown, Input } from "antd";
 import { AiOutlineAmazon } from "react-icons/ai";
 import {
+  FaHeart,
   FaRegUser,
   FaRegUserCircle,
   FaSignInAlt,
@@ -17,6 +18,7 @@ function NavBar() {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
+
   const handleLogout = () => {
     dispatch(removeUser());
     navigate("/");
@@ -27,9 +29,9 @@ function NavBar() {
       key: "greeting",
       label: (
         <div className="py-2 font-raleway">
-          <p className="text-sm text-white m-0">
+          <p className="m-0 text-sm text-white">
             Hello,
-            <span className="font-semibold  m-0 ml-1 ">{user?.name}</span>
+            <span className="ml-1 font-semibold">{user?.name}</span>
           </p>
         </div>
       ),
@@ -41,28 +43,29 @@ function NavBar() {
     },
 
     {
-      label: <p className="text-sm font-sans"> Profile</p>,
+      label: <p className="m-0 text-sm font-sans">Profile</p>,
       key: "profile",
       icon: <FaRegUserCircle className="size-3" />,
       onClick: () => navigate("/profile"),
     },
 
     {
-      label: <p className="text-sm font-sans"> Logout</p>,
+      label: <p className="m-0 text-sm font-sans">Logout</p>,
       key: "logout",
       icon: <FaSignOutAlt className="size-3" />,
       danger: true,
       onClick: handleLogout,
     },
   ];
+
   const guestItems = [
     {
       key: "greeting",
       label: (
         <div className="py-2 font-raleway">
-          <p className="text-sm text-white m-0">
+          <p className="m-0 text-sm text-white">
             Hello,
-            <span className="font-semibold  ml-1 m-0 ">Guest</span>
+            <span className="ml-1 font-semibold">Guest</span>
           </p>
         </div>
       ),
@@ -87,9 +90,26 @@ function NavBar() {
       onClick: () => navigate("/auth/register"),
     },
   ];
+
   return (
-    <header className="h-20 flex items-center justify-between px-10 gap-10">
-      <div className="flex justify-start items-center gap-2">
+    <header
+      className="
+        sticky
+        top-0
+        z-50
+        flex
+        h-18
+        items-center
+        justify-between
+        gap-10
+        border-b
+        border-gray-900
+        bg-black
+        px-10
+        shadow-sm
+      "
+    >
+      <div className="flex shrink-0 items-center justify-start gap-2">
         <Link to="/">
           <Avatar
             className="bg-amber-700!"
@@ -97,17 +117,35 @@ function NavBar() {
             icon={<AiOutlineAmazon />}
           />
         </Link>
-        <h3 className="text-sm font-semibold font-raleway ">Amazon</h3>
+
+        <h3 className="m-0 text-sm font-semibold font-raleway">Amazon</h3>
       </div>
+
       <Input
         placeholder="Search products..."
-        searchIcon={<TfiSearch />}
+        prefix={<TfiSearch />}
         className="w-64!"
       />
 
-      <div className="flex items-center gap-4">
-        <Link to="/cart" className="relative">
-          <Button icon={<TfiShoppingCart className="size-4" />}></Button>
+      <div className="flex items-center gap-3">
+        <Button
+          type="text"
+          onClick={() => navigate("/favourites")}
+          className="
+            flex!
+            items-center
+            gap-2
+            px-2!
+            hover:text-red-500!
+          "
+          icon={<FaHeart className="size-4" />}
+        >
+          <span className="hidden md:inline">Favourite</span>
+        </Button>
+        <Link to="/cart">
+          <Badge count={0} showZero>
+            <Button icon={<TfiShoppingCart className="size-4" />} />
+          </Badge>
         </Link>
 
         <Dropdown
@@ -117,7 +155,21 @@ function NavBar() {
           placement="bottomRight"
           trigger={["click"]}
         >
-          <Button type="text" icon={<FaRegUser className="size-3" />} />
+          <Button
+            type="text"
+            className="
+              flex!
+              items-center
+              gap-2
+              px-2!
+            "
+          >
+            <FaRegUser className="size-4" />
+
+            <span className="hidden text-sm font-medium sm:inline">
+              {user?.name || "Guest"}
+            </span>
+          </Button>
         </Dropdown>
       </div>
     </header>

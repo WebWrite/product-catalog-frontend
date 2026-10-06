@@ -1,9 +1,21 @@
 import { Button, Input, Typography } from "antd";
+import { useEffect } from "react";
 import { TfiReload } from "react-icons/tfi";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
 function Verification() {
+  let location = useLocation();
+  let navigate = useNavigate();
+  const email = location.state?.email;
+
+  useEffect(() => {
+    if (!email) {
+      navigate(-1);
+    }
+  }, [email, navigate]);
+
   let onChange = (text) => {
     console.log(text);
   };
@@ -15,9 +27,7 @@ function Verification() {
           <p className="text-xs mt-1.5 mb-2  text-gray-400">
             Enter the verification code we sent to your
           </p>
-          <p className="text-xs mb-6  text-gray-400 ">
-            Email address: m@example.com.
-          </p>
+          <p className="text-xs mb-6  text-gray-400 ">Email address: {email}</p>
 
           <div className="flex  justify-between items-center">
             <Title level={5}> Verification Code</Title>

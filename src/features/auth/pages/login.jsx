@@ -1,6 +1,6 @@
-import { App, Button, Form, Input } from "antd";
+import { App, Button, Divider, Form, Input } from "antd";
 import { useForm } from "antd/es/form/Form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setuser } from "../../../app/store/user/userSlice";
 import { login } from "../../../shared/utils/api";
@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 
 function Login() {
   let dispatch = useDispatch();
+  let navigate = useNavigate();
   const { notification } = App.useApp();
   let [form] = useForm();
 
@@ -39,6 +40,26 @@ function Login() {
       });
     },
   });
+
+  let handleOtp = async () => {
+    try {
+      const { email } = await form.validateFields(["email"]);
+      notification.success({
+        description: `Otp is send to  ${email}`,
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+
+      navigate("/auth/verify-otp", {
+        state: {
+          email,
+        },
+      });
+    } catch (error) {
+      console.log("Email is required/invalid ", error.message);
+    }
+  };
 
   return (
     <div className="bg-black min-h-screen">
@@ -85,6 +106,18 @@ function Login() {
                 className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
               >
                 {mutation.isPending ? "Logging in..." : "Login"}
+              </Button>
+            </Form.Item>
+            <Divider>Or</Divider>
+            <Form.Item>
+              <Button
+                disabled={mutation.isPending}
+                htmlType="button"
+                onClick={handleOtp}
+                type="dashed"
+                className="bg-gray-950! text-white! text-xs! w-full font-semibold!    "
+              >
+                Login with OTP
               </Button>
             </Form.Item>
 

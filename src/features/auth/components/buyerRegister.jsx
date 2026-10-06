@@ -35,7 +35,8 @@ function BuyerRegister() {
 
   let mutation = useMutation({
     mutationFn: handleSubmit,
-    onSuccess: () => {
+    onSuccess: async () => {
+      const { email } = await form.validateFields(["email"]);
       notification.success({
         title: "Sign Up successfully",
         description: "Welcome to our platfrom",
@@ -43,7 +44,7 @@ function BuyerRegister() {
         showProgress: true,
         placement: "bottomRight",
       });
-      navigate("/auth/login");
+      navigate("/auth/verify-otp", { state: { email } });
     },
     onError: (error) => {
       notification.error({
