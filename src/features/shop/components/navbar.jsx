@@ -1,5 +1,6 @@
-import { Avatar, Badge, Button, Dropdown, Input } from "antd";
+import { Avatar, Badge, Button, Dropdown, Input, Switch } from "antd";
 import { AiOutlineAmazon } from "react-icons/ai";
+import { FaMoon, FaSun } from "react-icons/fa";
 import {
   FaHeart,
   FaRegUser,
@@ -12,12 +13,14 @@ import { TfiSearch, TfiShoppingCart } from "react-icons/tfi";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { removeUser } from "../../../app/store/user/userSlice";
+import { useTheme } from "../../../app/theme/useTheme";
 
 function NavBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     dispatch(removeUser());
@@ -103,8 +106,7 @@ function NavBar() {
         justify-between
         gap-10
         border-b
-        border-gray-900
-        bg-black
+        theme-navbar
         px-10
         shadow-sm
       "
@@ -118,7 +120,9 @@ function NavBar() {
           />
         </Link>
 
-        <h3 className="m-0 text-sm font-semibold font-raleway">Amazon</h3>
+        <h3 className="theme-heading m-0 text-sm font-semibold font-raleway">
+          Amazon
+        </h3>
       </div>
 
       <Input
@@ -128,6 +132,13 @@ function NavBar() {
       />
 
       <div className="flex items-center gap-3">
+        <Switch
+          checked={isDarkMode}
+          onChange={toggleTheme}
+          checkedChildren={<FaMoon />}
+          unCheckedChildren={<FaSun />}
+          aria-label="Toggle dark mode"
+        />
         <Button
           type="text"
           onClick={() => navigate("/favourites")}

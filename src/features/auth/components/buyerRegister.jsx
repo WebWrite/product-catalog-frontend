@@ -61,7 +61,7 @@ function BuyerRegister() {
   return (
     <Form
       layout="vertical"
-      className="text-white"
+      className="theme-form"
       onFinish={handleFinish}
       form={form}
     >
@@ -69,7 +69,7 @@ function BuyerRegister() {
         label="Name"
         name={"name"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Name is required" }]}
       >
         <Input className="font-normal" type={"text"}></Input>
@@ -79,7 +79,7 @@ function BuyerRegister() {
         label="Email"
         name={"email"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[
           { required: true, message: "Email is required" },
           { type: "email", message: "Enter a valid email" },
@@ -96,7 +96,7 @@ function BuyerRegister() {
         name={"password"}
         label="Password"
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Password is required" }]}
       >
         <Input.Password className="font-normal"></Input.Password>
@@ -105,7 +105,7 @@ function BuyerRegister() {
       <Form.Item
         name={"confirmPassword"}
         label="Confirm Password"
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         required={false}
         dependencies={["password"]}
         rules={[

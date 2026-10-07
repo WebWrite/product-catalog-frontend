@@ -3,10 +3,10 @@ import { TfiSearch } from "react-icons/tfi";
 
 function NotFound() {
   return (
-    <div className="bg-black min-h-screen">
+    <div className="theme-page min-h-screen">
       <div className="flex justify-center items-center flex-col min-h-screen">
-        <h3 className="text-xl font-bold font-raleway "> 404 - Not Found</h3>
-        <p className="text-center text-gray-300 mt-2 font-sans text-xs ">
+        <h3 className="theme-heading text-xl font-bold font-raleway">404 - Not Found</h3>
+        <p className="theme-muted text-center mt-2 font-sans text-xs">
           The page you're looking for doesn't exist.
         </p>
         <p className="mt-0.5 font-sans text-xs">
@@ -20,7 +20,7 @@ function NotFound() {
             prefix={<TfiSearch />}
           />
         </div>
-        <p className="text-center text-gray-300 mt-2  font-raleway text-xs ">
+        <p className="theme-muted text-center mt-2 font-raleway text-xs">
           Need help?{" "}
           <Button type="link" className="p-0!">
             Contact support

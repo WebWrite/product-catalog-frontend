@@ -6,11 +6,11 @@ import SellerRegister from "../components/sellerRegister";
 function Register() {
   let [userType, setUserType] = useState("Buyer");
   return (
-    <div className="bg-black min-h-screen">
+    <div className="theme-page min-h-screen">
       <div className="flex justify-center min-h-screen items-center font-sans flex-col">
-        <div className="min-w-96 bg-neutral-900   text-white p-4 rounded-2xl">
-          <h2 className="text-sm font-bold  ">Create an account</h2>
-          <p className="text-xs mt-2 mb-6  text-gray-400">
+        <div className="theme-panel min-w-96 p-4 rounded-2xl">
+          <h2 className="theme-heading text-sm font-bold">Create an account</h2>
+          <p className="theme-muted text-xs mt-2 mb-6">
             Enter your information below to create your account
           </p>
 

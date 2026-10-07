@@ -20,14 +20,14 @@ function Verification() {
     console.log(text);
   };
   return (
-    <div className="bg-black min-h-screen">
+    <div className="theme-page min-h-screen">
       <div className="flex justify-center min-h-screen items-center font-sans flex-col">
-        <div className="min-w-96 bg-neutral-900   text-white p-4 rounded-2xl">
-          <h2 className="text-sm font-bold  ">Verify your login</h2>
-          <p className="text-xs mt-1.5 mb-2  text-gray-400">
+        <div className="theme-panel min-w-96 p-4 rounded-2xl">
+          <h2 className="theme-heading text-sm font-bold">Verify your login</h2>
+          <p className="theme-muted text-xs mt-1.5 mb-2">
             Enter the verification code we sent to your
           </p>
-          <p className="text-xs mb-6  text-gray-400 ">Email address: {email}</p>
+          <p className="theme-muted text-xs mb-6">Email address: {email}</p>
 
           <div className="flex  justify-between items-center">
             <Title level={5}> Verification Code</Title>
@@ -43,7 +43,7 @@ function Verification() {
             Verify
           </Button>
 
-          <p className="mt-4 text-center text-xs text-gray-300  ">
+          <p className="theme-muted mt-4 text-center text-xs">
             Having trouble signing in?{" "}
             <Button type="link" className="p-0!">
               Contact support

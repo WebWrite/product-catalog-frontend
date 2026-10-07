@@ -62,24 +62,24 @@ function Login() {
   };
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="theme-page min-h-screen">
       <div className="flex justify-center min-h-screen items-center font-sans flex-col">
-        <div className="min-w-96 bg-neutral-900   text-white p-4 rounded-2xl">
-          <h2 className="text-sm font-bold ">Login to your account</h2>
-          <p className="text-xs mt-2 mb-6 text-gray-400">
+        <div className="theme-panel min-w-96 p-4 rounded-2xl">
+          <h2 className="theme-heading text-sm font-bold">Login to your account</h2>
+          <p className="theme-muted text-xs mt-2 mb-6">
             Enter email below to login your account
           </p>
           <Form
             form={form}
             layout="vertical"
-            className="text-white"
+            className="theme-form"
             onFinish={handleFinish}
           >
             <Form.Item
               label="Email"
               name={"email"}
               required={false}
-              className="font-semibold text-white "
+              className="theme-form-label font-semibold"
               rules={[
                 { required: true, message: "Email is required" },
                 { type: "email", message: "Enter a valid email" },
@@ -92,7 +92,7 @@ function Login() {
               name={"password"}
               label="Password"
               required={false}
-              className="font-semibold text-white "
+              className="theme-form-label font-semibold"
               rules={[{ required: true, message: "Password is required" }]}
             >
               <Input.Password className="font-normal"></Input.Password>
@@ -115,7 +115,7 @@ function Login() {
                 htmlType="button"
                 onClick={handleOtp}
                 type="dashed"
-                className="bg-gray-950! text-white! text-xs! w-full font-semibold!    "
+                className="theme-outline-button! text-xs! w-full font-semibold!"
               >
                 Login with OTP
               </Button>
