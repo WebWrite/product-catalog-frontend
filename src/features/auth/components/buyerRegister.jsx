@@ -134,7 +134,6 @@ function BuyerRegister() {
         <Button
           disabled={mutation.isPending}
           htmlType="submit"
-          type="primary"
           className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
         >
           {mutation.isPending ? "Signing up...." : "Sign Up"}

@@ -12,7 +12,6 @@ import { Tag } from "antd";
 function ProductCard({
   id = 1,
   title = "Wireless Headphones",
-  description = "40-hour battery, deep bass and soft ear cushions.",
   category = "Electronics",
   image = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
   price = 79,
@@ -68,13 +67,13 @@ function ProductCard({
         </div>
         <Link
           to={`/products/${id}`}
-          className="theme-heading truncate font-raleway text-lg font-bold hover:text-blue-600"
+          className="theme-heading truncate  text-sm sm:text-lg font-bold hover:text-blue-600"
         >
           {title}
         </Link>
 
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="theme-heading text-xl font-extrabold font-raleway">
+          <span className="theme-heading text-lg sm:text-xl font-extrabold font-raleway">
             ${price}
           </span>
           {discount > 0 && (

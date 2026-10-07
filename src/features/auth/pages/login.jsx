@@ -64,8 +64,10 @@ function Login() {
   return (
     <div className="theme-page min-h-screen">
       <div className="flex justify-center min-h-screen items-center font-sans flex-col">
-        <div className="theme-panel min-w-96 p-4 rounded-2xl">
-          <h2 className="theme-heading text-sm font-bold">Login to your account</h2>
+        <div className="theme-panel min-w-76 sm:min-w-96 p-4 rounded-2xl">
+          <h2 className="theme-heading text-sm font-bold">
+            Login to your account
+          </h2>
           <p className="theme-muted text-xs mt-2 mb-6">
             Enter email below to login your account
           </p>
@@ -102,7 +104,6 @@ function Login() {
               <Button
                 disabled={mutation.isPending}
                 htmlType="submit"
-                type="primary"
                 className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
               >
                 {mutation.isPending ? "Logging in..." : "Login"}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ThemeContext } from "./themeContext";
 
-const THEME_STORAGE_KEY = "product-catalog-theme";
+const THEME_STORAGE_KEY = "app-theme";
 
 function getInitialTheme() {
   const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);

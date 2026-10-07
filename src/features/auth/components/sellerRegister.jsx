@@ -283,7 +283,6 @@ function SellerRegister() {
       <Form.Item>
         <Button
           htmlType="submit"
-          type="primary"
           className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
         >
           {mutation.isPending ? "Signing Up..." : "Sign up"}

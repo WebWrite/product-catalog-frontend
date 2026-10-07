@@ -1,4 +1,4 @@
-import { Avatar, Badge, Button, Dropdown, Input, Switch } from "antd";
+import { Avatar, Badge, Button, Drawer, Dropdown, Input, Switch } from "antd";
 import { AiOutlineAmazon } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import {
@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { removeUser } from "../../../app/store/user/userSlice";
 import { useTheme } from "../../../app/theme/useTheme";
+import { useState } from "react";
+import { FiMenu } from "react-icons/fi";
 
 function NavBar() {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ function NavBar() {
       key: "greeting",
       label: (
         <div className="py-2 font-raleway">
-          <p className="m-0 text-sm text-white">
+          <p className="m-0 text-sm theme-heading">
             Hello,
             <span className="ml-1 font-semibold">{user?.name}</span>
           </p>
@@ -65,8 +67,8 @@ function NavBar() {
     {
       key: "greeting",
       label: (
-        <div className="py-2 font-raleway">
-          <p className="m-0 text-sm text-white">
+        <div className="py-2 font-raleway theme-heading">
+          <p className="m-0 text-sm">
             Hello,
             <span className="ml-1 font-semibold">Guest</span>
           </p>
@@ -93,6 +95,8 @@ function NavBar() {
       onClick: () => navigate("/auth/register"),
     },
   ];
+
+  let [drawerFnOpen, setDrawerFnOpen] = useState(false);
 
   return (
     <header
@@ -128,10 +132,10 @@ function NavBar() {
       <Input
         placeholder="Search products..."
         prefix={<TfiSearch />}
-        className="w-64!"
+        className="w-64! hidden! sm:flex!"
       />
 
-      <div className="flex items-center gap-3">
+      <div className="hidden sm:flex items-center gap-3">
         <Switch
           checked={isDarkMode}
           onChange={toggleTheme}
@@ -183,6 +187,99 @@ function NavBar() {
           </Button>
         </Dropdown>
       </div>
+
+      <div className="flex items-center gap-5 sm:hidden">
+        <Link to="/cart" className="ml-1">
+          <Badge count={0} showZero>
+            <Button icon={<TfiShoppingCart className="size-4" />}></Button>
+          </Badge>
+        </Link>
+        <Button
+          icon={<FiMenu />}
+          onClick={() => setDrawerFnOpen(true)}
+        ></Button>
+      </div>
+
+      <Drawer
+        size={230}
+        title={`Hello, ${user?.name || "Guest"}`}
+        mask={{ enabled: true, blur: true }}
+        open={drawerFnOpen}
+        onClose={() => setDrawerFnOpen(false)}
+      >
+        <Input
+          placeholder="Search products..."
+          prefix={<TfiSearch />}
+          className="  mb-2"
+        />
+        <div className="mt-1">
+          <div className="flex justify-end ">
+            <Switch
+              checked={isDarkMode}
+              onChange={toggleTheme}
+              checkedChildren={<FaMoon />}
+              unCheckedChildren={<FaSun />}
+              aria-label="Toggle dark mode"
+            />
+          </div>
+
+          <Button
+            type=""
+            onClick={() => navigate("/favourites")}
+            className="
+            mt-2    
+            
+            w-full!
+             flex!
+            items-center
+            gap-2
+            px-2!
+            hover:text-red-500!
+          "
+            icon={<FaHeart className="size-4" />}
+          >
+            <span className="">Favourite</span>
+          </Button>
+
+          {user ? (
+            <div>
+              <Button
+                className="w-full! mt-2"
+                onClick={() => navigate("/profile")}
+                icon={<FaRegUserCircle className="size-3" />}
+              >
+                Profile
+              </Button>
+              <Button
+                className="w-full! mt-2"
+                onClick={handleLogout}
+                danger
+                icon={<FaSignOutAlt className="size-3" />}
+              >
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Button
+                className="w-full! mt-2"
+                onClick={() => navigate("/auth/login")}
+                icon={<FaSignInAlt className="size-3" />}
+              >
+                Login
+              </Button>
+              <Button
+                className="w-full! mt-2"
+                type="primary"
+                onClick={() => navigate("/auth/register")}
+                icon={<FaUser className="size-3" />}
+              >
+                Register
+              </Button>
+            </div>
+          )}
+        </div>
+      </Drawer>
     </header>
   );
 }
