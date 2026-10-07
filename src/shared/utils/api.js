@@ -81,4 +81,8 @@ export async function login(credentials) {
   });
 }
 
+export async function logout() {
+  return await api.post("/auth/logout");
+}
+
 export default api;

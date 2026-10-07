@@ -1,4 +1,13 @@
-import { Avatar, Badge, Button, Drawer, Dropdown, Input, Switch } from "antd";
+import {
+  Avatar,
+  Badge,
+  Button,
+  Drawer,
+  Dropdown,
+  Input,
+  notification,
+  Switch,
+} from "antd";
 import { AiOutlineAmazon } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import {
@@ -16,6 +25,7 @@ import { removeUser } from "../../../app/store/user/userSlice";
 import { useTheme } from "../../../app/theme/useTheme";
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
+import { logout } from "../../../shared/utils/api";
 
 function NavBar() {
   const navigate = useNavigate();
@@ -24,9 +34,18 @@ function NavBar() {
   const user = useSelector((state) => state.user);
   const { isDarkMode, toggleTheme } = useTheme();
 
-  const handleLogout = () => {
-    dispatch(removeUser());
-    navigate("/");
+  const handleLogout = async () => {
+    let res = await logout();
+    if (res.status === 200) {
+      dispatch(removeUser());
+      navigate("/");
+      notification.success({
+        title: "Logout successfully",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+    }
   };
 
   const loggedInItems = [

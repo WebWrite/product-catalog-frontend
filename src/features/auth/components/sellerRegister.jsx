@@ -137,12 +137,20 @@ function SellerRegister() {
 
   let handleFinish = (values) => {
     mutation.mutate(values);
-    form.resetFields();
   };
 
   let handleSubmit = async (data) => {
     const Backend_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await axios.post(`${Backend_URL}/auth/register/seller`, data);
+    console.log(data);
+
+    const res = await axios.post(`${Backend_URL}/auth/register-seller`, {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      storeType: data.storeType,
+      storeName: data.storeName,
+    });
+    console.log(res);
     return res;
   };
 
@@ -157,7 +165,8 @@ function SellerRegister() {
         showProgress: true,
         placement: "bottomRight",
       });
-      navigate("/auth/verify-otp", { state: { email } });
+      form.resetFields();
+      navigate("/auth/verify-otp", { state: { email, comeFrom: "register" } });
     },
     onError: (error) => {
       notification.error({

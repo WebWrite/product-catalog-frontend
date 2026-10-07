@@ -24,12 +24,15 @@ function BuyerRegister() {
 
   let handleFinish = (values) => {
     mutation.mutate(values);
-    form.resetFields();
   };
 
   let handleSubmit = async (data) => {
     const Backend_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await axios.post(`${Backend_URL}/auth/register/buyer`, data);
+    const res = await axios.post(`${Backend_URL}/auth/register-buyer`, {
+      name: data.name,
+      password: data.password,
+      email: data.email,
+    });
     return res;
   };
 
@@ -44,7 +47,8 @@ function BuyerRegister() {
         showProgress: true,
         placement: "bottomRight",
       });
-      navigate("/auth/verify-otp", { state: { email } });
+      form.resetFields();
+      navigate("/auth/verify-otp", { state: { email, comeFrom: "register" } });
     },
     onError: (error) => {
       notification.error({

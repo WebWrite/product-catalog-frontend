@@ -3,7 +3,7 @@ import { useForm } from "antd/es/form/Form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setuser } from "../../../app/store/user/userSlice";
-import { login } from "../../../shared/utils/api";
+import api, { login } from "../../../shared/utils/api";
 import { useMutation } from "@tanstack/react-query";
 
 function Login() {
@@ -14,13 +14,21 @@ function Login() {
 
   let handleFinish = async (values) => {
     mutation.mutate(values);
-    form.resetFields();
   };
 
   let mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      dispatch(setuser(data));
+      console.log(data);
+      dispatch(setuser(data.data.user));
+      form.resetFields();
+      if (data.data.user.role == "admin") {
+        navigate("/admin/dashboard");
+      } else if (data.data.user.role == "seller") {
+        navigate("/admin/seller");
+      } else {
+        navigate("/");
+      }
 
       notification.success({
         title: "Login successfully",
@@ -44,15 +52,22 @@ function Login() {
   let handleOtp = async () => {
     try {
       const { email } = await form.validateFields(["email"]);
+
+      const res = await api.post("/auth/send-login-otp", { email });
+      if (res.status !== 200) {
+        return;
+      }
+
       notification.success({
         description: `Otp is send to  ${email}`,
         pauseOnHover: true,
         showProgress: true,
         placement: "bottomRight",
       });
-
+      form.resetFields();
       navigate("/auth/verify-otp", {
         state: {
+          comeFrom: "login",
           email,
         },
       });
