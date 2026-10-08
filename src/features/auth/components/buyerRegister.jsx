@@ -24,18 +24,22 @@ function BuyerRegister() {
 
   let handleFinish = (values) => {
     mutation.mutate(values);
-    form.resetFields();
   };
 
   let handleSubmit = async (data) => {
     const Backend_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await axios.post(`${Backend_URL}/auth/register/buyer`, data);
+    const res = await axios.post(`${Backend_URL}/auth/register-customer`, {
+      name: data.name,
+      password: data.password,
+      email: data.email,
+    });
     return res;
   };
 
   let mutation = useMutation({
     mutationFn: handleSubmit,
-    onSuccess: () => {
+    onSuccess: async () => {
+      const { email } = await form.validateFields(["email"]);
       notification.success({
         title: "Sign Up successfully",
         description: "Welcome to our platfrom",
@@ -43,7 +47,8 @@ function BuyerRegister() {
         showProgress: true,
         placement: "bottomRight",
       });
-      navigate("/auth/login");
+      form.resetFields();
+      navigate("/auth/verify-otp", { state: { email, comeFrom: "register" } });
     },
     onError: (error) => {
       notification.error({
@@ -60,7 +65,7 @@ function BuyerRegister() {
   return (
     <Form
       layout="vertical"
-      className="text-white"
+      className="theme-form"
       onFinish={handleFinish}
       form={form}
     >
@@ -68,7 +73,7 @@ function BuyerRegister() {
         label="Name"
         name={"name"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Name is required" }]}
       >
         <Input className="font-normal" type={"text"}></Input>
@@ -78,7 +83,7 @@ function BuyerRegister() {
         label="Email"
         name={"email"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[
           { required: true, message: "Email is required" },
           { type: "email", message: "Enter a valid email" },
@@ -95,7 +100,7 @@ function BuyerRegister() {
         name={"password"}
         label="Password"
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Password is required" }]}
       >
         <Input.Password className="font-normal"></Input.Password>
@@ -104,7 +109,7 @@ function BuyerRegister() {
       <Form.Item
         name={"confirmPassword"}
         label="Confirm Password"
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         required={false}
         dependencies={["password"]}
         rules={[
@@ -133,7 +138,6 @@ function BuyerRegister() {
         <Button
           disabled={mutation.isPending}
           htmlType="submit"
-          type="primary"
           className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
         >
           {mutation.isPending ? "Signing up...." : "Sign Up"}

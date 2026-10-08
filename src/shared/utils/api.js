@@ -10,129 +10,84 @@ const api = axios.create({
   },
 });
 
-function getCookie(name) {
-  const cookie = document.cookie
-    .split("; ")
-    .find((item) => item.startsWith(`${name}=`));
+api.interceptors.request.use(
+  (config) => {
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
 
-  return cookie
-    ? decodeURIComponent(cookie.split("=").slice(1).join("="))
-    : null;
-}
-
-function setCookie(name, value, maxAge = 60 * 60 * 24 * 7) {
-  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
-}
-
-function removeCookie(name) {
-  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
-}
-
-function findTokens(payload) {
-  if (!payload || typeof payload !== "object") {
-    return {};
-  }
-
-  if (payload.accessToken || payload.refreshToken) {
-    return payload;
-  }
-
-  return findTokens(payload.data);
-}
-
-export function saveTokens(payload) {
-  const tokens = findTokens(payload);
-
-  if (tokens.accessToken) {
-    setCookie("accessToken", tokens.accessToken);
-  }
-  if (tokens.refreshToken) {
-    setCookie("refreshToken", tokens.refreshToken);
-  }
-}
-
-export function clearTokens() {
-  removeCookie("accessToken");
-  removeCookie("refreshToken");
-}
-
-api.interceptors.request.use((config) => {
-  const accessToken = getCookie("accessToken");
-  if (accessToken) {
-    config.headers["Authorization"] = `Bearer ${accessToken}`;
-  }
-  if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"];
-  }
-  return config;
-});
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 api.interceptors.response.use(
   (response) => response,
+
   async (error) => {
-    const originalError = error.config;
+    const originalRequest = error.config;
+
+    if (!error.response) {
+      return Promise.reject(error);
+    }
 
     if (
-      error.response?.status === 401 &&
-      originalError &&
-      !originalError._retry &&
-      !originalError._skipAuthRefresh
+      error.response.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest._skipAuthRefresh
     ) {
-      originalError._retry = true;
-      const refreshed = await refreshToken();
+      originalRequest._retry = true;
 
-      if (refreshed) {
-        const newAccessToken = getCookie("accessToken");
-        originalError.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalError);
+      try {
+        const refreshed = await refreshToken();
+
+        if (refreshed) {
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
       }
     }
-    throw error;
+
+    return Promise.reject(error);
   },
 );
 
 export async function refreshToken() {
-  const refreshTokenValue = getCookie("refreshToken");
-
-  if (!refreshTokenValue) {
-    return false;
-  }
-
   try {
-    const response = await axios.post(
-      `${Backend_Url}/auth/refresh`,
-      { refreshToken: refreshTokenValue },
+    const response = await api.post(
+      "/auth/refresh",
+      {},
       {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${refreshTokenValue}`,
-        },
+        _skipAuthRefresh: true,
       },
     );
 
-    if (
-      response.data?.success === false ||
-      !findTokens(response.data).accessToken
-    ) {
-      clearTokens();
-      return false;
-    }
-
-    saveTokens(response.data);
-    return true;
+    return response.data?.success !== false;
   } catch (error) {
     console.error(
       "Refresh token failed:",
       error.response?.data || error.message,
     );
-    clearTokens();
+
     return false;
   }
 }
 
 export async function login(credentials) {
-  console.log("credentials ", credentials);
   return await api.post("/auth/login", credentials, {
     _skipAuthRefresh: true,
   });
 }
+
+export async function logout() {
+  return await api.post("/auth/logout");
+}
+
+export async function getMe() {
+  let res = await api.get("/user/me");
+  return res.data.user;
+}
+
+export default api;

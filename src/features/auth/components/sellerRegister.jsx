@@ -137,18 +137,27 @@ function SellerRegister() {
 
   let handleFinish = (values) => {
     mutation.mutate(values);
-    form.resetFields();
   };
 
   let handleSubmit = async (data) => {
     const Backend_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await axios.post(`${Backend_URL}/auth/register/seller`, data);
+    console.log(data);
+
+    const res = await axios.post(`${Backend_URL}/auth/register-seller`, {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      storeType: data.storeType,
+      storeName: data.storeName,
+    });
+    console.log(res);
     return res;
   };
 
   let mutation = useMutation({
     mutationFn: handleSubmit,
-    onSuccess: () => {
+    onSuccess: async () => {
+      const { email } = await form.validateFields(["email"]);
       notification.success({
         title: "Sign Up successfully",
         description: "Welcome to our platfrom",
@@ -156,7 +165,8 @@ function SellerRegister() {
         showProgress: true,
         placement: "bottomRight",
       });
-      navigate("/auth/login");
+      form.resetFields();
+      navigate("/auth/verify-otp", { state: { email, comeFrom: "register" } });
     },
     onError: (error) => {
       notification.error({
@@ -185,7 +195,7 @@ function SellerRegister() {
   return (
     <Form
       layout="vertical"
-      className="text-white"
+      className="theme-form"
       onFinish={handleFinish}
       form={form}
     >
@@ -193,7 +203,7 @@ function SellerRegister() {
         label="Name"
         name={"name"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Name is required" }]}
       >
         <Input className="font-normal" type={"text"}></Input>
@@ -203,7 +213,7 @@ function SellerRegister() {
         label="Email"
         name={"email"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[
           { required: true, message: "Email is required" },
           { type: "email", message: "Enter a valid email" },
@@ -219,7 +229,7 @@ function SellerRegister() {
         label="Store Name"
         name={"storeName"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Store name is required" }]}
       >
         <Input className="font-normal" type={"text"}></Input>
@@ -229,7 +239,7 @@ function SellerRegister() {
         label="Store Type"
         name={"storeType"}
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Type is required" }]}
       >
         <Select
@@ -245,7 +255,7 @@ function SellerRegister() {
         name={"password"}
         label="Password"
         required={false}
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         rules={[{ required: true, message: "Password is required" }]}
       >
         <Input.Password className="font-normal"></Input.Password>
@@ -254,7 +264,7 @@ function SellerRegister() {
       <Form.Item
         name={"confirmPassword"}
         label="Confirm Password"
-        className="font-semibold text-white "
+        className="theme-form-label font-semibold"
         required={false}
         dependencies={["password"]}
         rules={[
@@ -282,7 +292,6 @@ function SellerRegister() {
       <Form.Item>
         <Button
           htmlType="submit"
-          type="primary"
           className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
         >
           {mutation.isPending ? "Signing Up..." : "Sign up"}

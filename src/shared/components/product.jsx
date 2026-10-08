@@ -12,7 +12,6 @@ import { Tag } from "antd";
 function ProductCard({
   id = 1,
   title = "Wireless Headphones",
-  description = "40-hour battery, deep bass and soft ear cushions.",
   category = "Electronics",
   image = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
   price = 79,
@@ -28,8 +27,8 @@ function ProductCard({
     oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
   return (
-    <div className="group w-72 overflow-hidden rounded-xl border border-gray-600 shadow-xs shadow-gray-600 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative  overflow-hidden bg-gray-100">
+    <div className="theme-card group w-72 overflow-hidden rounded-xl border shadow-xs transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div className="theme-media relative overflow-hidden">
         <Link to={`/products/${id}`}>
           <img
             src={image}
@@ -46,7 +45,7 @@ function ProductCard({
 
         <button
           onClick={() => setLiked(!liked)}
-          className={`absolute right-3 top-3 flex h-7 w-7 items-center  justify-center rounded-full bg-white/90 text-sm shadow transition hover:scale-110 ${
+          className={`theme-control absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-sm shadow transition hover:scale-110 ${
             liked ? "text-rose-600" : "text-gray-700"
           }`}
         >
@@ -55,29 +54,26 @@ function ProductCard({
       </div>
 
       <div className="flex flex-col gap-1 py-2 px-2">
-        <Tag variant="filled" className="bg-blue-500! text-white! w-fit">
-          {category}
-        </Tag>
+        <div className="flex justify-between">
+          <Tag variant="filled" className="bg-blue-500! text-white! w-fit">
+            {category}
+          </Tag>
 
+          <div className="theme-muted flex items-center gap-1 text-xs font-raleway">
+            <StarFilled className="text-amber-400!" />
+            <span className="theme-heading font-semibold">{rating}</span>
+            <span>({reviews})</span>
+          </div>
+        </div>
         <Link
           to={`/products/${id}`}
-          className="truncate font-raleway text-lg font-bold text-gray-900 hover:text-blue-600"
+          className="theme-heading truncate  text-sm sm:text-lg font-bold hover:text-blue-600"
         >
           {title}
         </Link>
 
-        <p className="line-clamp-2 font-raleway text-xs text-gray-500">
-          {description}
-        </p>
-
-        <div className="flex items-center gap-1 text-xs font-raleway text-gray-500">
-          <StarFilled className="text-amber-400!" />
-          <span className="font-semibold text-gray-700">{rating}</span>
-          <span>({reviews})</span>
-        </div>
-
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-xl font-extrabold font-raleway text-gray-900">
+          <span className="theme-heading text-lg sm:text-xl font-extrabold font-raleway">
             ${price}
           </span>
           {discount > 0 && (
@@ -91,7 +87,7 @@ function ProductCard({
       <div className="grid grid-cols-2 gap-2 px-4 pb-4 font-raleway">
         <button
           onClick={() => onAddToCart?.(id)}
-          className="flex items-center justify-center gap-2 rounded-xl border-2 border-gray-900 py-1.5 text-xs font-semibold text-gray-900 transition hover:bg-gray-900 hover:text-white"
+          className="theme-outline-button flex items-center justify-center gap-2 rounded-xl border-2 py-1.5 text-xs font-semibold transition"
         >
           <ShoppingCartOutlined /> Add to cart
         </button>

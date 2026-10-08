@@ -1,10 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-let initialState = {
-  name: "Mohsin",
-  email: "mohsin@gmail.com",
-  role: "admin",
-};
+let initialState = null;
 
 export const UserSlice = createSlice({
   name: "user",
@@ -14,7 +10,7 @@ export const UserSlice = createSlice({
       return actions.payload;
     },
 
-    removeUser(state, actions) {
+    removeUser() {
       return null;
     },
   },
