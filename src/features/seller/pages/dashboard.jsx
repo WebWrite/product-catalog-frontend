@@ -1,5 +1,5 @@
 function SellerDashboard() {
-  return <div>Seller Dashboard</div>;
+  return <div className="h-screen bg-white text-black">Seller Dashboard</div>;
 }
 
 export default SellerDashboard;
