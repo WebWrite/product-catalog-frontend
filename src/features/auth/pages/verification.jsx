@@ -39,7 +39,7 @@ function Verification() {
           if (res.data.user.role === "admin") {
             navigate("/admin/dashboard");
           } else if (res.data.user.role === "seller") {
-            navigate("/admin/seller");
+            navigate("/seller/dashboard");
           } else {
             navigate("/");
           }

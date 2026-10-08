@@ -85,4 +85,9 @@ export async function logout() {
   return await api.post("/auth/logout");
 }
 
+export async function getMe() {
+  let res = await api.get("/user/me");
+  return res.data.user;
+}
+
 export default api;

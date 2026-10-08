@@ -28,7 +28,7 @@ function BuyerRegister() {
 
   let handleSubmit = async (data) => {
     const Backend_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await axios.post(`${Backend_URL}/auth/register-buyer`, {
+    const res = await axios.post(`${Backend_URL}/auth/register-customer`, {
       name: data.name,
       password: data.password,
       email: data.email,
