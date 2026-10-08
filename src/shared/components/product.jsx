@@ -27,7 +27,7 @@ function ProductCard({
     oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
   return (
-    <div className="theme-card group w-72 overflow-hidden rounded-xl border shadow-xs transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <div className="theme-card group w-full min-w-0 overflow-hidden rounded-xl border shadow-xs transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="theme-media relative overflow-hidden">
         <Link to={`/products/${id}`}>
           <img

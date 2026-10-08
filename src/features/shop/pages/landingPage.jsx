@@ -74,23 +74,20 @@ function LandingPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {" "}
             <ProductCard />
             <ProductCard image="https://int.stylo.pk/cdn/shop/files/AT7482-02.png?v=1767854323" />
             <ProductCard image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS25i-Q4HGofsn7uQSemI3y5cuRLo5F61i0TwpT4MIL-OUoxhr1SHrh3Blz&s=10" />
-
             <ProductCard />
             <ProductCard image="https://int.stylo.pk/cdn/shop/files/AT7482-02.png?v=1767854323" />
             <ProductCard image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS25i-Q4HGofsn7uQSemI3y5cuRLo5F61i0TwpT4MIL-OUoxhr1SHrh3Blz&s=10" />
-
             <ProductCard />
             <ProductCard image="https://int.stylo.pk/cdn/shop/files/AT7482-02.png?v=1767854323" />
             <ProductCard image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS25i-Q4HGofsn7uQSemI3y5cuRLo5F61i0TwpT4MIL-OUoxhr1SHrh3Blz&s=10" />
-
             <ProductCard />
             <ProductCard image="https://int.stylo.pk/cdn/shop/files/AT7482-02.png?v=1767854323" />
             <ProductCard image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS25i-Q4HGofsn7uQSemI3y5cuRLo5F61i0TwpT4MIL-OUoxhr1SHrh3Blz&s=10" />
-
             <ProductCard />
             <ProductCard image="https://int.stylo.pk/cdn/shop/files/AT7482-02.png?v=1767854323" />
             <ProductCard image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS25i-Q4HGofsn7uQSemI3y5cuRLo5F61i0TwpT4MIL-OUoxhr1SHrh3Blz&s=10" />
