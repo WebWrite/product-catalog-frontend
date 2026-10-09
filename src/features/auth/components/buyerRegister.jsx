@@ -101,7 +101,14 @@ function BuyerRegister() {
         label="Password"
         required={false}
         className="theme-form-label font-semibold"
-        rules={[{ required: true, message: "Password is required" }]}
+        rules={[
+          { required: true, message: "Password is required" },
+          {
+            pattern: /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).+$/,
+            message:
+              "Password must contain at least one uppercase letter and one special character",
+          },
+        ]}
       >
         <Input.Password className="font-normal"></Input.Password>
       </Form.Item>
