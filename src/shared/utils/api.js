@@ -57,7 +57,7 @@ api.interceptors.response.use(
 export async function refreshToken() {
   try {
     const response = await api.post(
-      "/auth/refresh",
+      "/auth/refresh-token",
       {},
       {
         _skipAuthRefresh: true,

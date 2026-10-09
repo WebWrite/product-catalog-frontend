@@ -16,10 +16,26 @@ function LandingPage() {
           autoplaySpeed={5000}
           className="w-full overflow-hidden rounded-3xl shadow-[0_18px_45px_rgba(37,99,235,0.14)]"
         >
-          <CarouselItem img={"/src/assets/banner.jpg"} />
-          <CarouselItem img={"/src/assets/banner.jpg"} />
-          <CarouselItem img={"/src/assets/banner.jpg"} />
-          <CarouselItem img={"/src/assets/banner.jpg"} />
+          <CarouselItem
+            img={
+              "https://res.cloudinary.com/drawup2ef/image/upload/v1791530573/banner.jpg"
+            }
+          />
+          <CarouselItem
+            img={
+              "https://res.cloudinary.com/drawup2ef/image/upload/v1791530573/banner.jpg"
+            }
+          />
+          <CarouselItem
+            img={
+              "https://res.cloudinary.com/drawup2ef/image/upload/v1791530573/banner.jpg"
+            }
+          />
+          <CarouselItem
+            img={
+              "https://res.cloudinary.com/drawup2ef/image/upload/v1791530573/banner.jpg"
+            }
+          />
         </Carousel>
 
         <section className="theme-panel mt-5 grid grid-cols-1 divide-y rounded-2xl border p-1 shadow-sm sm:grid-cols-3 sm:divide-x sm:divide-y-0">
