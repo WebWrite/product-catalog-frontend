@@ -157,7 +157,8 @@ function Login() {
 
             <Form.Item>
               <Button
-                disabled={mutation.isPending}
+                disabled={mutation.isPending || otpMutation.isPending}
+                loading={mutation.isPending}
                 htmlType="submit"
                 className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
               >
@@ -167,13 +168,13 @@ function Login() {
             <Divider>Or</Divider>
             <Form.Item>
               <Button
-                disabled={mutation.isPending}
+                disabled={mutation.isPending || otpMutation.isPending}
                 htmlType="button"
                 onClick={handleOtp}
                 type="dashed"
                 className="theme-outline-button! text-xs! w-full font-semibold!"
               >
-                Login with OTP
+                {otpMutation.isPending ? "Sending OTP..." : "Login with OTP"}
               </Button>
             </Form.Item>
 
