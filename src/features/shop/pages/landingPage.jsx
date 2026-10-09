@@ -28,7 +28,7 @@ function LandingPage() {
           />
           <CarouselItem
             img={
-              "https://res.cloudinary.com/drawup2ef/image/upload/v1791530573/banner.jp"
+              "https://res.cloudinary.com/drawup2ef/image/upload/v1791530573/banner.jpg"
             }
           />
           <CarouselItem

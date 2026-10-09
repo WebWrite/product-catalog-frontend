@@ -171,7 +171,7 @@ function SellerRegister() {
     onError: (error) => {
       notification.error({
         title: "SignUp Failed",
-        description: error.message || "Something went wrong",
+        description: error.response?.data.message || "Something went wrong",
         pauseOnHover: true,
         showProgress: true,
         placement: "bottomRight",
@@ -230,7 +230,11 @@ function SellerRegister() {
         name={"storeName"}
         required={false}
         className="theme-form-label font-semibold"
-        rules={[{ required: true, message: "Store name is required" }]}
+        rules={[
+          { required: true, message: "Store name is required" },
+          { min: 3, message: "Name must be 3 character long" },
+          { max: 50, message: "Name contain only 50 character" },
+        ]}
       >
         <Input className="font-normal" type={"text"}></Input>
       </Form.Item>
@@ -261,8 +265,10 @@ function SellerRegister() {
           {
             pattern: /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).+$/,
             message:
-              "Password must contain at least one uppercase letter and one special character",
+              "Password must include an uppercase and a special character.   ",
           },
+          { min: 8, message: "Password must contain 8 character" },
+          { max: 128, message: "Password must be less than 128 character" },
         ]}
       >
         <Input.Password className="font-normal"></Input.Password>

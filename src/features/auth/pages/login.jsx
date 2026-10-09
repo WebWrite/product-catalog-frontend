@@ -21,7 +21,7 @@ function Login() {
     onSuccess: (data) => {
       console.log(data);
       dispatch(setuser(data.data.user));
-      form.resetFields();
+
       if (data.data.user.role == "admin") {
         navigate("/admin/dashboard");
       } else if (data.data.user.role == "seller") {
@@ -29,6 +29,7 @@ function Login() {
       } else {
         navigate("/");
       }
+      console.log(data);
 
       notification.success({
         title: "Login successfully",
@@ -37,11 +38,36 @@ function Login() {
         showProgress: true,
         placement: "bottomRight",
       });
+      form.resetFields();
     },
-    onError: () => {
+    onError: async (error) => {
+      const { email } = await form.validateFields(["email"]);
+      console.log(error.response?.status, error.response?.data.message);
+      if (
+        error.response?.status == 403 &&
+        error.response?.data.message == "Verify your email to access resources"
+      ) {
+        const res = await api.post("/auth/resend-email-otp", { email });
+        console.log(res);
+        if (res.status !== 200) {
+          return;
+        }
+        notification.success({
+          description: `Otp is send to  ${email}`,
+          pauseOnHover: true,
+          showProgress: true,
+          placement: "bottomRight",
+        });
+        navigate("/auth/verify-otp", {
+          state: {
+            comeFrom: "register",
+            email,
+          },
+        });
+      }
       notification.error({
         title: "Login Failed",
-        description: "Invalid credentials",
+        description: error.response?.data?.message || "Invalid credentials",
         pauseOnHover: true,
         showProgress: true,
         placement: "bottomRight",
