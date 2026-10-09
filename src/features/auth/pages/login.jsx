@@ -75,31 +75,45 @@ function Login() {
     },
   });
 
-  let handleOtp = async () => {
-    try {
-      const { email } = await form.validateFields(["email"]);
+  const otpMutation = useMutation({
+    mutationFn: async (email) => {
+      return await api.post("/auth/send-login-otp", { email });
+    },
 
-      const res = await api.post("/auth/send-login-otp", { email });
-      if (res.status !== 200) {
-        return;
+    onSuccess: (res, email) => {
+      if (res.status === 200) {
+        notification.success({
+          description: `OTP sent to ${email}`,
+          pauseOnHover: true,
+          showProgress: true,
+          placement: "bottomRight",
+        });
+
+        form.resetFields();
+
+        navigate("/auth/verify-otp", {
+          state: {
+            comeFrom: "login",
+            email,
+          },
+        });
       }
+    },
 
-      notification.success({
-        description: `Otp is send to  ${email}`,
+    onError: (error) => {
+      notification.error({
+        title: "OTP Request Failed",
+        description: error.response?.data?.message || "Failed to send OTP",
         pauseOnHover: true,
         showProgress: true,
         placement: "bottomRight",
       });
-      form.resetFields();
-      navigate("/auth/verify-otp", {
-        state: {
-          comeFrom: "login",
-          email,
-        },
-      });
-    } catch (error) {
-      console.log("Email is required/invalid ", error.message);
-    }
+    },
+  });
+
+  const handleOtp = async () => {
+    const { email } = await form.validateFields(["email"]);
+    otpMutation.mutate(email);
   };
 
   return (
