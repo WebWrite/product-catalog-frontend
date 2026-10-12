@@ -1,41 +1,83 @@
+import { useState } from "react";
 import {
+  App,
   Avatar,
   Badge,
   Button,
   Drawer,
   Dropdown,
   Input,
-  notification,
+  Select,
   Switch,
 } from "antd";
-import { AiOutlineAmazon } from "react-icons/ai";
-import { FaMoon, FaSun } from "react-icons/fa";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  FaHeart,
-  FaRegUser,
+  FaMoon,
+  FaSun,
   FaRegUserCircle,
   FaSignInAlt,
   FaSignOutAlt,
   FaUser,
 } from "react-icons/fa";
-import { TfiSearch, TfiShoppingCart } from "react-icons/tfi";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  MdMenu,
+  MdOutlineFavoriteBorder,
+  MdOutlineShoppingBag,
+  MdSearch,
+  MdViewInAr,
+} from "react-icons/md";
 import { removeUser } from "../../../app/store/user/userSlice";
 import { useTheme } from "../../../app/theme/useTheme";
-import { useState } from "react";
-import { FiMenu } from "react-icons/fi";
 import { logout } from "../../../shared/utils/api";
+
+const NAV_LINKS = [
+  { label: "Home", to: "/", end: true },
+  { label: "Shop", to: "/shop" },
+  { label: "Categories", to: "/categories" },
+  { label: "New Arrivals", to: "/new-arrivals" },
+  { label: "Sellers", to: "/sellers" },
+];
+
+const SEARCH_CATEGORIES = [
+  { value: "all", label: "All" },
+  { value: "fashion", label: "Fashion" },
+  { value: "home-furniture", label: "Home" },
+  { value: "art-crafts", label: "Art" },
+  { value: "handmade", label: "Handmade" },
+];
+
+const linkClass = ({ isActive }) =>
+  `rounded-lg px-2 py-2 text-xs font-semibold font-sans transition-colors ${
+    isActive
+      ? "bg-indigo-500! text-white!"
+      : "text-slate-500! hover:bg-indigo-50"
+  }`;
 
 function NavBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const { notification } = App.useApp();
   const user = useSelector((state) => state.user);
   const { isDarkMode, toggleTheme } = useTheme();
 
+  const favCount = 0;
+  const cartCount = 0;
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("search", query.trim());
+    if (category !== "all") params.set("category", category);
+    setDrawerOpen(false);
+    navigate(`/shop?${params.toString()}`);
+  };
+
   const handleLogout = async () => {
-    let res = await logout();
+    const res = await logout();
     if (res.status === 200) {
       dispatch(removeUser());
       navigate("/");
@@ -48,34 +90,38 @@ function NavBar() {
     }
   };
 
+  const themeItem = {
+    key: "theme",
+    label: isDarkMode ? "Light mode" : "Dark mode",
+    icon: isDarkMode ? (
+      <FaSun className="size-3" />
+    ) : (
+      <FaMoon className="size-3" />
+    ),
+    onClick: toggleTheme,
+  };
+
   const loggedInItems = [
     {
       key: "greeting",
       label: (
-        <div className="py-2 font-raleway">
-          <p className="m-0 text-sm theme-heading">
-            Hello,
-            <span className="ml-1 font-semibold">{user?.name}</span>
-          </p>
-        </div>
+        <p className="theme-heading m-0 py-1 text-xs">
+          Hello, <span className="font-semibold">{user?.name}</span>
+        </p>
       ),
       disabled: true,
     },
-
+    { type: "divider" },
     {
-      type: "divider",
-    },
-
-    {
-      label: <p className="m-0 text-sm font-sans">Profile</p>,
       key: "profile",
+      label: "Profile",
       icon: <FaRegUserCircle className="size-3" />,
       onClick: () => navigate("/profile"),
     },
-
+    themeItem,
     {
-      label: <p className="m-0 text-sm font-sans">Logout</p>,
       key: "logout",
+      label: "Logout",
       icon: <FaSignOutAlt className="size-3" />,
       danger: true,
       onClick: handleLogout,
@@ -86,218 +132,219 @@ function NavBar() {
     {
       key: "greeting",
       label: (
-        <div className="py-2 font-raleway theme-heading">
-          <p className="m-0 text-sm">
-            Hello,
-            <span className="ml-1 font-semibold">Guest</span>
-          </p>
-        </div>
+        <p className="theme-heading m-0 py-1 text-xs">
+          Hello, <span className="font-semibold">Guest</span>
+        </p>
       ),
       disabled: true,
     },
-
+    { type: "divider" },
     {
-      type: "divider",
-    },
-
-    {
-      label: "Login",
       key: "login",
+      label: "Login",
       icon: <FaSignInAlt />,
       onClick: () => navigate("/auth/login"),
     },
-
     {
-      label: "Register",
       key: "register",
+      label: "Register",
       icon: <FaUser />,
       onClick: () => navigate("/auth/register"),
     },
+    themeItem,
   ];
 
-  let [drawerFnOpen, setDrawerFnOpen] = useState(false);
+  const iconButtonClass = "h-9! w-9! rounded-lg! border-slate-200!";
 
   return (
-    <header
-      className="
-        sticky
-        top-0
-        z-50
-        flex
-        h-18
-        items-center
-        justify-between
-        gap-10
-        border-b
-        theme-navbar
-        px-10
-        shadow-sm
-      "
-    >
-      <div className="flex shrink-0 items-center justify-start gap-2">
-        <Link to="/">
-          <Avatar
-            className="bg-amber-700!"
-            size={40}
-            icon={<AiOutlineAmazon />}
-          />
+    <header className="theme-navbar sticky top-0 font-sans z-50 flex h-16 items-center justify-between gap-4 border-b px-4 shadow-sm sm:px-6 lg:px-8">
+      <div className="flex items-center gap-6">
+        <Link to="/" className="flex shrink-0 items-center gap-2">
+          <span className="flex size-9 items-center justify-center rounded-xl bg-indigo-600 text-xl text-white">
+            <MdViewInAr />
+          </span>
+          <span className="theme-heading text-lg font-bold">Aura</span>
         </Link>
 
-        <h3 className="theme-heading m-0 text-sm font-semibold font-raleway">
-          Amazon
-        </h3>
+        <nav className="hidden items-center gap-1 lg:flex">
+          {NAV_LINKS.map((l) => (
+            <NavLink key={l.to} to={l.to} end={l.end} className={linkClass}>
+              {l.label}
+            </NavLink>
+          ))}
+        </nav>
       </div>
 
-      <Input
-        placeholder="Search products..."
-        prefix={<TfiSearch />}
-        className="w-64! hidden! sm:flex!"
-      />
-
-      <div className="hidden sm:flex items-center gap-3">
-        <Switch
-          checked={isDarkMode}
-          onChange={toggleTheme}
-          checkedChildren={<FaMoon />}
-          unCheckedChildren={<FaSun />}
-          aria-label="Toggle dark mode"
+      <div className="hidden h-10 w-full max-w-md items-center rounded-xl border border-slate-200 bg-white pr-2 md:flex">
+        <Select
+          value={category}
+          onChange={setCategory}
+          options={SEARCH_CATEGORIES}
+          variant="borderless"
+          className="w-24 text-xs"
+          popupMatchSelectWidth={false}
         />
-        <Button
-          type="text"
-          onClick={() => navigate("/favourites")}
-          className="
-            flex!
-            items-center
-            gap-2
-            px-2!
-            hover:text-red-500!
-          "
-          icon={<FaHeart className="size-4" />}
-        >
-          <span className="hidden md:inline">Favourite</span>
-        </Button>
-        <Link to="/cart">
-          <Badge count={0} showZero>
-            <Button icon={<TfiShoppingCart className="size-4" />} />
-          </Badge>
-        </Link>
+        <span className="h-5 w-px bg-slate-200" />
+        <Input
+          variant="borderless"
+          style={{ boxShadow: "none", outline: "none" }}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onPressEnter={handleSearch}
+          placeholder="Search curated goods, designers, collections"
+          prefix={<MdSearch className="text-lg text-slate-500" />}
+          suffix={
+            <kbd className="rounded-md bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700">
+              ⌘ K
+            </kbd>
+          }
+        />
+      </div>
+
+      <div className="hidden items-center gap-3 md:flex">
+        <Badge count={favCount} size="small" color="#4f46e5">
+          <Button
+            className={iconButtonClass}
+            onClick={() => navigate("/favourites")}
+            aria-label="Favourites"
+            icon={<MdOutlineFavoriteBorder className="text-lg" />}
+          />
+        </Badge>
+
+        <Badge count={cartCount} size="small" color="#4f46e5">
+          <Button
+            className={iconButtonClass}
+            onClick={() => navigate("/cart")}
+            aria-label="Cart"
+            icon={<MdOutlineShoppingBag className="text-lg" />}
+          />
+        </Badge>
 
         <Dropdown
-          menu={{
-            items: user ? loggedInItems : guestItems,
-          }}
+          menu={{ items: user ? loggedInItems : guestItems }}
           placement="bottomRight"
           trigger={["click"]}
         >
-          <Button
-            type="text"
-            className="
-              flex!
-              items-center
-              gap-2
-              px-2!
-            "
+          <button
+            type="button"
+            className="flex cursor-pointer items-center gap-2 rounded-lg px-1 py-1 hover:bg-indigo-50"
           >
-            <FaRegUser className="size-4" />
-
-            <span className="hidden text-sm font-medium sm:inline">
+            <span className="theme-heading hidden text-xs font-semibold xl:inline">
               {user?.name || "Guest"}
             </span>
-          </Button>
+            <Avatar src={user?.avatar} size={34} className="bg-indigo-600!">
+              {(user?.name || "G").charAt(0).toUpperCase()}
+            </Avatar>
+          </button>
         </Dropdown>
       </div>
 
-      <div className="flex items-center gap-5 sm:hidden">
-        <Link to="/cart" className="ml-1">
-          <Badge count={0} showZero>
-            <Button icon={<TfiShoppingCart className="size-4" />}></Button>
-          </Badge>
-        </Link>
+      <div className="flex items-center gap-3 md:hidden">
+        <Badge count={cartCount} size="small" color="#4f46e5">
+          <Button
+            className={iconButtonClass}
+            onClick={() => navigate("/cart")}
+            icon={<MdOutlineShoppingBag className="text-lg" />}
+          />
+        </Badge>
         <Button
-          icon={<FiMenu />}
-          onClick={() => setDrawerFnOpen(true)}
-        ></Button>
+          className={iconButtonClass}
+          onClick={() => setDrawerOpen(true)}
+          icon={<MdMenu className="text-lg" />}
+        />
       </div>
 
       <Drawer
-        size={230}
+        size={260}
         title={`Hello, ${user?.name || "Guest"}`}
         mask={{ enabled: true, blur: true }}
-        open={drawerFnOpen}
-        onClose={() => setDrawerFnOpen(false)}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
       >
         <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onPressEnter={handleSearch}
           placeholder="Search products..."
-          prefix={<TfiSearch />}
-          className="  mb-2"
+          prefix={<MdSearch className="text-lg" />}
         />
-        <div className="mt-1">
-          <div className="flex justify-end ">
-            <Switch
-              checked={isDarkMode}
-              onChange={toggleTheme}
-              checkedChildren={<FaMoon />}
-              unCheckedChildren={<FaSun />}
-              aria-label="Toggle dark mode"
-            />
-          </div>
 
-          <Button
-            type=""
-            onClick={() => navigate("/favourites")}
-            className="
-            mt-2    
-            
-            w-full!
-             flex!
-            items-center
-            gap-2
-            px-2!
-            hover:text-red-500!
-          "
-            icon={<FaHeart className="size-4" />}
-          >
-            <span className="">Favourite</span>
-          </Button>
+        <nav className="mt-4 flex flex-col gap-1">
+          {NAV_LINKS.map((l) => (
+            <NavLink
+              key={l.to}
+              to={l.to}
+              end={l.end}
+              className={linkClass}
+              onClick={() => setDrawerOpen(false)}
+            >
+              {l.label}
+            </NavLink>
+          ))}
+        </nav>
 
-          {user ? (
-            <div>
-              <Button
-                className="w-full! mt-2"
-                onClick={() => navigate("/profile")}
-                icon={<FaRegUserCircle className="size-3" />}
-              >
-                Profile
-              </Button>
-              <Button
-                className="w-full! mt-2"
-                onClick={handleLogout}
-                danger
-                icon={<FaSignOutAlt className="size-3" />}
-              >
-                Logout
-              </Button>
-            </div>
-          ) : (
-            <div>
-              <Button
-                className="w-full! mt-2"
-                onClick={() => navigate("/auth/login")}
-                icon={<FaSignInAlt className="size-3" />}
-              >
-                Login
-              </Button>
-              <Button
-                className="w-full! mt-2"
-                type="primary"
-                onClick={() => navigate("/auth/register")}
-                icon={<FaUser className="size-3" />}
-              >
-                Register
-              </Button>
-            </div>
-          )}
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-sm">Dark mode</span>
+          <Switch
+            checked={isDarkMode}
+            onChange={toggleTheme}
+            checkedChildren={<FaMoon />}
+            unCheckedChildren={<FaSun />}
+            aria-label="Toggle dark mode"
+          />
         </div>
+
+        <Button
+          className="mt-3 w-full!"
+          onClick={() => {
+            setDrawerOpen(false);
+            navigate("/favourites");
+          }}
+          icon={<MdOutlineFavoriteBorder />}
+        >
+          Favourites
+        </Button>
+
+        {user ? (
+          <>
+            <Button
+              className="mt-2 w-full!"
+              onClick={() => {
+                setDrawerOpen(false);
+                navigate("/profile");
+              }}
+              icon={<FaRegUserCircle className="size-3" />}
+            >
+              Profile
+            </Button>
+            <Button
+              danger
+              className="mt-2 w-full!"
+              onClick={handleLogout}
+              icon={<FaSignOutAlt className="size-3" />}
+            >
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              className="mt-2 w-full!"
+              onClick={() => navigate("/auth/login")}
+              icon={<FaSignInAlt className="size-3" />}
+            >
+              Login
+            </Button>
+            <Button
+              type="primary"
+              className="mt-2 w-full!"
+              onClick={() => navigate("/auth/register")}
+              icon={<FaUser className="size-3" />}
+            >
+              Register
+            </Button>
+          </>
+        )}
       </Drawer>
     </header>
   );

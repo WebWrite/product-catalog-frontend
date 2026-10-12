@@ -1,32 +1,40 @@
 import { useMutation } from "@tanstack/react-query";
-import { App, AutoComplete, Button, Form, Input } from "antd";
-import { useForm } from "antd/es/form/Form";
+import { App, AutoComplete, Button, Checkbox, Form, Input } from "antd";
 import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { MdArrowForward, MdBadge, MdOutlineMail } from "react-icons/md";
+import PasswordStrength from "./passwordStrength";
+
+const PASSWORD_CHECKS = [
+  { label: "8+ chars", test: (v) => v.length >= 8 },
+  { label: "Upper & Lower", test: (v) => /[A-Z]/.test(v) && /[a-z]/.test(v) },
+  { label: "1+ Number", test: (v) => /\d/.test(v) },
+  { label: "1+ Symbol", test: (v) => /[^A-Za-z0-9]/.test(v) },
+];
 
 function BuyerRegister() {
   const { notification } = App.useApp();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
+  const password = Form.useWatch("password", form) ?? "";
 
-  let [autoComplete, SetAutoComplete] = useState([]);
+  const [autoComplete, setAutoComplete] = useState([]);
 
-  let handleAutoComplete = (value) => {
-    SetAutoComplete(() => {
-      if (!value || value.includes("@")) {
-        return;
-      }
-      return ["gmail.com", "yahoo.com", "outlook.com", "github.com"].map(
-        (v) => ({ label: `${value}@${v}`, value: `${value}@${v}` }),
-      );
-    });
+  const handleAutoComplete = (value) => {
+    if (!value || value.includes("@")) {
+      setAutoComplete([]);
+      return;
+    }
+    setAutoComplete(
+      ["gmail.com", "yahoo.com", "outlook.com", "github.com"].map((v) => ({
+        label: `${value}@${v}`,
+        value: `${value}@${v}`,
+      })),
+    );
   };
 
-  let handleFinish = (values) => {
-    mutation.mutate(values);
-  };
-
-  let handleSubmit = async (data) => {
+  const handleSubmit = async (data) => {
     const Backend_URL = import.meta.env.VITE_BACKEND_URL;
     const res = await axios.post(`${Backend_URL}/auth/register-customer`, {
       name: data.name,
@@ -36,7 +44,7 @@ function BuyerRegister() {
     return res;
   };
 
-  let mutation = useMutation({
+  const mutation = useMutation({
     mutationFn: handleSubmit,
     onSuccess: async () => {
       const { email } = await form.validateFields(["email"]);
@@ -61,7 +69,8 @@ function BuyerRegister() {
     },
   });
 
-  let [form] = useForm();
+  const handleFinish = (values) => mutation.mutate(values);
+
   return (
     <Form
       layout="vertical"
@@ -69,99 +78,161 @@ function BuyerRegister() {
       onFinish={handleFinish}
       form={form}
     >
-      <Form.Item
-        label="Name"
-        name={"name"}
-        required={false}
-        className="theme-form-label font-semibold"
-        rules={[
-          { required: true, message: "Name is required" },
-          { min: 3, message: "Name must be 3 character long" },
-          { max: 50, message: "Name contain only 50 character" },
-        ]}
-      >
-        <Input className="font-normal" type={"text"}></Input>
-      </Form.Item>
-
-      <Form.Item
-        label="Email"
-        name={"email"}
-        required={false}
-        className="theme-form-label font-semibold"
-        rules={[
-          { required: true, message: "Email is required" },
-          { type: "email", message: "Enter a valid email" },
-        ]}
-      >
-        <AutoComplete
-          className="font-normal"
-          showSearch={{ onSearch: handleAutoComplete }}
-          options={autoComplete}
-        ></AutoComplete>
-      </Form.Item>
-
-      <Form.Item
-        name={"password"}
-        label="Password"
-        required={false}
-        className="theme-form-label font-semibold"
-        rules={[
-          { required: true, message: "Password is required" },
-          {
-            pattern: /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).+$/,
-            message:
-              "Password must include an uppercase and a special character.   ",
-          },
-          { min: 8, message: "Password must contain 8 character" },
-          { max: 128, message: "Password must be less than 128 character" },
-        ]}
-      >
-        <Input.Password className="font-normal"></Input.Password>
-      </Form.Item>
-
-      <Form.Item
-        name={"confirmPassword"}
-        label="Confirm Password"
-        className="theme-form-label font-semibold"
-        required={false}
-        dependencies={["password"]}
-        rules={[
-          { required: true, message: "Confirm Password is required" },
-          ({ getFieldValue }) => ({
-            validator(_, value) {
-              if (!value || getFieldValue("password") == value) {
-                return Promise.resolve();
-              }
-              return Promise.reject(
-                new Error(
-                  "The confirm password that you entered do not match!",
-                ),
-              );
-            },
-          }),
-        ]}
-      >
-        <Input.Password
-          className="font-normal"
-          variant="outlined"
-        ></Input.Password>
-      </Form.Item>
-
-      <Form.Item>
-        <Button
-          disabled={mutation.isPending}
-          htmlType="submit"
-          className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
+      <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2 mb-2">
+        <Form.Item
+          label="Full Name"
+          name="name"
+          required={false}
+          className="theme-form-label font-semibold"
+          rules={[
+            { required: true, message: "Name is required" },
+            { min: 3, message: "Name must be 3 character long" },
+            { max: 50, message: "Name contain only 50 character" },
+          ]}
         >
-          {mutation.isPending ? "Signing up...." : "Sign Up"}
+          <Input
+            size="large"
+            className="font-normal"
+            placeholder="Elena Vance"
+            prefix={<MdBadge className="text-sm text-slate-500" />}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Email Address"
+          name="email"
+          required={false}
+          className="theme-form-label font-semibold"
+          rules={[
+            { required: true, message: "Email is required" },
+            { type: "email", message: "Enter a valid email" },
+          ]}
+        >
+          <AutoComplete
+            className="font-normal"
+            showSearch={{ onSearch: handleAutoComplete }}
+            options={autoComplete}
+          >
+            <Input
+              size="large"
+              placeholder="elena.vance@auramarket.design"
+              prefix={<MdOutlineMail className="text-sm text-slate-500" />}
+            />
+          </AutoComplete>
+        </Form.Item>
+
+        <Form.Item
+          label="Password"
+          name="password"
+          required={false}
+          className="theme-form-label font-semibold"
+          rules={[
+            { required: true, message: "Password is required" },
+            { max: 128, message: "Password must be less than 128 character" },
+            {
+              validator: (_, value) =>
+                !value || PASSWORD_CHECKS.every((c) => c.test(value))
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      new Error("Password doesn't meet all requirements"),
+                    ),
+            },
+          ]}
+        >
+          <Input.Password size="large" className="font-normal" />
+        </Form.Item>
+
+        <Form.Item
+          label="Confirm Password"
+          name="confirmPassword"
+          required={false}
+          dependencies={["password"]}
+          className="theme-form-label font-semibold"
+          rules={[
+            { required: true, message: "Confirm Password is required" },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("password") === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error("The password not match!"));
+              },
+            }),
+          ]}
+        >
+          <Input.Password size="large" className="font-normal" />
+        </Form.Item>
+      </div>
+
+      <PasswordStrength password={password} />
+
+      <Form.Item
+        name="terms"
+        valuePropName="checked"
+        className="mb-2!"
+        rules={[
+          {
+            validator: (_, value) =>
+              value
+                ? Promise.resolve()
+                : Promise.reject(new Error("You must agree to continue")),
+          },
+        ]}
+      >
+        <Checkbox className="text-xs!">
+          I agree to Aura's{" "}
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noreferrer"
+            className="text-indigo-600"
+          >
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a
+            href="/privacy"
+            target="_blank"
+            rel="noreferrer"
+            className="text-indigo-600"
+          >
+            Privacy Policy
+          </a>
+          .
+        </Checkbox>
+      </Form.Item>
+
+      <Form.Item name="updates" valuePropName="checked" className="mb-6!">
+        <Checkbox className="text-xs!">
+          Stay updated on exclusive launches, new collections, and special
+          offers.
+        </Checkbox>
+      </Form.Item>
+
+      <Form.Item className="mb-4!">
+        <Button
+          type="primary"
+          htmlType="submit"
+          size="large"
+          block
+          loading={mutation.isPending}
+          className="h-11! gap-2 bg-indigo-700! text-xs! font-semibold! hover:bg-indigo-800!"
+        >
+          {mutation.isPending ? (
+            "Creating account..."
+          ) : (
+            <>
+              Create Account <MdArrowForward className="inline" />
+            </>
+          )}
         </Button>
       </Form.Item>
 
-      <p className="text-center">
+      <p className="text-center text-xs">
         Have any account?{" "}
-        <Button className="p-0!" type="link">
-          <Link to={"/auth/login"}>Sign in</Link>
-        </Button>
+        <Link to="/auth/login" className="font-semibold text-indigo-600">
+          Sign in
+        </Link>
       </p>
     </Form>
   );

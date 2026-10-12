@@ -1,102 +1,96 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  HeartOutlined,
-  HeartFilled,
-  ShoppingCartOutlined,
-  ThunderboltFilled,
-  StarFilled,
-} from "@ant-design/icons";
-import { Tag } from "antd";
+  MdFavorite,
+  MdFavoriteBorder,
+  MdOutlineShoppingBag,
+  MdStar,
+  MdVerified,
+} from "react-icons/md";
 
 function ProductCard({
-  id = 1,
-  title = "Wireless Headphones",
-  category = "Electronics",
-  image = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
-  price = 79,
-  oldPrice = 129,
-  rating = 4.5,
-  reviews = 128,
+  to,
+  image,
+  name,
+  brand,
+  rating,
+  reviews,
+  price,
+  oldPrice,
+  badge,
   onAddToCart,
-  onBuyNow,
 }) {
   const [liked, setLiked] = useState(false);
 
-  const discount =
-    oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
-
   return (
-    <div className="theme-card group w-full min-w-0 overflow-hidden rounded-xl border shadow-xs transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="theme-media relative overflow-hidden">
-        <Link to={`/products/${id}`}>
+    <div className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-lg">
+      <div className="relative aspect-4/5 overflow-hidden bg-slate-100">
+        <Link to={to} className="block h-full w-full">
           <img
             src={image}
-            alt={title}
-            className="h-52 w-full object-cover transition duration-500 group-hover:scale-110"
+            alt={name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </Link>
 
-        {discount > 0 && (
-          <span className="absolute left-3 top-3 rounded-full bg-rose-600 px-2 pt-1 pb-0.5 text-xs text-center font-semibold font-sans  text-white">
-            -{discount}%
+        {badge && (
+          <span className="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm backdrop-blur">
+            {badge}
           </span>
         )}
 
         <button
-          onClick={() => setLiked(!liked)}
-          className={`theme-control absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-sm shadow transition hover:scale-110 ${
-            liked ? "text-rose-600" : "text-gray-700"
-          }`}
+          type="button"
+          aria-label={liked ? "Remove from favourites" : "Add to favourites"}
+          onClick={() => setLiked((v) => !v)}
+          className="absolute right-2.5 top-2.5 flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/90 text-sm text-slate-600 shadow-sm backdrop-blur transition-colors hover:text-red-500"
         >
-          {liked ? <HeartFilled /> : <HeartOutlined />}
+          {liked ? (
+            <MdFavorite className="text-red-500" />
+          ) : (
+            <MdFavoriteBorder />
+          )}
         </button>
       </div>
 
-      <div className="flex flex-col gap-1 py-2 px-2">
-        <div className="flex justify-between">
-          <Tag variant="filled" className="bg-blue-500! text-white! w-fit">
-            {category}
-          </Tag>
+      <div className="px-3.5 pb-3.5 pt-3">
+        <p className="m-0 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-slate-500">
+          {brand}
+          <MdVerified className="text-xs text-indigo-600" />
+        </p>
 
-          <div className="theme-muted flex items-center gap-1 text-xs font-raleway">
-            <StarFilled className="text-amber-400!" />
-            <span className="theme-heading font-semibold">{rating}</span>
-            <span>({reviews})</span>
-          </div>
-        </div>
-        <Link
-          to={`/products/${id}`}
-          className="theme-heading truncate  text-sm sm:text-lg font-bold hover:text-blue-600"
-        >
-          {title}
+        <Link to={to}>
+          <h3 className="m-0 mt-1 truncate text-sm font-semibold text-slate-900">
+            {name}
+          </h3>
         </Link>
 
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="theme-heading text-lg sm:text-xl font-extrabold font-raleway">
-            ${price}
-          </span>
-          {discount > 0 && (
-            <span className="text-sm font-raleway text-gray-400 line-through">
-              ${oldPrice}
-            </span>
-          )}
-        </div>
-      </div>
+        <p className="m-0 mt-1 flex items-center gap-1 text-[11px] text-slate-500">
+          <MdStar className="text-xs text-amber-600" />
+          <span className="font-semibold text-slate-800">{rating}</span>
+          <span>({reviews} reviews)</span>
+        </p>
 
-      <div className="grid grid-cols-2 gap-2 px-4 pb-4 font-raleway">
-        <button
-          onClick={() => onAddToCart?.(id)}
-          className="theme-outline-button flex items-center justify-center gap-2 rounded-xl border-2 py-1.5 text-xs font-semibold transition"
-        >
-          <ShoppingCartOutlined /> Add to cart
-        </button>
-        <button
-          onClick={() => onBuyNow?.(id)}
-          className="flex items-center justify-center gap-2 rounded-xl border-2 border-blue-600 bg-blue-600 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700"
-        >
-          <ThunderboltFilled /> Buy now
-        </button>
+        <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+          <p className="m-0 flex items-baseline gap-1.5">
+            <span className="text-base font-bold text-slate-900">{price}</span>
+            {oldPrice && (
+              <span className="text-[11px] text-slate-400 line-through">
+                {oldPrice}
+              </span>
+            )}
+          </p>
+
+          <button
+            type="button"
+            aria-label={`Add ${name} to cart`}
+            onClick={onAddToCart}
+            className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-indigo-50 text-base text-indigo-700 transition-colors hover:bg-indigo-100"
+          >
+            <MdOutlineShoppingBag />
+          </button>
+        </div>
       </div>
     </div>
   );
