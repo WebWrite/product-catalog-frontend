@@ -227,7 +227,9 @@ function NavBar() {
         >
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg px-1 py-1 hover:bg-indigo-50"
+            className={`flex cursor-pointer items-center gap-2 rounded-lg px-1 py-1 transition-colors ${
+              isDarkMode ? "hover:bg-indigo-950" : "hover:bg-indigo-50"
+            }`}
           >
             <span className="theme-heading hidden text-xs font-semibold xl:inline">
               {user?.name || "Guest"}

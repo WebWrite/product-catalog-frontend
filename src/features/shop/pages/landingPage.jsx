@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import NavBar from "../components/navbar";
 import {
   MdArrowForward,
   MdChevronRight,
@@ -14,7 +13,6 @@ import { IoShieldCheckmarkSharp } from "react-icons/io5";
 import { CiLock } from "react-icons/ci";
 import { FaRotateLeft } from "react-icons/fa6";
 import { RiLeafLine } from "react-icons/ri";
-import Footer from "../../../shared/components/footer";
 
 const filters = [
   { value: "all", label: "All Featured" },
@@ -237,7 +235,6 @@ function LandingPage() {
 
   return (
     <div className="landing-page min-h-screen font-sans">
-      <NavBar />
       <section className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:px-8 lg:py-14">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-600 shadow-sm ring-1 ring-slate-100">
@@ -417,7 +414,7 @@ function LandingPage() {
         )}
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 grid grid-cols-4 items-center gap-4 ">
+      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 items-stretch gap-4 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
         {benefitCard.map((item, idx) => (
           <CustomCard
             key={idx}
@@ -463,8 +460,6 @@ function LandingPage() {
           </p>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }
