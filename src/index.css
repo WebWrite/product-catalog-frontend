@@ -67,6 +67,16 @@ body {
   box-shadow: var(--shadow);
 }
 
+.theme-tag {
+  color: var(--text-h) !important;
+}
+
+.theme-surface {
+  background: var(--code-bg);
+  color: var(--text-h);
+  border-color: var(--border);
+}
+
 .theme-form-label,
 .theme-form {
   color: var(--text-h);
@@ -104,6 +114,48 @@ body {
 
 .theme-muted {
   color: var(--text);
+}
+
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white\/90,
+[data-theme="dark"] .bg-white\/95 {
+  background-color: var(--code-bg) !important;
+}
+
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-slate-700,
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500 {
+  color: var(--text-h) !important;
+}
+
+[data-theme="dark"] .text-slate-400 {
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] .border-slate-100,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .ring-slate-100 {
+  border-color: var(--border) !important;
+  --tw-ring-color: var(--border) !important;
+}
+
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-slate-100,
+[data-theme="dark"] .bg-purple-50,
+[data-theme="dark"] .bg-purple-50\/60 {
+  background-color: var(--bg) !important;
+}
+
+[data-theme="dark"] .from-indigo-50,
+[data-theme="dark"] .from-purple-50,
+[data-theme="dark"] .via-white,
+[data-theme="dark"] .to-white,
+[data-theme="dark"] .to-purple-50 {
+  --tw-gradient-from: var(--bg) !important;
+  --tw-gradient-to: var(--bg) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
 .theme-outline-button {

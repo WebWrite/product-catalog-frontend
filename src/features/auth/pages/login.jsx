@@ -1,70 +1,71 @@
 import { App, Button, Divider, Form, Input } from "antd";
-import { useForm } from "antd/es/form/Form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import {
+  MdArrowForward,
+  MdOutlineLock,
+  MdOutlineMail,
+  MdOutlineMarkEmailRead,
+  MdOutlineShield,
+  MdVerifiedUser,
+  MdViewInAr,
+} from "react-icons/md";
 import { setuser } from "../../../app/store/user/userSlice";
 import api, { login } from "../../../shared/utils/api";
-import { useMutation } from "@tanstack/react-query";
+import CustomTag from "../../../shared/components/customTag";
 
 function Login() {
-  let dispatch = useDispatch();
-  let navigate = useNavigate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { notification } = App.useApp();
-  let [form] = useForm();
+  const [form] = Form.useForm();
 
-  let handleFinish = async (values) => {
-    mutation.mutate(values);
-  };
+  const [step, setStep] = useState("email");
 
-  let mutation = useMutation({
+  const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      console.log(data);
-      dispatch(setuser(data.data.user));
+      const user = data.data.user;
+      dispatch(setuser(user));
 
-      if (data.data.user.role == "admin") {
-        navigate("/admin/dashboard");
-      } else if (data.data.user.role == "seller") {
-        navigate("/seller/dashboard");
-      } else {
-        navigate("/");
-      }
-      console.log(data);
+      if (user.role === "admin") navigate("/admin/dashboard");
+      else if (user.role === "seller") navigate("/seller/dashboard");
+      else navigate("/");
 
       notification.success({
         title: "Login successfully",
-        description: "Welcome back to our platfrom",
+        description: "Welcome back to our platform",
         pauseOnHover: true,
         showProgress: true,
         placement: "bottomRight",
       });
       form.resetFields();
     },
-    onError: async (error) => {
-      const { email } = await form.validateFields(["email"]);
-      console.log(error.response?.status, error.response?.data.message);
+    onError: async (error, variables) => {
+      const { email } = variables;
+
       if (
-        error.response?.status == 403 &&
-        error.response?.data.message == "Verify your email to access resources"
+        error.response?.status === 403 &&
+        error.response?.data?.message ===
+          "Verify your email to access resources"
       ) {
         const res = await api.post("/auth/resend-email-otp", { email });
-        console.log(res);
-        if (res.status !== 200) {
-          return;
-        }
+        if (res.status !== 200) return;
+
         notification.success({
-          description: `Otp is send to  ${email}`,
+          description: `OTP is sent to ${email}`,
           pauseOnHover: true,
           showProgress: true,
           placement: "bottomRight",
         });
         navigate("/auth/verify-otp", {
-          state: {
-            comeFrom: "register",
-            email,
-          },
+          state: { comeFrom: "register", email },
         });
+        return;
       }
+
       notification.error({
         title: "Login Failed",
         description: error.response?.data?.message || "Invalid credentials",
@@ -76,10 +77,7 @@ function Login() {
   });
 
   const otpMutation = useMutation({
-    mutationFn: async (email) => {
-      return await api.post("/auth/send-login-otp", { email });
-    },
-
+    mutationFn: (email) => api.post("/auth/send-login-otp", { email }),
     onSuccess: (res, email) => {
       if (res.status === 200) {
         notification.success({
@@ -88,18 +86,10 @@ function Login() {
           showProgress: true,
           placement: "bottomRight",
         });
-
         form.resetFields();
-
-        navigate("/auth/verify-otp", {
-          state: {
-            comeFrom: "login",
-            email,
-          },
-        });
+        navigate("/auth/verify-otp", { state: { comeFrom: "login", email } });
       }
     },
-
     onError: (error) => {
       notification.error({
         title: "OTP Request Failed",
@@ -111,80 +101,202 @@ function Login() {
     },
   });
 
+  const handleFinish = (values) => {
+    if (step === "email") {
+      setStep("password");
+      return;
+    }
+    mutation.mutate(values);
+  };
+
   const handleOtp = async () => {
     const { email } = await form.validateFields(["email"]);
     otpMutation.mutate(email);
   };
 
+  const handleChangeEmail = () => {
+    form.resetFields(["password"]);
+    setStep("email");
+  };
+
+  const busy = mutation.isPending || otpMutation.isPending;
+
   return (
-    <div className="theme-page min-h-screen">
-      <div className="flex justify-center min-h-screen items-center font-sans flex-col">
-        <div className="theme-panel min-w-76 sm:min-w-96 p-4 rounded-2xl">
-          <h2 className="theme-heading text-sm font-bold">
-            Login to your account
-          </h2>
-          <p className="theme-muted text-xs mt-2 mb-6">
-            Enter email below to login your account
+    <div className="min-h-screen bg-purple-50">
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10 font-sans">
+        <div className="z-10 w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl shadow-indigo-100 sm:p-8">
+          <div className="flex items-center justify-center gap-2">
+            <MdViewInAr className="text-3xl text-indigo-700" />
+            <span className="text-2xl font-bold text-slate-900">Aura</span>
+          </div>
+
+          <p className="mx-auto mt-3 max-w-64 text-center text-[11px] leading-snug text-slate-500">
+            Your Marketplace for Quality Products, Trusted Sellers & Everyday
+            Essentials
           </p>
+
+          <div className="mt-4 flex justify-center">
+            <CustomTag
+              className={"py-1! px-2! rounded-2xl!"}
+              color="#EAEDFF"
+              text="Shopping Privileges: Secure Checkout"
+            />
+          </div>
+
+          <div className="mt-6 mb-3 flex justify-center">
+            <span className="border-b-2 border-indigo-700 pb-1 text-sm font-semibold text-indigo-700">
+              Sign In
+            </span>
+          </div>
+
           <Form
             form={form}
             layout="vertical"
-            className="theme-form"
+            className="theme-form mt-6"
+            requiredMark={false}
             onFinish={handleFinish}
           >
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">
+                Email Address
+              </span>
+              <button
+                type="button"
+                onClick={handleOtp}
+                disabled={busy}
+                className="cursor-pointer text-[11px] font-medium text-indigo-600 hover:underline disabled:opacity-50"
+              >
+                Passwordless OTP
+              </button>
+            </div>
+
             <Form.Item
-              label="Email"
-              name={"email"}
-              required={false}
-              className="theme-form-label font-semibold"
+              name="email"
+              className="mb-2!"
               rules={[
                 { required: true, message: "Email is required" },
                 { type: "email", message: "Enter a valid email" },
               ]}
             >
-              <Input className="font-normal" type={"email"}></Input>
+              <Input
+                size="large"
+                type="email"
+                disabled={step === "password"}
+                placeholder="elena.vance@auramarket.design"
+                className="font-normal"
+                prefix={<MdOutlineMail className="text-base text-slate-500" />}
+                suffix={
+                  step === "password" ? (
+                    <button
+                      type="button"
+                      onClick={handleChangeEmail}
+                      className="cursor-pointer text-[11px] font-medium text-indigo-600 hover:underline"
+                    >
+                      Change
+                    </button>
+                  ) : null
+                }
+              />
             </Form.Item>
 
-            <Form.Item
-              name={"password"}
-              label="Password"
-              required={false}
-              className="theme-form-label font-semibold"
-              rules={[{ required: true, message: "Password is required" }]}
-            >
-              <Input.Password className="font-normal"></Input.Password>
-            </Form.Item>
+            {step === "email" && (
+              <p className="mb-5 pt-2 flex items-center gap-1.5 text-[11px] text-slate-500">
+                <MdOutlineMarkEmailRead className="text-sm text-indigo-600" />
+                We'll send a secure 6-digit verification code. No password
+                needed.
+              </p>
+            )}
 
-            <Form.Item>
+            {step === "password" && (
+              <Form.Item
+                name="password"
+                label={
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">
+                    Password
+                  </span>
+                }
+                className="mt-3"
+                rules={[{ required: true, message: "Password is required" }]}
+              >
+                <Input.Password
+                  autoFocus
+                  size="large"
+                  placeholder="Enter your password"
+                  className="font-normal"
+                  prefix={
+                    <MdOutlineLock className="text-base text-slate-500" />
+                  }
+                />
+              </Form.Item>
+            )}
+
+            <Form.Item className="mb-0!">
               <Button
-                disabled={mutation.isPending || otpMutation.isPending}
-                loading={mutation.isPending}
+                type="primary"
                 htmlType="submit"
-                className="bg-white! text-black! text-xs! w-full font-semibold! mt-8   "
+                size="large"
+                block
+                disabled={busy}
+                loading={mutation.isPending}
+                className="h-11! gap-2 bg-indigo-700! text-xs! font-semibold! hover:bg-indigo-800!"
               >
-                {mutation.isPending ? "Logging in..." : "Login"}
-              </Button>
-            </Form.Item>
-            <Divider>Or</Divider>
-            <Form.Item>
-              <Button
-                disabled={mutation.isPending || otpMutation.isPending}
-                htmlType="button"
-                onClick={handleOtp}
-                type="dashed"
-                className="theme-outline-button! text-xs! w-full font-semibold!"
-              >
-                {otpMutation.isPending ? "Sending OTP..." : "Login with OTP"}
+                {step === "email" ? (
+                  <>
+                    Continue with Password <MdArrowForward className="inline" />
+                  </>
+                ) : mutation.isPending ? (
+                  "Signing in..."
+                ) : (
+                  <>
+                    Sign In <MdArrowForward className="inline" />
+                  </>
+                )}
               </Button>
             </Form.Item>
 
-            <p className="text-center">
-              Don't have any account?{" "}
-              <Button className="p-0!" type="link">
-                <Link to={"/auth/register"}> Sign up</Link>
-              </Button>
+            <Divider className="my-5! text-[10px]! tracking-wider text-slate-500!">
+              OR CONTINUE WITH
+            </Divider>
+
+            <Button
+              block
+              size="large"
+              htmlType="button"
+              disabled={busy}
+              loading={otpMutation.isPending}
+              onClick={handleOtp}
+              className="h-10! border-0! bg-indigo-50! text-xs! font-medium! text-indigo-700! hover:bg-indigo-100!"
+            >
+              {otpMutation.isPending ? "Sending OTP..." : "Passwordless OTP"}
+            </Button>
+
+            <p className="mt-5 text-center text-xs text-slate-600">
+              Don't have an account?{" "}
+              <Link
+                to="/auth/register"
+                className="font-semibold text-indigo-600"
+              >
+                Sign up
+              </Link>
             </p>
           </Form>
+        </div>
+
+        <div className="mt-10 flex flex-col items-center gap-3 text-[10px] text-slate-600">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium uppercase tracking-wide">
+            <span className="flex items-center gap-1.5">
+              <MdVerifiedUser className="text-sm" /> 256-bit TLS encrypted
+            </span>
+            <span className="flex items-center gap-1.5">
+              <MdOutlineShield className="text-sm" /> ISO 27001 compliant
+            </span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+            <Link>Help Center</Link>
+            <Link>Privacy Policy</Link>
+            <Link>Terms of Service</Link>
+            <Link>Artisan Handbook</Link>
+          </div>
         </div>
       </div>
     </div>

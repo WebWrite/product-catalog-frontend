@@ -7,6 +7,7 @@ import AdminDashboard from "../../features/admin/pages/dashboard";
 import SellerDashboard from "../../features/seller/pages/dashboard";
 import NotFound from "../../shared/components/notFound";
 import LandingPage from "../../features/shop/pages/landingPage";
+import ShopLayout from "../../features/shop/layouts/shopLayout";
 
 export const router = createBrowserRouter([
   {
@@ -24,7 +25,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <ShopLayout>
+        <LandingPage />
+      </ShopLayout>
+    ),
   },
 
   {
