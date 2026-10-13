@@ -8,6 +8,7 @@ import SellerDashboard from "../../features/seller/pages/dashboard";
 import NotFound from "../../shared/components/notFound";
 import LandingPage from "../../features/shop/pages/landingPage";
 import ShopLayout from "../../features/shop/layouts/shopLayout";
+import CartPage from "../../features/shop/pages/cart";
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,14 @@ export const router = createBrowserRouter([
     element: (
       <ShopLayout>
         <LandingPage />
+      </ShopLayout>
+    ),
+  },
+  {
+    path: "/cart",
+    element: (
+      <ShopLayout>
+        <CartPage />
       </ShopLayout>
     ),
   },
