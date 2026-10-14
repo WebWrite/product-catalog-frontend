@@ -8,7 +8,7 @@ import SellerDashboard from "../../features/seller/pages/dashboard";
 import NotFound from "../../shared/components/notFound";
 import LandingPage from "../../features/shop/pages/landingPage";
 import ShopLayout from "../../features/shop/layouts/shopLayout";
-import CartPage from "../../features/shop/pages/cart";
+import CartPage from "../../features/cart/pages/cart";
 
 export const router = createBrowserRouter([
   {

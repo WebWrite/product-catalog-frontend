@@ -9,6 +9,7 @@ import {
 import { money } from "../utils/currency";
 
 function CartItem({
+  id,
   to,
   image,
   name,
@@ -88,7 +89,7 @@ function CartItem({
                   type="button"
                   aria-label="Decrease quantity"
                   disabled={quantity <= 1}
-                  onClick={() => onQuantityChange?.(quantity - 1)}
+                  onClick={() => onQuantityChange(id, -1)}
                   className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-white text-base text-slate-700 shadow-sm transition-colors hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <MdRemove />
@@ -100,7 +101,7 @@ function CartItem({
                   type="button"
                   aria-label="Increase quantity"
                   disabled={quantity >= maxQuantity}
-                  onClick={() => onQuantityChange?.(quantity + 1)}
+                  onClick={() => onQuantityChange(id, 1)}
                   className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-white text-base text-slate-700 shadow-sm transition-colors hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <MdAdd />
@@ -110,7 +111,7 @@ function CartItem({
               <div className="flex items-center gap-5 text-xs font-medium">
                 <button
                   type="button"
-                  onClick={onRemove}
+                  onClick={() => onRemove(id)}
                   className="flex cursor-pointer items-center gap-1.5 text-red-600 transition-colors hover:text-red-700"
                 >
                   <MdDeleteOutline className="text-base" />

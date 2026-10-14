@@ -1,6 +1,6 @@
 import { App, Button, Divider, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -15,10 +15,12 @@ import {
 import { setuser } from "../../../app/store/user/userSlice";
 import api, { login } from "../../../shared/utils/api";
 import CustomTag from "../../../shared/components/customTag";
+import { clearCart } from "../../../app/store/cart/cart";
 
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  let cart = useSelector((state) => state.cart);
   const { notification } = App.useApp();
   const [form] = Form.useForm();
 
@@ -26,13 +28,21 @@ function Login() {
 
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const user = data.data.user;
       dispatch(setuser(user));
-
       if (user.role === "admin") navigate("/admin/dashboard");
       else if (user.role === "seller") navigate("/seller/dashboard");
-      else navigate("/");
+      else {
+        if (cart?.items.length >= 1) {
+          const res = await api.post("/cart/merge", cart);
+          console.log(res);
+          if (res.data.success) {
+            dispatch(clearCart());
+          }
+        }
+        navigate("/");
+      }
 
       notification.success({
         title: "Login successfully",

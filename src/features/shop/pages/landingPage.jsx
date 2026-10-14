@@ -13,125 +13,11 @@ import { IoShieldCheckmarkSharp } from "react-icons/io5";
 import { CiLock } from "react-icons/ci";
 import { FaRotateLeft } from "react-icons/fa6";
 import { RiLeafLine } from "react-icons/ri";
+import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "../api/api";
+import { money } from "../../../shared/utils/currency";
 
-const filters = [
-  { value: "all", label: "All Featured" },
-  { value: "handcrafted", label: "Handcrafted" },
-  { value: "minimal-audio", label: "Minimal Audio" },
-  { value: "sustainable-wear", label: "Sustainable Wear" },
-  { value: "home-accents", label: "Home Accents" },
-];
-
-const products = [
-  {
-    id: 1,
-    slug: "aura-studio-over-ear",
-    name: "Aura Studio Over-Ear Headphones",
-    brand: "Aura Audio Lab",
-    rating: 4.9,
-    reviews: 128,
-    price: "$289.00",
-    oldPrice: "$320.00",
-    badge: "Bestseller",
-    collection: "minimal-audio",
-    image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 2,
-    slug: "matte-stoneware-dinner-set",
-    name: "Matte Stoneware Dinner Set",
-    brand: "Kanso Ceramics",
-    rating: 4.8,
-    reviews: 66,
-    price: "$145.00",
-    badge: "New",
-    collection: "home-accents",
-    image:
-      "https://images.unsplash.com/photo-1490312278390-ab64016e0aa9?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 3,
-    slug: "structured-organic-linen-set",
-    name: "Structured Organic Linen Set",
-    brand: "Atelier Vester",
-    rating: 4.9,
-    reviews: 92,
-    price: "$110.00",
-    badge: "Eco Certified",
-    collection: "sustainable-wear",
-    image:
-      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 4,
-    slug: "machined-aluminum-desk-lamp",
-    name: "Machined Aluminum Desk Lamp",
-    brand: "Lumina Works",
-    rating: 4.8,
-    reviews: 45,
-    price: "$165.00",
-    oldPrice: "$190.00",
-    badge: "Low Stock",
-    collection: "home-accents",
-    image:
-      "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 5,
-    slug: "full-grain-leather-crossbody",
-    name: "Full-Grain Leather Crossbody",
-    brand: "Norr Leathercraft",
-    rating: 5.0,
-    reviews: 114,
-    price: "$220.00",
-    badge: "Bestseller",
-    collection: "handcrafted",
-    image:
-      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 6,
-    slug: "extraction-restorative-serum",
-    name: "Extraction Restorative Serum",
-    brand: "Flora Apothecary",
-    rating: 4.9,
-    reviews: 78,
-    price: "$78.00",
-    badge: "Clean Beauty",
-    collection: "sustainable-wear",
-    image:
-      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 7,
-    slug: "solid-walnut-wireless-charger",
-    name: "Solid Walnut Wireless Charger",
-    brand: "Grove & Grain",
-    rating: 4.8,
-    reviews: 53,
-    price: "$92.00",
-    badge: "Craft Wood",
-    collection: "handcrafted",
-    image:
-      "https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    id: 8,
-    slug: "soy-wax-scented-candle-duo",
-    name: "Soy Wax Scented Candle Duo",
-    brand: "Haven Scent Studio",
-    rating: 4.9,
-    reviews: 180,
-    price: "$44.00",
-    badge: "Artisan Blend",
-    collection: "home-accents",
-    image:
-      "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=900&q=85",
-  },
-];
-
-let benefitCard = [
+const benefitCard = [
   {
     id: "verified-independent",
     icon: <IoShieldCheckmarkSharp />,
@@ -161,77 +47,98 @@ let benefitCard = [
   },
 ];
 
-function LandingPage() {
-  const STATS = [
-    { value: "2,400+", label: "Verified Makers" },
-    { value: "48h", label: "Insured Logistics" },
-    { value: "4.9", label: "Customer Rating", star: true },
-  ];
+const STATS = [
+  { value: "2,400+", label: "Verified Makers" },
+  { value: "48h", label: "Insured Logistics" },
+  { value: "4.9", label: "Customer Rating", star: true },
+];
 
-  const featured = {
-    name: "Nordic Ceramic Vase",
-    price: "$68.00",
-    batch: "Batch No. 04 — In Stock",
+const featured = {
+  name: "Nordic Ceramic Vase",
+  price: "$68.00",
+  batch: "Batch No. 04 — In Stock",
+  image:
+    "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=1200&q=90",
+  to: "/shop/nordic-ceramic-vase",
+};
+
+const departments = [
+  {
+    slug: "apparel-textiles",
+    title: "Apparel & Textiles",
+    subtitle: "Natural fibers",
+    itemCount: "420+",
     image:
-      "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=1200&q=90",
-    to: "/shop/nordic-ceramic-vase",
-  };
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    slug: "audio-electronics",
+    title: "Audio & Electronics",
+    subtitle: "Precision gear",
+    itemCount: "180+",
+    image:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    slug: "home-living",
+    title: "Home & Living",
+    subtitle: "Artisanal ceramics",
+    itemCount: "350+",
+    image:
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    slug: "accessories",
+    title: "Accessories",
+    subtitle: "Full-grain craft",
+    itemCount: "210+",
+    image:
+      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    slug: "clean-wellness",
+    title: "Clean Wellness",
+    subtitle: "Botanical formulas",
+    itemCount: "140+",
+    image:
+      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    slug: "studio-workspace",
+    title: "Studio & Workspace",
+    subtitle: "Desk companions",
+    itemCount: "95+",
+    image:
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85",
+  },
+];
 
-  const departments = [
-    {
-      slug: "apparel-textiles",
-      title: "Apparel & Textiles",
-      subtitle: "Natural fibers",
-      itemCount: "420+",
-      image:
-        "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-      slug: "audio-electronics",
-      title: "Audio & Electronics",
-      subtitle: "Precision gear",
-      itemCount: "180+",
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-      slug: "home-living",
-      title: "Home & Living",
-      subtitle: "Artisanal ceramics",
-      itemCount: "350+",
-      image:
-        "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-      slug: "accessories",
-      title: "Accessories",
-      subtitle: "Full-grain craft",
-      itemCount: "210+",
-      image:
-        "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-      slug: "clean-wellness",
-      title: "Clean Wellness",
-      subtitle: "Botanical formulas",
-      itemCount: "140+",
-      image:
-        "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-      slug: "studio-workspace",
-      title: "Studio & Workspace",
-      subtitle: "Desk companions",
-      itemCount: "95+",
-      image:
-        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85",
-    },
-  ];
+const getBadge = (p) => {
+  if (p.status && p.status !== "active") return "Unavailable";
+  if (p.stock === 0) return "Out of Stock";
+  if (p.stock > 0 && p.stock <= 5) return "Low Stock";
+  return undefined;
+};
+
+function LandingPage() {
   const [active, setActive] = useState("all");
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts,
+  });
+
+  const products = data?.data ?? [];
+
+  const filters = [
+    { value: "all", label: "All Featured" },
+    ...[...new Set(products.map((p) => p.category).filter(Boolean))].map(
+      (c) => ({ value: c, label: c }),
+    ),
+  ];
+
   const visible =
-    active === "all"
-      ? products
-      : products.filter((p) => p.collection === active);
+    active === "all" ? products : products.filter((p) => p.category === active);
 
   return (
     <div className="landing-page min-h-screen font-sans">
@@ -322,6 +229,7 @@ function LandingPage() {
           </div>
         </div>
       </section>
+
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
@@ -390,24 +298,39 @@ function LandingPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {visible.map((p) => (
-            <ProductCard
-              key={p.id}
-              to={`/shop/${p.slug}`}
-              image={p.image}
-              name={p.name}
-              brand={p.brand}
-              rating={p.rating.toFixed(1)}
-              reviews={p.reviews}
-              price={p.price}
-              oldPrice={p.oldPrice}
-              badge={p.badge}
-            />
-          ))}
-        </div>
+        {isLoading && (
+          <p className="theme-muted py-16 text-center text-sm">
+            Loading products...
+          </p>
+        )}
 
-        {visible.length === 0 && (
+        {isError && (
+          <p className="py-16 text-center text-sm text-red-600">
+            Failed to load products. Please try again.
+          </p>
+        )}
+
+        {!isLoading && !isError && (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {visible.map((p) => (
+              <ProductCard
+                key={p._id}
+                id={p._id}
+                to={`/shop/${p._id}`}
+                image={p.image?.url}
+                name={p.name}
+                brand={p.seller?.storeName || p.sellerId?.name}
+                price={money(p.price)}
+                badge={getBadge(p)}
+                rating={5}
+                reviews={15}
+                sizes={p.sizes}
+              />
+            ))}
+          </div>
+        )}
+
+        {!isLoading && !isError && visible.length === 0 && (
           <p className="theme-muted py-16 text-center text-sm">
             No products in this collection yet.
           </p>
@@ -415,9 +338,9 @@ function LandingPage() {
       </section>
 
       <section className="mx-auto grid w-full max-w-7xl grid-cols-1 items-stretch gap-4 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-        {benefitCard.map((item, idx) => (
+        {benefitCard.map((item) => (
           <CustomCard
-            key={idx}
+            key={item.id}
             icon={item.icon}
             title={item.title}
             desc={item.description}
