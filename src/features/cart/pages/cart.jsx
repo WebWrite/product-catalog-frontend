@@ -26,6 +26,7 @@ import {
   removeItem,
   updateItem,
 } from "../../../app/store/cart/cart";
+import { updateCart } from "../../../app/store/user/userSlice";
 
 function CartPage() {
   const assurance = [
@@ -129,6 +130,7 @@ function CartPage() {
 
     if (isLoggedIn) {
       editItem.mutate({ item: item.id, quantity });
+      dispatch(updateCart(quantity));
     } else {
       dispatch(
         updateItem({ productId: item.productId, size: item.size, quantity }),

@@ -18,7 +18,7 @@ function CartItem({
   note,
   unitPrice,
   quantity,
-  maxQuantity = 99,
+  maxQuantity = 25,
   onQuantityChange,
   onRemove,
   sellerName,

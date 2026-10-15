@@ -30,13 +30,13 @@ function Login() {
     mutationFn: login,
     onSuccess: async (data) => {
       const user = data.data.user;
+      console.log(user);
       dispatch(setuser(user));
       if (user.role === "admin") navigate("/admin/dashboard");
       else if (user.role === "seller") navigate("/seller/dashboard");
       else {
         if (cart?.items.length >= 1) {
           const res = await api.post("/cart/merge", cart);
-          console.log(res);
           if (res.data.success) {
             dispatch(clearCart());
           }

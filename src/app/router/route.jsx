@@ -9,6 +9,8 @@ import NotFound from "../../shared/components/notFound";
 import LandingPage from "../../features/shop/pages/landingPage";
 import ShopLayout from "../../features/shop/layouts/shopLayout";
 import CartPage from "../../features/cart/pages/cart";
+import ExplorePage from "../../features/shop/pages/explorePage";
+import ProductDetail from "../../features/shop/pages/productDetails";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +39,23 @@ export const router = createBrowserRouter([
     element: (
       <ShopLayout>
         <CartPage />
+      </ShopLayout>
+    ),
+  },
+  {
+    path: "/shop",
+    element: (
+      <ShopLayout>
+        <ExplorePage />
+      </ShopLayout>
+    ),
+  },
+
+  {
+    path: "/shop/:id",
+    element: (
+      <ShopLayout>
+        <ProductDetail />
       </ShopLayout>
     ),
   },

@@ -9,6 +9,14 @@ export const UserSlice = createSlice({
     setuser(state, actions) {
       return actions.payload;
     },
+    updateCart(state, action) {
+      if (!state) return state;
+
+      return {
+        ...state,
+        cart: (state.cart ?? 0) + action.payload,
+      };
+    },
 
     removeUser() {
       return null;
@@ -16,6 +24,6 @@ export const UserSlice = createSlice({
   },
 });
 
-export const { setuser, removeUser } = UserSlice.actions;
+export const { setuser, removeUser, updateCart } = UserSlice.actions;
 
 export default UserSlice.reducer;

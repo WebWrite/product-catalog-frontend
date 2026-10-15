@@ -16,6 +16,7 @@ import { RiLeafLine } from "react-icons/ri";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "../api/api";
 import { money } from "../../../shared/utils/currency";
+import { getBadge } from "../utils/constant";
 
 const benefitCard = [
   {
@@ -113,13 +114,6 @@ const departments = [
   },
 ];
 
-const getBadge = (p) => {
-  if (p.status && p.status !== "active") return "Unavailable";
-  if (p.stock === 0) return "Out of Stock";
-  if (p.stock > 0 && p.stock <= 5) return "Low Stock";
-  return undefined;
-};
-
 function LandingPage() {
   const [active, setActive] = useState("all");
 
@@ -128,7 +122,7 @@ function LandingPage() {
     queryFn: getProducts,
   });
 
-  const products = data?.data ?? [];
+  const products = data?.data.products ?? [];
 
   const filters = [
     { value: "all", label: "All Featured" },

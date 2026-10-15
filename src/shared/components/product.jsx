@@ -10,6 +10,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useAddToCart } from "../../features/cart/hooks/useCart";
 import { addItem } from "../../app/store/cart/cart";
+import { updateCart } from "../../app/store/user/userSlice";
 
 function ProductCard({
   id,
@@ -33,6 +34,7 @@ function ProductCard({
   let onAddToCart = () => {
     if (isloogedIn) {
       addItemMutation.mutate({ id, quantity: 1, size: sizes[0] });
+      dispatch(updateCart(1));
     } else {
       dispatch(addItem({ productId: id, size: sizes[0], quantity: 1 }));
     }
