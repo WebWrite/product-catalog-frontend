@@ -34,7 +34,6 @@ function ProductCard({
   let onAddToCart = () => {
     if (isloogedIn) {
       addItemMutation.mutate({ id, quantity: 1, size: sizes[0] });
-      dispatch(updateCart(1));
     } else {
       dispatch(addItem({ productId: id, size: sizes[0], quantity: 1 }));
     }

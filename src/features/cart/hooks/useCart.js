@@ -24,12 +24,15 @@ const useCartMutation = (mutationFn) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn,
-    onSuccess: () => {
+    onSuccess: async () => {
       message.open({
         type: "success",
         content: "Added to cart",
       });
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["cart"] }),
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] }),
+      ]);
     },
 
     onError: (error) =>

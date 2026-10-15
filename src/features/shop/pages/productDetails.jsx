@@ -74,7 +74,6 @@ function ProductDetail() {
   let handleAddToCart = () => {
     if (isloogedIn) {
       addItemMutation.mutate({ id, quantity: quantity, size: sizes[0] });
-      dispatch(updateCart(quantity));
     } else {
       dispatch(addItem({ productId: id, size: sizes[0], quantity: quantity }));
     }
