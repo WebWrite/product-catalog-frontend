@@ -1,41 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    Button,
-    Tag,
-    Dropdown,
-    Empty,
-    Skeleton,
-    Modal,
-    App as AntdApp,
-} from "antd";
-import {
-    MdMoreVert,
-    MdEdit,
-    MdDelete,
-    MdAdd,
-    MdInventory2,
-    MdWarningAmber,
-} from "react-icons/md";
+import { Button, Tag, Dropdown, Empty, Skeleton, Modal, Checkbox, App as AntdApp, } from "antd";
+import { MdMoreVert, MdEdit, MdDelete, MdAdd, MdInventory2, MdWarningAmber, } from "react-icons/md";
 import {
     useSellerProducts,
     useDeleteSellerProduct,
+    useBulkDeleteSellerProducts
 } from "../hooks/useSellerProducts";
 import UpdateStockModal from "../components/updateStockModal";
+import DeleteConfirmationModal from "../components/deleteConfirmationModal";
+
+
 
 function SellerProducts() {
     const navigate = useNavigate();
     const { notification } = AntdApp.useApp();
 
     const { data: products = [], isLoading, isError } = useSellerProducts();
-    const { mutate: deleteProduct, isPending: isDeleting } =
-        useDeleteSellerProduct();
+    const { mutate: deleteProduct, isPending: isDeleting } = useDeleteSellerProduct();
+
+    const { mutate: bulkDeleteProducts, isPending: isBulkDeleting, } = useBulkDeleteSellerProducts();
 
     const [stockModalOpen, setStockModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
+
+    const [selectedProductIds, setSelectedProductIds] = useState([]);
+    const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
 
     const openDeleteModal = (product) => {
         setProductToDelete(product);
@@ -73,6 +66,49 @@ function SellerProducts() {
         });
     };
 
+    const handleProductSelection = (productId, checked) => {
+        setSelectedProductIds((current) =>
+            checked
+                ? current.includes(productId)
+                    ? current
+                    : [...current, productId]
+                : current.filter((id) => id !== productId)
+        );
+    };
+
+    const confirmBulkDelete = () => {
+        if (
+            selectedProductIds.length === 0 ||
+            selectedProductIds.length > 100
+        ) {
+            return;
+        }
+
+        bulkDeleteProducts(selectedProductIds, {
+            onSuccess: () => {
+                notification.success({
+                    title: "Products deleted",
+                    description: `${selectedProductIds.length} products were removed from your catalog.`,
+                    placement: "bottomRight",
+                });
+
+                setSelectedProductIds([]);
+                setBulkDeleteModalOpen(false);
+            },
+            onError: (err) => {
+                notification.error({
+                    title: "Bulk delete failed",
+                    description:
+                        err?.response?.data?.message ||
+                        err?.message ||
+                        "Failed to delete selected products.",
+                    placement: "bottomRight",
+                });
+            },
+        });
+    };
+
+
     const handleOpenStockModal = (product) => {
         setSelectedProduct(product);
         setStockModalOpen(true);
@@ -108,7 +144,7 @@ function SellerProducts() {
 
     return (
         <div className="flex flex-col gap-4 md:gap-6 w-full min-w-0 max-w-[1600px] mx-auto">
-       
+
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                 <div className="min-w-0">
                     <h1 className="text-[22px] md:text-[26px] lg:text-[30px] font-bold text-slate-100 m-0 tracking-tight">
@@ -130,7 +166,15 @@ function SellerProducts() {
                 </div>
             </div>
 
-       
+            <Button
+                danger
+                disabled={selectedProductIds.length === 0 || isBulkDeleting}
+                onClick={() => setBulkDeleteModalOpen(true)}
+                className="h-10 px-4 rounded-xl font-semibold text-xs md:text-sm"
+            >
+                Bulk Delete ({selectedProductIds.length})
+            </Button>
+
             <div className="flex flex-wrap gap-3 md:gap-4 w-full">
                 <div
                     className="p-4 md:p-5 rounded-2xl w-[calc(50%-6px)] lg:flex-1 border border-slate-800"
@@ -156,7 +200,7 @@ function SellerProducts() {
                 </div>
             </div>
 
-           
+
             <div
                 className="rounded-2xl border border-slate-800 overflow-hidden w-full min-w-0"
                 style={{ background: "#1E293B" }}
@@ -167,6 +211,7 @@ function SellerProducts() {
                     </span>
                     <span className="text-[11px] font-bold text-slate-500 tracking-wider w-32">
                         CATEGORY
+                        
                     </span>
                     <span className="text-[11px] font-bold text-slate-500 tracking-wider w-24 text-right">
                         PRICE
@@ -214,6 +259,21 @@ function SellerProducts() {
                             }
                         >
                             <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <Checkbox
+                                    checked={selectedProductIds.includes(product._id)}
+                                    disabled={
+                                        isBulkDeleting ||
+                                        (!selectedProductIds.includes(product._id) &&
+                                            selectedProductIds.length >= 100)
+                                    }
+                                    onClick={(event) => event.stopPropagation()}
+                                    onChange={(event) =>
+                                        handleProductSelection(
+                                            product._id,
+                                            event.target.checked
+                                        )
+                                    }
+                                />
                                 <div className="w-12 h-12 md:w-14 md:h-14 rounded-lg bg-slate-700 overflow-hidden flex-shrink-0 border border-slate-600">
                                     <img
                                         src={product.image?.url}
@@ -251,13 +311,12 @@ function SellerProducts() {
                             </span>
                             <span className="hidden md:flex w-24 justify-end">
                                 <Tag
-                                    className={`m-0 border-0 text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                                        product.stock > 10
-                                            ? "bg-green-900/30 text-green-400"
-                                            : product.stock > 0
-                                              ? "bg-yellow-900/30 text-yellow-400"
-                                              : "bg-red-900/30 text-red-400"
-                                    }`}
+                                    className={`m-0 border-0 text-[10px] font-bold px-2 py-0.5 rounded-md ${product.stock > 10
+                                        ? "bg-green-900/30 text-green-400"
+                                        : product.stock > 0
+                                            ? "bg-yellow-900/30 text-yellow-400"
+                                            : "bg-red-900/30 text-red-400"
+                                        }`}
                                 >
                                     {product.stock}
                                 </Tag>
@@ -285,49 +344,26 @@ function SellerProducts() {
                 product={selectedProduct}
             />
 
-            <Modal
+            <DeleteConfirmationModal
                 open={deleteModalOpen}
                 onCancel={closeDeleteModal}
-                title={
-                    <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-red-900/30 text-red-400">
-                            <MdWarningAmber size={16} />
-                        </div>
-                        <span className="font-bold text-slate-100">
-                            Delete product?
-                        </span>
-                    </div>
-                }
-                footer={[
-                    <Button
-                        key="cancel"
-                        onClick={closeDeleteModal}
-                        disabled={isDeleting}
-                        className="bg-slate-800 border-slate-700 text-slate-300 rounded-lg"
-                    >
-                        Cancel
-                    </Button>,
-                    <Button
-                        key="delete"
-                        danger
-                        type="primary"
-                        loading={isDeleting}
-                        onClick={confirmDelete}
-                        className="rounded-lg"
-                    >
-                        Delete
-                    </Button>,
-                ]}
-                centered
-                destroyOnClose
-            >
-                <p className="text-sm text-slate-400 m-0 leading-relaxed">
-                    <span className="font-semibold text-slate-200">
-                        "{productToDelete?.name}"
-                    </span>{" "}
-                    will be permanently removed. This action cannot be undone.
-                </p>
-            </Modal>
+                onConfirm={confirmDelete}
+                loading={isDeleting}
+                title="Delete product?"
+                confirmText="Delete"
+                description={`"${productToDelete?.name ?? ""}" will be permanently removed. This action cannot be undone.`}
+            />
+
+            <DeleteConfirmationModal
+                open={bulkDeleteModalOpen}
+                onCancel={() => setBulkDeleteModalOpen(false)}
+                onConfirm={confirmBulkDelete}
+                loading={isBulkDeleting}
+                title="Delete selected products?"
+                confirmText="Delete selected"
+                description={`You are about to permanently delete ${selectedProductIds.length} products. This action cannot be undone.`}
+            />
+
         </div>
     );
 }

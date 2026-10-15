@@ -4,8 +4,9 @@ import {
   createSellerProduct,
   deleteSellerProduct,
   updateSellerProductStock,
+  updateSellerProduct,
+  bulkDeleteSellerProducts,
 } from "../api/products";
-
 const QUERY_KEY = ["seller-products"];
 
 export function useSellerProducts() {
@@ -39,5 +40,28 @@ export function useUpdateSellerStock() {
     mutationFn: ({ productId, stock }) =>
       updateSellerProductStock(productId, stock),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+  });
+}
+
+export function useUpdateSellerProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateSellerProduct,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+  });
+}
+
+
+export function useBulkDeleteSellerProducts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: bulkDeleteSellerProducts,
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEY,
+      }),
   });
 }
