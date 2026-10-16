@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {  useState } from "react";
 import {
   App,
   Avatar,
@@ -41,10 +41,13 @@ const NAV_LINKS = [
 
 const SEARCH_CATEGORIES = [
   { value: "all", label: "All" },
-  { value: "fashion", label: "Fashion" },
-  { value: "home-furniture", label: "Home" },
-  { value: "art-crafts", label: "Art" },
-  { value: "handmade", label: "Handmade" },
+  { value: "Clothing", label: "Fashion & Clothing" },
+  { value: "Electronics", label: "Electronic Devices" },
+  { value: "Beauty", label: "Beauty & Personal Care" },
+  { value: "Furniture", label: "Home & Furniture" },
+  { value: "Sports", label: "Sports & Outdoors" },
+  { value: "Toys", label: "Toys & Games" },
+  { value: "Food", label: "Food & Groceries" },
 ];
 
 const linkClass = ({ isActive }) =>
@@ -62,8 +65,11 @@ function NavBar() {
   const { isDarkMode, toggleTheme } = useTheme();
 
   const favCount = 0;
-  const cartCount = 0;
+  const isloogedIn = useSelector((state) => !!state.user?.email);
 
+  const cartCount = useSelector((state) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0),
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
@@ -211,7 +217,11 @@ function NavBar() {
           />
         </Badge>
 
-        <Badge count={cartCount} size="small" color="#4f46e5">
+        <Badge
+          count={isloogedIn ? user?.cart : cartCount}
+          size="small"
+          color="#4f46e5"
+        >
           <Button
             className={iconButtonClass}
             onClick={() => navigate("/cart")}
@@ -242,7 +252,11 @@ function NavBar() {
       </div>
 
       <div className="flex items-center gap-3 md:hidden">
-        <Badge count={cartCount} size="small" color="#4f46e5">
+        <Badge
+          count={isloogedIn ? user?.cart : cartCount}
+          size="small"
+          color="#4f46e5"
+        >
           <Button
             className={iconButtonClass}
             onClick={() => navigate("/cart")}
