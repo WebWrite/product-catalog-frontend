@@ -160,6 +160,7 @@ function NavBar() {
   ];
 
   const iconButtonClass = "h-9! w-9! rounded-lg! border-slate-200!";
+  const isSeller = useSelector((state) => state.user?.role);
 
   return (
     <header className="theme-navbar sticky top-0 font-sans z-50 flex h-16 items-center justify-between gap-4 border-b px-4 shadow-sm sm:px-6 lg:px-8">
@@ -177,6 +178,11 @@ function NavBar() {
               {l.label}
             </NavLink>
           ))}
+          {isSeller == "seller" && (
+            <NavLink to={"/seller/dashboard"} className={linkClass}>
+              Seller
+            </NavLink>
+          )}
         </nav>
       </div>
 

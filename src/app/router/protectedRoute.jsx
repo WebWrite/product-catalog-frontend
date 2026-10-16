@@ -1,8 +1,17 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
+import { useCurrentUser } from "../../features/auth/hooks/useCurrentUser";
+import PageLoader from "../../shared/components/pageLoader";
 
 function ProtectedRoutes({ allowedRoles, children }) {
-  let user = useSelector((state) => state.user);
+  const storedUser = useSelector((state) => state.user);
+  const { data: fetchedUser, isLoading } = useCurrentUser();
+
+  if (isLoading) {
+    return <PageLoader />;
+  }
+
+  const user = storedUser || fetchedUser;
 
   if (!user) {
     return <Navigate to={"/auth/login"} />;
