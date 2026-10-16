@@ -1,10 +1,8 @@
-
 import { useNavigate } from "react-router-dom";
 import { App as AntdApp } from "antd";
 
 import { useCreateSellerProduct } from "../hooks/useSellerProducts";
-import ProductForm from "../components/ProductForm";
-
+import ProductForm from "../components/productForm";
 
 function AddProduct() {
   const navigate = useNavigate();
@@ -36,11 +34,7 @@ function AddProduct() {
   };
 
   return (
-    <ProductForm
-      mode="add"
-      onSubmit={handleSubmit}
-      isPending={isPending}
-    />
+    <ProductForm mode="add" onSubmit={handleSubmit} isPending={isPending} />
   );
 }
 

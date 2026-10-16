@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { App as AntdApp, Button, Skeleton } from "antd";
 
@@ -6,25 +5,18 @@ import {
   useSellerProducts,
   useUpdateSellerProduct,
 } from "../hooks/useSellerProducts";
-import ProductForm from "../components/ProductForm";
+import ProductForm from "../components/productForm";
 
 function EditProduct() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { notification } = AntdApp.useApp();
 
-  const {
-    data: products = [],
-    isLoading,
-    isError,
-  } = useSellerProducts();
+  const { data: products = [], isLoading, isError } = useSellerProducts();
 
-  const { mutate: updateProduct, isPending } =
-    useUpdateSellerProduct();
+  const { mutate: updateProduct, isPending } = useUpdateSellerProduct();
 
-  const product = products.find(
-    (item) => item._id === productId,
-  );
+  const product = products.find((item) => item._id === productId);
 
   const handleSubmit = (payload) => {
     updateProduct(
