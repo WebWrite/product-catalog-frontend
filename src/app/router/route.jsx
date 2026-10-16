@@ -47,6 +47,31 @@ export const router = createBrowserRouter([
       </ShopLayout>
     ),
   },
+  {
+    path: "/cart",
+    element: (
+      <ShopLayout>
+        <CartPage />
+      </ShopLayout>
+    ),
+  },
+  {
+    path: "/shop",
+    element: (
+      <ShopLayout>
+        <ExplorePage />
+      </ShopLayout>
+    ),
+  },
+
+  {
+    path: "/shop/:id",
+    element: (
+      <ShopLayout>
+        <ProductDetail />
+      </ShopLayout>
+    ),
+  },
 
   {
     element: <ProtectedRoutes allowedRoles={["admin"]} />,
