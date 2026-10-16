@@ -1,4 +1,3 @@
-
 import * as yup from "yup";
 import {
   PRODUCT_CATEGORIES,
