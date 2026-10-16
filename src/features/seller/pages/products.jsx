@@ -9,6 +9,7 @@ import {
 } from "../hooks/useSellerProducts";
 import UpdateStockModal from "../components/updateStockModal";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
+import SellerProductFilters from "../components/sellerProductFilters";
 
 
 
@@ -16,7 +17,10 @@ function SellerProducts() {
     const navigate = useNavigate();
     const { notification } = AntdApp.useApp();
 
-    const { data: products = [], isLoading, isError } = useSellerProducts();
+    const [filters, setFilters] = useState({ search: "", category: "", sortBy: "newest", });
+
+
+    const { data: products = [], isLoading, isError } = useSellerProducts(filters);
     const { mutate: deleteProduct, isPending: isDeleting } = useDeleteSellerProduct();
 
     const { mutate: bulkDeleteProducts, isPending: isBulkDeleting, } = useBulkDeleteSellerProducts();
@@ -29,6 +33,7 @@ function SellerProducts() {
 
     const [selectedProductIds, setSelectedProductIds] = useState([]);
     const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
+
 
     const openDeleteModal = (product) => {
         setProductToDelete(product);
@@ -200,6 +205,8 @@ function SellerProducts() {
                 </div>
             </div>
 
+                <SellerProductFilters filters={filters} onChange={setFilters}/>
+
 
             <div
                 className="rounded-2xl border border-slate-800 overflow-hidden w-full min-w-0"
@@ -211,7 +218,7 @@ function SellerProducts() {
                     </span>
                     <span className="text-[11px] font-bold text-slate-500 tracking-wider w-32">
                         CATEGORY
-                        
+
                     </span>
                     <span className="text-[11px] font-bold text-slate-500 tracking-wider w-24 text-right">
                         PRICE
@@ -248,15 +255,14 @@ function SellerProducts() {
                     </div>
                 )}
 
+
                 {!isLoading &&
                     !isError &&
                     products.map((product) => (
                         <div
                             key={product._id}
                             className="flex items-center gap-3 md:gap-4 px-3 md:px-5 py-3 border-b border-slate-800 last:border-b-0 hover:bg-slate-800/40 transition-colors cursor-pointer"
-                            onClick={() =>
-                                navigate(`/seller/products/${product._id}`)
-                            }
+                           
                         >
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <Checkbox

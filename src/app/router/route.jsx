@@ -1,12 +1,14 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
-
 import ProtectedRoutes from "./protectedRoute";
 import NotFound from "../../shared/components/notFound";
 import ShopLayout from "../../features/shop/layouts/shopLayout";
 import SellerLayout from "../../features/seller/layouts/sellerLayout";
 import PageLoader from "../../shared/components/pageLoader";
+import CartPage from "../../features/cart/pages/cart";
+import ExplorePage from "../../features/shop/pages/explorePage";
+import ProductDetail from "../../features/shop/pages/productDetails";
 
 const Login = lazy(() => import("../../features/auth/pages/login"));
 const Register = lazy(() => import("../../features/auth/pages/register"));
@@ -18,6 +20,7 @@ const LandingPage = lazy(() => import("../../features/shop/pages/landingPage"));
 const SellerProducts = lazy(() => import("../../features/seller/pages/products"));
 const AddProduct = lazy(() => import("../../features/seller/pages/addProduct"));
 const EditProduct = lazy(() => import("../../features/seller/pages/editProduct"));
+
 
 const renderPage = (Component) => (
   <Suspense fallback={<PageLoader />}>

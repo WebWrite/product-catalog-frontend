@@ -9,10 +9,10 @@ import {
 } from "../api/products";
 const QUERY_KEY = ["seller-products"];
 
-export function useSellerProducts() {
+export function useSellerProducts(filters = {}) {
   return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: getSellerProducts,
+    queryKey: [...QUERY_KEY, filters],
+    queryFn: () => getSellerProducts(filters),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 5,
   });
