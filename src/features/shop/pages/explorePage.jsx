@@ -52,9 +52,26 @@ function ExplorePage() {
     setSearchParams(params, { replace: true });
   }, [filters]);
 
+  const [debouncedKeyword, setDebouncedKeyword] = useState(
+    searchParams.get("search") || "",
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(filters.keyword);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [filters.keyword]);
+
+  const queryFilters = {
+    ...filters,
+    keyword: debouncedKeyword,
+  };
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["products", filters],
-    queryFn: () => getProducts({ ...filters, limit: PAGE_SIZE }),
+    queryKey: ["products", queryFilters],
+    queryFn: () => getProducts({ ...queryFilters, limit: PAGE_SIZE }),
     placeholderData: keepPreviousData,
   });
 
@@ -97,7 +114,7 @@ function ExplorePage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl bg-purple-50 p-3 sm:p-4 md:p-6">
+    <div className="mx-auto min-h-screen w-full max-w-7xl  p-3 sm:p-4 md:p-6">
       <div className="mb-4 mt-2 flex flex-col gap-3 p-2 sm:mt-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="m-0 text-xl font-semibold text-black sm:text-2xl">

@@ -10,7 +10,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useAddToCart } from "../../features/cart/hooks/useCart";
 import { addItem } from "../../app/store/cart/cart";
-import { updateCart } from "../../app/store/user/userSlice";
 
 function ProductCard({
   id,

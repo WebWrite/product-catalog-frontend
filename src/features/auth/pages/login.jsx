@@ -2,7 +2,7 @@ import { App, Button, Divider, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   MdArrowForward,
   MdOutlineLock,
@@ -20,6 +20,7 @@ import { clearCart } from "../../../app/store/cart/cart";
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   let cart = useSelector((state) => state.cart);
   const { notification } = App.useApp();
   const [form] = Form.useForm();
@@ -41,6 +42,7 @@ function Login() {
             dispatch(clearCart());
           }
         }
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
         navigate("/");
       }
 

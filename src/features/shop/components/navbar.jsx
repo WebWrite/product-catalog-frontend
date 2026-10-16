@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import {
   App,
   Avatar,
@@ -36,7 +36,6 @@ const NAV_LINKS = [
   { label: "Shop", to: "/shop" },
   { label: "Categories", to: "/categories" },
   { label: "New Arrivals", to: "/new-arrivals" },
-  { label: "Sellers", to: "/sellers" },
 ];
 
 const SEARCH_CATEGORIES = [

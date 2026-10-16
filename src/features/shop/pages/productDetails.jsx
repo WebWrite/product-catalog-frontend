@@ -21,7 +21,6 @@ import ProductSkeleton from "../components/productSkeleton";
 import ProductNotFound from "../components/productNotFound";
 import { useDispatch, useSelector } from "react-redux";
 import { useAddToCart } from "../../cart/hooks/useCart";
-import { updateCart } from "../../../app/store/user/userSlice";
 import { addItem } from "../../../app/store/cart/cart";
 
 function ProductDetail() {

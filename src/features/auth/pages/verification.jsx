@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { App, Button, Input } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   MdFingerprint,
   MdHourglassTop,
@@ -31,6 +31,7 @@ function Verification() {
 
   const [otp, setOtp] = useState("");
   const [resendTimer, setResendTimer] = useState(RESEND_SECONDS);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!email) navigate(-1);
@@ -56,6 +57,7 @@ function Verification() {
       if (comeFrom === "login") {
         const user = res.data.user;
         dispatch(setuser(user));
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
 
         if (user.role === "admin") navigate("/admin/dashboard");
         else if (user.role === "seller") navigate("/seller/dashboard");
