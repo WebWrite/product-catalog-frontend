@@ -10,6 +10,7 @@ import {
   Input,
   ConfigProvider,
   theme,
+  notification,
 } from "antd";
 import {
   MdDashboard,
@@ -76,6 +77,20 @@ function SellerLayout() {
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const handleLogout = async () => {
+    const res = await logout();
+    if (res.status === 200) {
+      dispatch(removeUser());
+      queryClient.removeQueries({ queryKey: ["currentUser"] });
+      navigate("/");
+      notification.success({
+        title: "Logout successfully",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+    }
+  };
 
   const user = {
     name: "Seller",
@@ -168,7 +183,10 @@ function SellerLayout() {
           <div
             className={`flex items-center ${collapsed ? "justify-center" : "gap-3 px-6"} py-6 mb-2`}
           >
-            <Link to="/" className="flex shrink-0 items-center gap-2">
+            <Link
+              to="/seller/dashboard"
+              className="flex shrink-0 items-center gap-2"
+            >
               <span className="flex size-9 items-center justify-center rounded-xl bg-indigo-600 text-xl text-white">
                 <MdViewInAr />
               </span>

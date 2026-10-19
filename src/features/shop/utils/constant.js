@@ -1,4 +1,4 @@
-export const PRICE_MIN = 100;
+export const PRICE_MIN = 1;
 export const PRICE_MAX = 100000;
 export const PAGE_SIZE = 15;
 

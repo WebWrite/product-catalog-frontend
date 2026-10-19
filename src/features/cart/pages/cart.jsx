@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import CartItem from "../../../shared/components/cartCard";
 import CustomTag from "../../../shared/components/customTag";
 import { BsPatchCheck } from "react-icons/bs";
@@ -26,7 +27,7 @@ import {
   removeItem,
   updateItem,
 } from "../../../app/store/cart/cart";
-import { updateCart } from "../../../app/store/user/userSlice";
+import { Link } from "react-router-dom";
 
 function CartPage() {
   const assurance = [
@@ -48,7 +49,7 @@ function CartPage() {
   ];
   let dispatch = useDispatch();
 
-  const isLoggedIn = useSelector((state) => !!state.user?.email);
+  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
   const guestItems = useSelector((state) => state.cart.items);
   const editItem = useEditItem();
   const deleteItem = useDeleteItem();
@@ -61,24 +62,30 @@ function CartPage() {
     isError: areGuestProductsError,
   } = useGuestCartProducts();
 
+  useEffect(() => {
+    if (isLoggedIn && isError) {
+      notification.error({
+        description: "Something went wrong",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+    }
+  }, [isError, isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn && areGuestProductsError) {
+      notification.error({
+        description: "Unable to load cart products",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+    }
+  }, [areGuestProductsError, isLoggedIn]);
+
   if (isLoggedIn && isLoading) return <Loader />;
   if (!isLoggedIn && areGuestProductsLoading) return <Loader />;
-
-  if (isLoggedIn && isError)
-    notification.error({
-      description: `Something went wrong`,
-      pauseOnHover: true,
-      showProgress: true,
-      placement: "bottomRight",
-    });
-
-  if (!isLoggedIn && areGuestProductsError)
-    notification.error({
-      description: "Unable to load cart products",
-      pauseOnHover: true,
-      showProgress: true,
-      placement: "bottomRight",
-    });
 
   const guestProductsById = new Map(
     guestProducts.map((product) => [product?._id, product]),
@@ -98,7 +105,6 @@ function CartPage() {
       }))
     : guestItems.flatMap((i) => {
         const product = guestProductsById.get(i.productId);
-        console.log(guestProducts);
 
         if (!product) return [];
 
@@ -130,7 +136,6 @@ function CartPage() {
 
     if (isLoggedIn) {
       editItem.mutate({ item: item.id, quantity });
-      dispatch(updateCart(quantity));
     } else {
       dispatch(
         updateItem({ productId: item.productId, size: item.size, quantity }),
@@ -208,14 +213,16 @@ function CartPage() {
           )}
 
           <div className="bg-white rounded-xl p-3 sm:p-4 flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <CustomButton
-              className={
-                "text-sm! font-semibold! gap-2! text-indigo-800! hover:text-indigo-900! "
-              }
-              text={"Continue Shopping"}
-              icon={<FaArrowLeftLong />}
-              type={"link"}
-            />
+            <Link to={"/shop"}>
+              <CustomButton
+                className={
+                  "text-sm! font-semibold! gap-2! text-indigo-800! hover:text-indigo-900! "
+                }
+                text={"Continue Shopping"}
+                icon={<FaArrowLeftLong />}
+                type={"link"}
+              />
+            </Link>
 
             <Popconfirm
               title="Clear all cart"

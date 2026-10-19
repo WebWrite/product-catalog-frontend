@@ -6,7 +6,13 @@ export const getCart = async () => {
 };
 
 export const addToCart = async ({ id, quantity, size }) => {
-  let res = await api.post("/cart", { productId: id, quantity, size });
+  const payload = { productId: id, quantity };
+
+  if (size) {
+    payload.size = size;
+  }
+
+  let res = await api.post("/cart", payload);
   return res.data;
 };
 

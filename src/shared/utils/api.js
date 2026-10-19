@@ -39,14 +39,10 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-      try {
-        const refreshed = await refreshToken();
+      const refreshed = await refreshToken();
 
-        if (refreshed) {
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
+      if (refreshed) {
+        return api(originalRequest);
       }
     }
 
@@ -65,12 +61,7 @@ export async function refreshToken() {
     );
 
     return response.data?.success !== false;
-  } catch (error) {
-    console.error(
-      "Refresh token failed:",
-      error.response?.data || error.message,
-    );
-
+  } catch {
     return false;
   }
 }

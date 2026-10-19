@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { message } from "antd";
 
 const saved = localStorage.getItem("cart");
 const initialState = {
@@ -16,9 +15,12 @@ const cartSlice = createSlice({
         (i) => i.productId === item.productId && i.size === item.size,
       );
       if (found) {
-        // found.quantity += item.quantity;
+        found.quantity = Math.min(found.quantity + item.quantity, 25);
       } else {
-        state.items.push(item);
+        state.items.push({
+          ...item,
+          quantity: Math.min(item.quantity, 25),
+        });
       }
     },
 
