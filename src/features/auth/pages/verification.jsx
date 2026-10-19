@@ -16,6 +16,7 @@ import api from "../../../shared/utils/api";
 import { setuser } from "../../../app/store/user/userSlice";
 import { clearCart } from "../../../app/store/cart/cart";
 import { mergeCart } from "../../cart/api/cartApi";
+import { setLoginMarker } from "../../../shared/utils/authStorage";
 
 const RESEND_SECONDS = 30;
 
@@ -59,8 +60,8 @@ function Verification() {
 
       if (comeFrom === "login") {
         const user = res.data.user;
+        setLoginMarker();
         dispatch(setuser(user));
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
 
         if (user.role === "admin") navigate("/admin/dashboard");
         else if (user.role === "seller") navigate("/seller/dashboard");
@@ -69,9 +70,13 @@ function Verification() {
             const response = await mergeCart(cart.items);
             if (response?.success !== false) {
               dispatch(clearCart());
+              await new Promise((resolve) => setTimeout(resolve, 1500));
             }
           }
-          queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+          await queryClient.refetchQueries({
+            queryKey: ["currentUser"],
+            type: "all",
+          });
           navigate("/");
         }
 

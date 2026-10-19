@@ -11,7 +11,7 @@ import { notification } from "antd";
 import { getProductsById } from "../../shop/api/api";
 
 export const useCartQuery = () => {
-  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
+  const isLoggedIn = useSelector((state) => !!state.user?.email);
 
   return useQuery({
     queryKey: ["cart"],
@@ -27,7 +27,10 @@ const useCartMutation = (mutationFn) => {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["cart"] }),
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] }),
+        queryClient.refetchQueries({
+          queryKey: ["currentUser"],
+          type: "active",
+        }),
       ]);
     },
 
@@ -47,7 +50,7 @@ export const useDeleteItem = () => useCartMutation(deleteCartItem);
 export const useDeleteCart = () => useCartMutation(deleteAllCart);
 
 export const useGuestCartProducts = () => {
-  const isLoggedIn = useSelector((s) => !!s.user?.user?.email);
+  const isLoggedIn = useSelector((s) => !!s.user?.email);
   const items = useSelector((s) => s.cart.items);
   const ids = [...new Set(items.map((i) => i.productId))].sort();
 

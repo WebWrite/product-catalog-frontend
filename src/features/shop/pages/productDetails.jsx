@@ -28,7 +28,7 @@ function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(0);
   const [liked, setLiked] = useState(false);
-  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
+  const isLoggedIn = useSelector((state) => !!state.user?.email);
   const cart = useSelector((state) => state.cart);
 
   let dispatch = useDispatch();

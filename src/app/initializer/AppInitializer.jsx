@@ -1,33 +1,35 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 
 import { useCurrentUser } from "../../features/auth/hooks/useCurrentUser";
-import { setuser, removeUser, setCheckingAuth } from "../store/user/userSlice";
-
+import { setuser, removeUser } from "../store/user/userSlice";
 import { router } from "../router/route";
+
+import { clearLoginMarker, hasLoginMarker } from "../../shared/utils/authStorage";
 import PageLoader from "../../shared/components/pageLoader";
 
 function AppInitializer() {
   const dispatch = useDispatch();
 
   const { data, isLoading, isError } = useCurrentUser();
-
-  const isCheckingAuth = useSelector((state) => state.user.isCheckingAuth);
+  const isLoggedIn = hasLoginMarker();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (!isLoggedIn) {
+      dispatch(removeUser());
+      return;
+    }
 
     if (data) {
       dispatch(setuser(data));
-    } else if (isError || !data) {
+    } else if (isError) {
       dispatch(removeUser());
+      clearLoginMarker();
     }
+  }, [data, isError, isLoggedIn, dispatch]);
 
-    dispatch(setCheckingAuth(false));
-  }, [data, isLoading, isError, dispatch]);
-
-  if (isLoading || isCheckingAuth) {
+  if (isLoggedIn && isLoading) {
     return <PageLoader />;
   }
 

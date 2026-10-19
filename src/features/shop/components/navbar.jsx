@@ -31,6 +31,7 @@ import {
 import { removeUser } from "../../../app/store/user/userSlice";
 import { useTheme } from "../../../app/theme/useTheme";
 import { logout } from "../../../shared/utils/api";
+import { clearLoginMarker } from "../../../shared/utils/authStorage";
 
 const NAV_LINKS = [
   { label: "Home", to: "/", end: true },
@@ -62,7 +63,7 @@ function NavBar() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const { notification } = App.useApp();
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state.user);
   const { isDarkMode, toggleTheme } = useTheme();
 
   const favCount = 0;
@@ -86,6 +87,7 @@ function NavBar() {
   const handleLogout = async () => {
     const res = await logout();
     if (res.status === 200) {
+      clearLoginMarker();
       dispatch(removeUser());
       queryClient.removeQueries({ queryKey: ["currentUser"] });
       navigate("/");

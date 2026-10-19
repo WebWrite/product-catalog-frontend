@@ -17,6 +17,7 @@ import api, { login } from "../../../shared/utils/api";
 import CustomTag from "../../../shared/components/customTag";
 import { clearCart } from "../../../app/store/cart/cart";
 import { mergeCart } from "../../cart/api/cartApi";
+import { setLoginMarker } from "../../../shared/utils/authStorage";
 
 function Login() {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ function Login() {
     mutationFn: login,
     onSuccess: async (data) => {
       const user = data.data.user;
+      setLoginMarker();
       dispatch(setuser(user));
       if (user.role === "admin") navigate("/admin/dashboard");
       else if (user.role === "seller") navigate("/seller/dashboard");
@@ -40,9 +42,13 @@ function Login() {
           const response = await mergeCart(cart.items);
           if (response?.success !== false) {
             dispatch(clearCart());
+            await new Promise((resolve) => setTimeout(resolve, 1500));
           }
         }
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        await queryClient.refetchQueries({
+          queryKey: ["currentUser"],
+          type: "all",
+        });
         navigate("/");
       }
 

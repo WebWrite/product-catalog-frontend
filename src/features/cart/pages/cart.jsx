@@ -49,7 +49,7 @@ function CartPage() {
   ];
   let dispatch = useDispatch();
 
-  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
+  const isLoggedIn = useSelector((state) => !!state.user?.email);
   const guestItems = useSelector((state) => state.cart.items);
   const editItem = useEditItem();
   const deleteItem = useDeleteItem();

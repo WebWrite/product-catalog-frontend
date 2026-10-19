@@ -30,6 +30,7 @@ import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
 import { useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
+import { clearLoginMarker } from "../../../shared/utils/authStorage";
 
 const { Sider, Content } = Layout;
 
@@ -81,6 +82,7 @@ function SellerLayout() {
   const handleLogout = async () => {
     const res = await logout();
     if (res.status === 200) {
+      clearLoginMarker();
       dispatch(removeUser());
       queryClient.removeQueries({ queryKey: ["currentUser"] });
       navigate("/");

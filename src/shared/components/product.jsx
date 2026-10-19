@@ -28,7 +28,7 @@ function ProductCard({
   const [liked, setLiked] = useState(false);
 
   const cart = useSelector((state) => state.cart);
-  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
+  const isLoggedIn = useSelector((state) => !!state.user?.email);
 
   const dispatch = useDispatch();
   const addItemMutation = useAddToCart();

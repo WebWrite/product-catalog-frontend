@@ -1,4 +1,5 @@
 import axios from "axios";
+import { hasLoginMarker } from "./authStorage";
 
 const Backend_Url = import.meta.env.VITE_BACKEND_URL;
 
@@ -33,6 +34,7 @@ api.interceptors.response.use(
 
     if (
       error.response.status === 401 &&
+      hasLoginMarker() &&
       originalRequest &&
       !originalRequest._retry &&
       !originalRequest._skipAuthRefresh
