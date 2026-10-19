@@ -329,6 +329,18 @@ function LandingPage() {
             No products in this collection yet.
           </p>
         )}
+
+        {!isLoading && !isError && (
+          <div className="mt-8 flex justify-center">
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
+            >
+              View More
+              <MdArrowForward />
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="mx-auto grid w-full max-w-7xl grid-cols-1 items-stretch gap-4 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">

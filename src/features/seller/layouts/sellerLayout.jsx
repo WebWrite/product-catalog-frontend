@@ -4,10 +4,8 @@ import {
   Layout,
   Menu,
   Avatar,
-  Button,
   Badge,
   Dropdown,
-  Input,
   ConfigProvider,
   theme,
   notification,
@@ -20,17 +18,18 @@ import {
   MdMessage,
   MdSettings,
   MdNotificationsNone,
-  MdAdd,
   MdMenu as MdMenuIcon,
   MdLogout,
   MdPerson,
   MdKeyboardArrowDown,
   MdSearch,
-  MdClose,
   MdViewInAr,
 } from "react-icons/md";
 import Footer from "../../../shared/components/footer";
 import { logout } from "../../../shared/utils/api";
+import { removeUser } from "../../../app/store/user/userSlice";
+import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
 const { Sider, Content } = Layout;
 
@@ -77,6 +76,8 @@ function SellerLayout() {
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const handleLogout = async () => {
     const res = await logout();
     if (res.status === 200) {
@@ -105,7 +106,13 @@ function SellerLayout() {
       onClick: () => navigate("/profile"),
     },
     { type: "divider" },
-    { key: "logout", label: "Logout", icon: <MdLogout />, danger: true, onClick: () => {logout(),navigate('/auth/login') }},
+    {
+      key: "logout",
+      label: "Logout",
+      icon: <MdLogout />,
+      danger: true,
+      onClick: handleLogout,
+    },
   ];
 
   useEffect(() => {
@@ -160,8 +167,10 @@ function SellerLayout() {
         },
       }}
     >
-      <div className="min-h-screen font-sans flex w-full overflow-x-hidden" style={{ background: '#0F172A' }}>
-
+      <div
+        className="min-h-screen font-sans flex w-full overflow-x-hidden"
+        style={{ background: "#0F172A" }}
+      >
         {isMobile && !collapsed && (
           <div
             className="fixed inset-0 bg-black/60 z-20 backdrop-blur-sm"
@@ -223,8 +232,12 @@ function SellerLayout() {
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold m-0 text-slate-100">Studio Kanso</p>
-                  <p className="text-[10px] text-slate-500 m-0 font-medium">Kyoto, JP</p>
+                  <p className="text-xs font-bold m-0 text-slate-100">
+                    Studio Kanso
+                  </p>
+                  <p className="text-[10px] text-slate-500 m-0 font-medium">
+                    Kyoto, JP
+                  </p>
                 </div>
                 <MdSettings className="text-slate-500 cursor-pointer hover:text-indigo-400" />
               </div>
@@ -235,9 +248,9 @@ function SellerLayout() {
         <div
           className="flex flex-col flex-1 min-h-screen min-w-0"
           style={{
-            marginLeft: isMobile ? 0 : (collapsed ? 80 : 260),
-            transition: 'all 0.2s',
-            background: '#0F172A'
+            marginLeft: isMobile ? 0 : collapsed ? 80 : 260,
+            transition: "all 0.2s",
+            background: "#0F172A",
           }}
         >
           <header
@@ -257,7 +270,6 @@ function SellerLayout() {
                 </span>
               </div>
 
-
               <div className="hidden lg:flex items-center justify-center flex-1">
                 <div className="flex items-center bg-slate-800 rounded-lg px-3 py-3.5 border border-slate-700 w-64 xl:w-96">
                   <MdSearch
@@ -273,24 +285,35 @@ function SellerLayout() {
                 </div>
               </div>
 
-
               <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
-
-
-
                 <Badge dot color="red" offset={[-2, 2]}>
-                  <MdNotificationsNone size={22} className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors" />
+                  <MdNotificationsNone
+                    size={22}
+                    className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"
+                  />
                 </Badge>
-                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
+                <Dropdown
+                  menu={{ items: userMenuItems }}
+                  placement="bottomRight"
+                  trigger={["click"]}
+                >
                   <div className="flex items-center gap-2 cursor-pointer bg-slate-800 hover:bg-slate-700 px-1.5 py-1 rounded-full border border-slate-700 transition-colors">
-                    <Avatar src={user.avatar} size={28} className="bg-indigo-600" />
-                    <span className="text-xs font-bold text-slate-200 hidden xl:block pr-1">{user.name}</span>
-                    <MdKeyboardArrowDown className="text-slate-500 hidden xl:block" size={16} />
+                    <Avatar
+                      src={user.avatar}
+                      size={28}
+                      className="bg-indigo-600"
+                    />
+                    <span className="text-xs font-bold text-slate-200 hidden xl:block pr-1">
+                      {user.name}
+                    </span>
+                    <MdKeyboardArrowDown
+                      className="text-slate-500 hidden xl:block"
+                      size={16}
+                    />
                   </div>
                 </Dropdown>
               </div>
             </div>
-
           </header>
 
           <Content className="p-3 md:p-4 lg:p-6 flex-1 min-w-0 overflow-x-hidden">
