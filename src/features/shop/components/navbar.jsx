@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   FaMoon,
   FaSun,
@@ -59,12 +60,13 @@ const linkClass = ({ isActive }) =>
 function NavBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { notification } = App.useApp();
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user.user);
   const { isDarkMode, toggleTheme } = useTheme();
 
   const favCount = 0;
-  const isloogedIn = useSelector((state) => !!state.user?.email);
+  const isLoggedIn = !!user?.email;
 
   const cartCount = useSelector((state) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0),
@@ -85,6 +87,7 @@ function NavBar() {
     const res = await logout();
     if (res.status === 200) {
       dispatch(removeUser());
+      queryClient.removeQueries({ queryKey: ["currentUser"] });
       navigate("/");
       notification.success({
         title: "Logout successfully",
@@ -160,8 +163,7 @@ function NavBar() {
   ];
 
   const iconButtonClass = "h-9! w-9! rounded-lg! border-slate-200!";
-  const isSeller = useSelector((state) => state.user?.role);
-
+  const isSeller = user?.role;
   return (
     <header className="theme-navbar sticky top-0 font-sans z-50 flex h-16 items-center justify-between gap-4 border-b px-4 shadow-sm sm:px-6 lg:px-8">
       <div className="flex items-center gap-6">
@@ -223,7 +225,7 @@ function NavBar() {
         </Badge>
 
         <Badge
-          count={isloogedIn ? user?.cart : cartCount}
+          count={isLoggedIn ? (user?.cart ?? 0) : cartCount}
           size="small"
           color="#4f46e5"
         >
@@ -236,7 +238,7 @@ function NavBar() {
         </Badge>
 
         <Dropdown
-          menu={{ items: user ? loggedInItems : guestItems }}
+          menu={{ items: isLoggedIn ? loggedInItems : guestItems }}
           placement="bottomRight"
           trigger={["click"]}
         >
@@ -258,7 +260,7 @@ function NavBar() {
 
       <div className="flex items-center gap-3 md:hidden">
         <Badge
-          count={isloogedIn ? user?.cart : cartCount}
+          count={isLoggedIn ? user?.cart : cartCount}
           size="small"
           color="#4f46e5"
         >
@@ -326,7 +328,7 @@ function NavBar() {
           Favourites
         </Button>
 
-        {user ? (
+        {isLoggedIn ? (
           <>
             <Button
               className="mt-2 w-full!"

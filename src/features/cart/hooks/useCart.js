@@ -11,7 +11,7 @@ import { message, notification } from "antd";
 import { getProductsById } from "../../shop/api/api";
 
 export const useCartQuery = () => {
-  const isLoggedIn = useSelector((state) => !!state.user?.email);
+  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
 
   return useQuery({
     queryKey: ["cart"],
@@ -25,10 +25,6 @@ const useCartMutation = (mutationFn) => {
   return useMutation({
     mutationFn,
     onSuccess: async () => {
-      message.open({
-        type: "success",
-        content: "Added to cart",
-      });
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["cart"] }),
         queryClient.invalidateQueries({ queryKey: ["currentUser"] }),
@@ -51,7 +47,7 @@ export const useDeleteItem = () => useCartMutation(deleteCartItem);
 export const useDeleteCart = () => useCartMutation(deleteAllCart);
 
 export const useGuestCartProducts = () => {
-  const isLoggedIn = useSelector((s) => !!s.user?.email);
+  const isLoggedIn = useSelector((s) => !!s.user?.user?.email);
   const items = useSelector((s) => s.cart.items);
   const ids = [...new Set(items.map((i) => i.productId))].sort();
 
@@ -59,8 +55,6 @@ export const useGuestCartProducts = () => {
     queryKey: ["guest-cart-products", ids],
     queryFn: async () => {
       const responses = await Promise.all(ids.map((id) => getProductsById(id)));
-      console.log(responses);
-
       return responses.map((response) => response?.data ?? response);
     },
     enabled: !isLoggedIn && ids.length > 0,

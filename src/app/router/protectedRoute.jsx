@@ -4,7 +4,7 @@ import { useCurrentUser } from "../../features/auth/hooks/useCurrentUser";
 import PageLoader from "../../shared/components/pageLoader";
 
 function ProtectedRoutes({ allowedRoles, children }) {
-  const storedUser = useSelector((state) => state.user);
+  const storedUser = useSelector((state) => state.user.user);
   const { data: fetchedUser, isLoading } = useCurrentUser();
 
   if (isLoading) {
