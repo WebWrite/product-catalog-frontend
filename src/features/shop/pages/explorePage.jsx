@@ -50,7 +50,7 @@ function ExplorePage() {
     if (filters.sortBy) params.set("sortBy", filters.sortBy);
     if (filters.page > 1) params.set("page", filters.page);
     setSearchParams(params, { replace: true });
-  }, [filters]);
+  }, [filters, setSearchParams]);
 
   const [debouncedKeyword, setDebouncedKeyword] = useState(
     searchParams.get("search") || "",
