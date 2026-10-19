@@ -42,17 +42,7 @@ function SellerDashboard() {
             verification.
           </p>
         </div>
-        <div className="flex gap-2 md:gap-3 w-full md:w-auto shrink-0">
-          <Button className="border-slate-700 text-slate-300 font-semibold h-10 px-3 md:px-5 rounded-xl shadow-sm bg-slate-800 hover:bg-slate-700 flex-1 md:flex-none text-xs md:text-sm">
-            Monthly Ledger
-          </Button>
-          <Button
-            type="primary"
-            className="bg-indigo-600 hover:bg-indigo-700 h-10 px-3 md:px-5 rounded-xl font-semibold shadow-sm flex-1 md:flex-none text-xs md:text-sm"
-          >
-            + Add Product
-          </Button>
-        </div>
+      
       </div>
 
       <div className="flex flex-wrap gap-3 md:gap-4 w-full min-w-0">

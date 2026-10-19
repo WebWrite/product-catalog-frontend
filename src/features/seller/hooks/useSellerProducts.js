@@ -6,8 +6,11 @@ import {
   updateSellerProductStock,
   updateSellerProduct,
   bulkDeleteSellerProducts,
+  getSellerProductStats,
 } from "../api/products";
+
 const QUERY_KEY = ["seller-products"];
+const STATS_QUERY_KEY = ["seller-product-stats"];
 
 export function useSellerProducts() {
   return useQuery({
@@ -22,7 +25,12 @@ export function useCreateSellerProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createSellerProduct,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: STATS_QUERY_KEY }),
+      ]);
+    },
   });
 }
 
@@ -30,7 +38,12 @@ export function useDeleteSellerProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteSellerProduct,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: STATS_QUERY_KEY }),
+      ]);
+    },
   });
 }
 
@@ -59,9 +72,21 @@ export function useBulkDeleteSellerProducts() {
 
   return useMutation({
     mutationFn: bulkDeleteSellerProducts,
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEY,
-      }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: STATS_QUERY_KEY }),
+      ]);
+    },
+  });
+}
+
+
+export function useSellerProductStats() {
+  return useQuery({
+    queryKey: STATS_QUERY_KEY,
+    queryFn: getSellerProductStats,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   });
 }

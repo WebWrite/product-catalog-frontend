@@ -217,13 +217,13 @@ function ProductForm({
               fileList={
                 imageFile
                   ? [
-                      {
-                        uid: imageFile.uid,
-                        name: imageFile.name,
-                        status: "done",
-                        ...(previewUrl ? { url: previewUrl } : {}),
-                      },
-                    ]
+                    {
+                      uid: imageFile.uid,
+                      name: imageFile.name,
+                      status: "done",
+                      ...(previewUrl ? { url: previewUrl } : {}),
+                    },
+                  ]
                   : []
               }
               accept="image/jpeg,image/png,image/webp"
@@ -290,11 +290,13 @@ function ProductForm({
               rules={[productFieldRule("price")]}
             >
               <InputNumber
-                min={0.01}
+                min={1}
                 max={1_000_000}
-                step={0.01}
-                precision={2}
-                placeholder="100.00"
+                step={1}
+                precision={0}
+                stringMode={false}
+               
+                placeholder="100"
                 style={{ width: "100%" }}
               />
             </Form.Item>
@@ -306,7 +308,7 @@ function ProductForm({
               rules={[productFieldRule("stock")]}
             >
               <InputNumber
-                min={0}
+                min={1}
                 max={100_000}
                 step={1}
                 precision={0}

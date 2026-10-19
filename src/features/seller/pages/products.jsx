@@ -5,10 +5,13 @@ import { MdMoreVert, MdEdit, MdDelete, MdAdd, MdInventory2, MdWarningAmber, } fr
 import {
     useSellerProducts,
     useDeleteSellerProduct,
-    useBulkDeleteSellerProducts
+    useBulkDeleteSellerProducts,
+    useSellerProductStats
 } from "../hooks/useSellerProducts";
 import UpdateStockModal from "../components/updateStockModal";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
+import SellerProductFilters from "../components/sellerProductFilters";
+import SellerProductPagination from "../components/sellerPagination";
 
 
 
@@ -16,7 +19,13 @@ function SellerProducts() {
     const navigate = useNavigate();
     const { notification } = AntdApp.useApp();
 
-    const { data: products = [], isLoading, isError } = useSellerProducts();
+    const [filters, setFilters] = useState({ search: "", category: "", sortBy: "newest", page: 1, limit: 10, });
+
+    const { data, isLoading, isError } = useSellerProducts(filters);
+
+    const products = data?.products || [];
+    const total = data?.pagination?.total || 0;
+    const { data: stats, isLoading: isStatsLoading, isError: isStatsError, } = useSellerProductStats();
     const { mutate: deleteProduct, isPending: isDeleting } = useDeleteSellerProduct();
 
     const { mutate: bulkDeleteProducts, isPending: isBulkDeleting, } = useBulkDeleteSellerProducts();
@@ -183,10 +192,16 @@ function SellerProducts() {
                     <p className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-wider m-0">
                         Total Products
                     </p>
+
                     <p className="text-[24px] md:text-[30px] font-bold text-slate-100 m-0 mt-2 leading-none">
-                        {products.length}
+                        {isStatsLoading
+                            ? "..."
+                            : isStatsError
+                                ? <span className="text-xs text-red-400">Failed to fetch total products</span>
+                                : stats?.totalProducts || 0}
                     </p>
                 </div>
+
                 <div
                     className="p-4 md:p-5 rounded-2xl w-[calc(50%-6px)] lg:flex-1 border border-slate-800"
                     style={{ background: "#1E293B" }}
@@ -194,12 +209,24 @@ function SellerProducts() {
                     <p className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-wider m-0">
                         Active
                     </p>
+
                     <p className="text-[24px] md:text-[30px] font-bold text-green-400 m-0 mt-2 leading-none">
-                        {products.filter((p) => p.status === "active").length}
+                        {isStatsLoading
+                            ? "..."
+                            : isStatsError
+                                ? <span className="text-xs text-red-400">  Failed to fetch total active products </span>
+                                : stats?.activeProducts || 0}
                     </p>
                 </div>
             </div>
 
+
+            <SellerProductFilters
+                filters={filters}
+                onChange={(newFilters) =>
+                    setFilters((prev) => ({ ...prev, ...newFilters, page: 1, }))
+                }
+            />
 
             <div
                 className="rounded-2xl border border-slate-800 overflow-hidden w-full min-w-0"
@@ -254,9 +281,6 @@ function SellerProducts() {
                         <div
                             key={product._id}
                             className="flex items-center gap-3 md:gap-4 px-3 md:px-5 py-3 border-b border-slate-800 last:border-b-0 hover:bg-slate-800/40 transition-colors cursor-pointer"
-                            onClick={() =>
-                                navigate(`/seller/products/${product._id}`)
-                            }
                         >
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <Checkbox
@@ -337,6 +361,12 @@ function SellerProducts() {
                         </div>
                     ))}
             </div>
+
+            <SellerProductPagination page={filters.page} limit={filters.limit} total={total}
+                onChange={(page, limit) =>
+                    setFilters((prev) => ({ ...prev, page, limit, }))}
+            />
+
 
             <UpdateStockModal
                 open={stockModalOpen}
