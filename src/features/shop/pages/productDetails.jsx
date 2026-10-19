@@ -73,26 +73,29 @@ function ProductDetail() {
     const selectedSizeValue =
       typeof sizeOption === "string" ? sizeOption : sizeOption?.label;
 
-    if (!selectedSizeValue) {
+    if (sizes.length > 0 && !selectedSizeValue) {
       message.error("Please select a size.");
       return;
     }
 
     if (isLoggedIn) {
-      addItemMutation.mutate({
+      const item = {
         id,
         quantity,
-        size: selectedSizeValue,
-      });
+      };
+      if (selectedSizeValue) {
+        item.size = selectedSizeValue;
+      }
+      addItemMutation.mutate(item);
     } else {
       if (quantity > maxQuantity) {
         message.error("Maximum quantity is 25.");
         return;
       }
 
-      const currentItem = cart.items.find(
-        (item) => item.productId === id && item.size === selectedSizeValue,
-      );
+      const currentItem = cart.items.find((item) => {
+        return item.productId === id && item.size === selectedSizeValue;
+      });
 
       if (currentItem && currentItem.quantity + quantity > maxQuantity) {
         message.error(
@@ -100,13 +103,14 @@ function ProductDetail() {
         );
         return;
       }
-      dispatch(
-        addItem({
-          productId: id,
-          size: selectedSizeValue,
-          quantity,
-        }),
-      );
+      const item = {
+        productId: id,
+        quantity,
+      };
+      if (selectedSizeValue) {
+        item.size = selectedSizeValue;
+      }
+      dispatch(addItem(item));
     }
   };
 

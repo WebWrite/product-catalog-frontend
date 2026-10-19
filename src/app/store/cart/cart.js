@@ -1,27 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const loadSavedCart = () => {
-  const saved = localStorage.getItem("cart");
-
-  if (!saved) return [];
-
-  try {
-    const parsed = JSON.parse(saved);
-
-    if (!Array.isArray(parsed)) {
-      throw new Error("Saved cart must be an array");
-    }
-
-    return parsed;
-  } catch (error) {
-    console.error("Unable to restore saved cart:", error);
-    localStorage.removeItem("cart");
-    return [];
-  }
-};
-
+const saved = localStorage.getItem("cart");
 const initialState = {
-  items: loadSavedCart(),
+  items: saved ? JSON.parse(saved) : [],
 };
 
 const cartSlice = createSlice({

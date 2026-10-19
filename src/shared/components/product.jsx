@@ -23,7 +23,7 @@ function ProductCard({
   price,
   oldPrice,
   badge,
-  sizes,
+  sizes = [],
 }) {
   const [liked, setLiked] = useState(false);
 
@@ -35,19 +35,27 @@ function ProductCard({
 
   const onAddToCart = () => {
     if (isLoggedIn) {
-      addItemMutation.mutate({
+      const item = {
         id,
         quantity: 1,
-        size: sizes[0],
-      });
+      };
+
+      if (sizes[0]) {
+        item.size = sizes[0];
+      }
+
+      addItemMutation.mutate(item);
       return;
     }
 
     const item = {
       productId: id,
-      size: sizes[0],
       quantity: 1,
     };
+
+    if (sizes[0]) {
+      item.size = sizes[0];
+    }
 
     const currentItem = cart.items.find(
       (i) => i.productId === item.productId && i.size === item.size,
