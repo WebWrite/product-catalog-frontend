@@ -8,7 +8,7 @@ export const getProducts = async (filters) => {
       minPrice: filters.minPrice,
       maxPrice: filters.maxPrice,
       inStock: filters.inStock || undefined,
-      sortBy: filters.sortby,
+      sortBy: filters.sortBy,
       page: filters.page,
       limit: filters.limit,
     },

@@ -10,6 +10,7 @@ import {
   Input,
   ConfigProvider,
   theme,
+  notification,
 } from "antd";
 import {
   MdDashboard,
@@ -29,6 +30,10 @@ import {
   MdViewInAr,
 } from "react-icons/md";
 import Footer from "../../../shared/components/footer";
+import { logout } from "../../../shared/utils/api";
+import { removeUser } from "../../../app/store/user/userSlice";
+import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
 const { Sider, Content } = Layout;
 
@@ -74,8 +79,24 @@ function SellerLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const location = useLocation();
   const navigate = useNavigate();
+  const handleLogout = async () => {
+    const res = await logout();
+    if (res.status === 200) {
+      dispatch(removeUser());
+      queryClient.removeQueries({ queryKey: ["currentUser"] });
+      navigate("/");
+      notification.success({
+        title: "Logout successfully",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+    }
+  };
 
   const user = {
     name: "Seller",
@@ -95,7 +116,7 @@ function SellerLayout() {
       label: "Logout",
       icon: <MdLogout />,
       danger: true,
-      onClick: () => console.log("Logout"),
+      onClick: handleLogout,
     },
   ];
 
@@ -176,7 +197,10 @@ function SellerLayout() {
           <div
             className={`flex items-center ${collapsed ? "justify-center" : "gap-3 px-6"} py-6 mb-2`}
           >
-            <Link to="/" className="flex shrink-0 items-center gap-2">
+            <Link
+              to="/seller/dashboard"
+              className="flex shrink-0 items-center gap-2"
+            >
               <span className="flex size-9 items-center justify-center rounded-xl bg-indigo-600 text-xl text-white">
                 <MdViewInAr />
               </span>

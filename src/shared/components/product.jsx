@@ -10,6 +10,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useAddToCart } from "../../features/cart/hooks/useCart";
 import { addItem } from "../../app/store/cart/cart";
+import { message } from "antd";
 
 function ProductCard({
   id,
@@ -22,20 +23,55 @@ function ProductCard({
   price,
   oldPrice,
   badge,
-  sizes,
+  sizes = [],
 }) {
   const [liked, setLiked] = useState(false);
 
-  let isloogedIn = useSelector((state) => !!state.user?.email);
+  const cart = useSelector((state) => state.cart);
+  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
 
-  let dispatch = useDispatch();
-  let addItemMutation = useAddToCart();
-  let onAddToCart = () => {
-    if (isloogedIn) {
-      addItemMutation.mutate({ id, quantity: 1, size: sizes[0] });
-    } else {
-      dispatch(addItem({ productId: id, size: sizes[0], quantity: 1 }));
+  const dispatch = useDispatch();
+  const addItemMutation = useAddToCart();
+
+  const onAddToCart = () => {
+    if (isLoggedIn) {
+      const item = {
+        id,
+        quantity: 1,
+      };
+
+      if (sizes[0]) {
+        item.size = sizes[0];
+      }
+
+      addItemMutation.mutate(item);
+      return;
     }
+
+    const item = {
+      productId: id,
+      quantity: 1,
+    };
+
+    if (sizes[0]) {
+      item.size = sizes[0];
+    }
+
+    const currentItem = cart.items.find(
+      (i) => i.productId === item.productId && i.size === item.size,
+    );
+
+    if (currentItem && currentItem.quantity + item.quantity > 25) {
+      message.error("Maximum quantity of 25 reached!");
+      return;
+    }
+
+    if (item.quantity > 25) {
+      message.error("You can add a maximum of 25 items!");
+      return;
+    }
+
+    dispatch(addItem(item));
   };
 
   return (

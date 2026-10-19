@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "antd";
+import { Button, message } from "antd";
 import {
   MdAdd,
   MdFavorite,
@@ -28,7 +28,8 @@ function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(0);
   const [liked, setLiked] = useState(false);
-  let isloogedIn = useSelector((state) => !!state.user?.email);
+  const isLoggedIn = useSelector((state) => !!state.user?.user?.email);
+  const cart = useSelector((state) => state.cart);
 
   let dispatch = useDispatch();
   let addItemMutation = useAddToCart();
@@ -39,7 +40,6 @@ function ProductDetail() {
     enabled: !!id,
   });
 
-  console.log(data);
   const product = data;
 
   const { data: related } = useQuery({
@@ -48,14 +48,12 @@ function ProductDetail() {
       getProducts({ ...DEFAULT_FILTERS, category: product.category, limit: 5 }),
     enabled: !!product?.category,
   });
-  console.log(related);
 
   if (isLoading) return <ProductSkeleton />;
 
   if (isError || !product) {
     return <ProductNotFound />;
   }
-
   const seller = product.seller;
   const sellerName = seller?.storeName || seller?.name;
   //   const sellerLink = `/sellers/${seller?._id ?? ""}`;
@@ -70,11 +68,49 @@ function ProductDetail() {
     .filter((p) => p._id !== product._id)
     .slice(0, 4);
 
-  let handleAddToCart = () => {
-    if (isloogedIn) {
-      addItemMutation.mutate({ id, quantity: quantity, size: sizes[0] });
+  const handleAddToCart = () => {
+    const sizeOption = sizes[selectedSize];
+    const selectedSizeValue =
+      typeof sizeOption === "string" ? sizeOption : sizeOption?.label;
+
+    if (sizes.length > 0 && !selectedSizeValue) {
+      message.error("Please select a size.");
+      return;
+    }
+
+    if (isLoggedIn) {
+      const item = {
+        id,
+        quantity,
+      };
+      if (selectedSizeValue) {
+        item.size = selectedSizeValue;
+      }
+      addItemMutation.mutate(item);
     } else {
-      dispatch(addItem({ productId: id, size: sizes[0], quantity: quantity }));
+      if (quantity > maxQuantity) {
+        message.error("Maximum quantity is 25.");
+        return;
+      }
+
+      const currentItem = cart.items.find((item) => {
+        return item.productId === id && item.size === selectedSizeValue;
+      });
+
+      if (currentItem && currentItem.quantity + quantity > maxQuantity) {
+        message.error(
+          `You can add ${maxQuantity - currentItem.quantity} more of this size.`,
+        );
+        return;
+      }
+      const item = {
+        productId: id,
+        quantity,
+      };
+      if (selectedSizeValue) {
+        item.size = selectedSizeValue;
+      }
+      dispatch(addItem(item));
     }
   };
 

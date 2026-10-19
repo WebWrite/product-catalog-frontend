@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { App, Button, Input } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   MdFingerprint,
@@ -14,6 +14,8 @@ import {
 } from "react-icons/md";
 import api from "../../../shared/utils/api";
 import { setuser } from "../../../app/store/user/userSlice";
+import { clearCart } from "../../../app/store/cart/cart";
+import { mergeCart } from "../../cart/api/cartApi";
 
 const RESEND_SECONDS = 30;
 
@@ -25,6 +27,7 @@ function Verification() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  let cart = useSelector((state) => state.cart);
 
   const email = location.state?.email;
   const comeFrom = location.state?.comeFrom || "register";
@@ -51,7 +54,7 @@ function Verification() {
           : "auth/verify-email-otp";
       return api.post(url, { email, otp: code });
     },
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       setOtp("");
 
       if (comeFrom === "login") {
@@ -61,7 +64,16 @@ function Verification() {
 
         if (user.role === "admin") navigate("/admin/dashboard");
         else if (user.role === "seller") navigate("/seller/dashboard");
-        else navigate("/");
+        else {
+          if (cart?.items.length >= 1) {
+            const response = await mergeCart(cart.items);
+            if (response?.success !== false) {
+              dispatch(clearCart());
+            }
+          }
+          queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+          navigate("/");
+        }
 
         notification.success({
           title: "Login successfully",

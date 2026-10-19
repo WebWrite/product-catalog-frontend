@@ -16,6 +16,7 @@ import { setuser } from "../../../app/store/user/userSlice";
 import api, { login } from "../../../shared/utils/api";
 import CustomTag from "../../../shared/components/customTag";
 import { clearCart } from "../../../app/store/cart/cart";
+import { mergeCart } from "../../cart/api/cartApi";
 
 function Login() {
   const dispatch = useDispatch();
@@ -31,14 +32,13 @@ function Login() {
     mutationFn: login,
     onSuccess: async (data) => {
       const user = data.data.user;
-      console.log(user);
       dispatch(setuser(user));
       if (user.role === "admin") navigate("/admin/dashboard");
       else if (user.role === "seller") navigate("/seller/dashboard");
       else {
         if (cart?.items.length >= 1) {
-          const res = await api.post("/cart/merge", cart);
-          if (res.data.success) {
+          const response = await mergeCart(cart.items);
+          if (response?.success !== false) {
             dispatch(clearCart());
           }
         }
