@@ -7,7 +7,7 @@ import {
   editItem,
   getCart,
 } from "../api/cartApi";
-import { message, notification } from "antd";
+import { notification } from "antd";
 import { getProductsById } from "../../shop/api/api";
 
 export const useCartQuery = () => {
