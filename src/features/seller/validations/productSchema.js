@@ -27,7 +27,8 @@ export const productSchema = yup.object({
   price: yup
     .number()
     .typeError("Price must be a valid number.")
-    .min(0.01, "Price must be greater than 0.")
+    .integer("Price must be a whole number.")
+    .min(1, "Price must be greater than 0.")
     .max(1_000_000, "Price cannot exceed 1,000,000.")
     .required("Price is required."),
 
@@ -35,7 +36,7 @@ export const productSchema = yup.object({
     .number()
     .typeError("Stock must be a valid number.")
     .integer("Stock must be a whole number.")
-    .min(0, "Stock cannot be negative.")
+    .min(1, "Stock cannot be 0 or  negative.")
     .max(100_000, "Stock cannot exceed 100,000.")
     .required("Stock is required."),
 

@@ -12,11 +12,16 @@ function EditProduct() {
   const navigate = useNavigate();
   const { notification } = AntdApp.useApp();
 
-  const { data: products = [], isLoading, isError } = useSellerProducts();
+
+  const {data,isLoading,isError,} = useSellerProducts();
+
+  const products = data?.products ?? [];
+
+  const product = products.find((item) => item._id === productId);
 
   const { mutate: updateProduct, isPending } = useUpdateSellerProduct();
 
-  const product = products.find((item) => item._id === productId);
+
 
   const handleSubmit = (payload) => {
     updateProduct(

@@ -31,9 +31,6 @@ import {
 } from "react-icons/md";
 import Footer from "../../../shared/components/footer";
 import { logout } from "../../../shared/utils/api";
-import { removeUser } from "../../../app/store/user/userSlice";
-import { useDispatch } from "react-redux";
-import { useQueryClient } from "@tanstack/react-query";
 
 const { Sider, Content } = Layout;
 
@@ -78,9 +75,6 @@ const MENU_ITEMS = [
 function SellerLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const location = useLocation();
   const navigate = useNavigate();
   const handleLogout = async () => {
@@ -111,13 +105,7 @@ function SellerLayout() {
       onClick: () => navigate("/profile"),
     },
     { type: "divider" },
-    {
-      key: "logout",
-      label: "Logout",
-      icon: <MdLogout />,
-      danger: true,
-      onClick: handleLogout,
-    },
+    { key: "logout", label: "Logout", icon: <MdLogout />, danger: true, onClick: () => {logout(),navigate('/auth/login') }},
   ];
 
   useEffect(() => {
@@ -172,10 +160,8 @@ function SellerLayout() {
         },
       }}
     >
-      <div
-        className="min-h-screen font-sans flex w-full overflow-x-hidden"
-        style={{ background: "#0F172A" }}
-      >
+      <div className="min-h-screen font-sans flex w-full overflow-x-hidden" style={{ background: '#0F172A' }}>
+
         {isMobile && !collapsed && (
           <div
             className="fixed inset-0 bg-black/60 z-20 backdrop-blur-sm"
@@ -237,12 +223,8 @@ function SellerLayout() {
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold m-0 text-slate-100">
-                    Studio Kanso
-                  </p>
-                  <p className="text-[10px] text-slate-500 m-0 font-medium">
-                    Kyoto, JP
-                  </p>
+                  <p className="text-xs font-bold m-0 text-slate-100">Studio Kanso</p>
+                  <p className="text-[10px] text-slate-500 m-0 font-medium">Kyoto, JP</p>
                 </div>
                 <MdSettings className="text-slate-500 cursor-pointer hover:text-indigo-400" />
               </div>
@@ -253,9 +235,9 @@ function SellerLayout() {
         <div
           className="flex flex-col flex-1 min-h-screen min-w-0"
           style={{
-            marginLeft: isMobile ? 0 : collapsed ? 80 : 260,
-            transition: "all 0.2s",
-            background: "#0F172A",
+            marginLeft: isMobile ? 0 : (collapsed ? 80 : 260),
+            transition: 'all 0.2s',
+            background: '#0F172A'
           }}
         >
           <header
@@ -275,93 +257,40 @@ function SellerLayout() {
                 </span>
               </div>
 
+
               <div className="hidden lg:flex items-center justify-center flex-1">
-                <div className="flex items-center bg-slate-800 rounded-lg px-3 py-2 border border-slate-700 focus-within:border-indigo-500 transition-colors w-64 xl:w-96">
+                <div className="flex items-center bg-slate-800 rounded-lg px-3 py-3.5 border border-slate-700 w-64 xl:w-96">
                   <MdSearch
-                    className="text-slate-500 mr-2 shrink-0"
                     size={16}
+                    className="text-slate-500 mr-2 shrink-0"
                   />
-                  <Input
-                    variant="borderless"
+
+                  <input
+                    type="text"
                     placeholder="Search orders, products, collectors..."
-                    className="text-xs text-slate-200 placeholder-slate-500 p-0 flex-1"
-                    style={{ color: "#E2E8F0" }}
+                    className="w-full min-w-0 bg-transparent border-none outline-none ring-0 shadow-none text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-0"
                   />
-                  <span className="text-[10px] text-slate-500 bg-slate-700 px-1.5 py-0.5 rounded border border-slate-600 font-medium shrink-0 ml-2">
-                    ⌘K
-                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
-                <button
-                  onClick={() => setSearchOpen(!searchOpen)}
-                  className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-                >
-                  <MdSearch size={20} />
-                </button>
 
-                <div className="hidden md:flex items-center gap-2 border-r border-slate-800 pr-3 mr-1">
-                  <Button
-                    icon={<MdAdd />}
-                    type="primary"
-                    className="bg-indigo-600 hover:bg-indigo-700 h-8 text-xs font-semibold rounded-lg shadow-sm px-3"
-                  >
-                    Add Ware
-                  </Button>
-                </div>
+              <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+
+
+
                 <Badge dot color="red" offset={[-2, 2]}>
-                  <MdNotificationsNone
-                    size={22}
-                    className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"
-                  />
+                  <MdNotificationsNone size={22} className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors" />
                 </Badge>
-                <Dropdown
-                  menu={{ items: userMenuItems }}
-                  placement="bottomRight"
-                  trigger={["click"]}
-                >
+                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
                   <div className="flex items-center gap-2 cursor-pointer bg-slate-800 hover:bg-slate-700 px-1.5 py-1 rounded-full border border-slate-700 transition-colors">
-                    <Avatar
-                      src={user.avatar}
-                      size={28}
-                      className="bg-indigo-600"
-                    />
-                    <span className="text-xs font-bold text-slate-200 hidden xl:block pr-1">
-                      {user.name}
-                    </span>
-                    <MdKeyboardArrowDown
-                      className="text-slate-500 hidden xl:block"
-                      size={16}
-                    />
+                    <Avatar src={user.avatar} size={28} className="bg-indigo-600" />
+                    <span className="text-xs font-bold text-slate-200 hidden xl:block pr-1">{user.name}</span>
+                    <MdKeyboardArrowDown className="text-slate-500 hidden xl:block" size={16} />
                   </div>
                 </Dropdown>
               </div>
             </div>
 
-            {searchOpen && (
-              <div className="lg:hidden px-3 pb-3 border-t border-slate-800 pt-3">
-                <div className="flex items-center bg-slate-800 rounded-lg px-3 py-2 border border-slate-700 focus-within:border-indigo-500">
-                  <MdSearch
-                    className="text-slate-500 mr-2 shrink-0"
-                    size={16}
-                  />
-                  <Input
-                    autoFocus
-                    variant="borderless"
-                    placeholder="Search orders, products..."
-                    className="text-xs text-slate-200 placeholder-slate-500 p-0 flex-1"
-                    style={{ color: "#E2E8F0" }}
-                  />
-                  <button
-                    onClick={() => setSearchOpen(false)}
-                    className="p-1 ml-2 rounded-md text-slate-500 hover:text-slate-300"
-                  >
-                    <MdClose size={16} />
-                  </button>
-                </div>
-              </div>
-            )}
           </header>
 
           <Content className="p-3 md:p-4 lg:p-6 flex-1 min-w-0 overflow-x-hidden">

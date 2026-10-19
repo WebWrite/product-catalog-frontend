@@ -1,10 +1,12 @@
 import api from "../../../shared/utils/api";
 
 
-export async function getSellerProducts() {
-  const res = await api.get("/seller/products");
-  return res.data.data;
-}
+export async function getSellerProducts(params = {}) {
+  const res = await api.get("/seller/products", { params });
+ return {
+        products: res.data.data,
+        pagination: res.data.pagination,
+    };}
 
 
 export async function createSellerProduct(payload) {
@@ -69,4 +71,9 @@ export async function bulkDeleteSellerProducts(productIds) {
   });
 
   return res.data;
+}
+
+export async function getSellerProductStats() {
+  const res = await api.get("/seller/products/stats");
+  return res.data.data;
 }
