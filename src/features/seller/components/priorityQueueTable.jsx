@@ -2,11 +2,21 @@ import { Button, Tag, Checkbox, Skeleton } from "antd";
 import { useNavigate } from "react-router-dom";
 import { MdInventory2 } from "react-icons/md";
 import { useSellerProducts } from "../hooks/useSellerProducts";
+import { useState } from "react";
+import SellerProductPagination from "./sellerPagination";
 
 function PriorityQueueTable() {
   const navigate = useNavigate();
-  const { data: products, isLoading, isError } = useSellerProducts();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
+  const { data, isLoading, isError } = useSellerProducts({
+    page,
+    limit,
+  });
+
+  const products = data?.products ?? [];
+  const total = data?.pagination?.total ?? 0;
   const handleCardClick = () => {
     navigate("/seller/products");
   };
@@ -24,7 +34,7 @@ function PriorityQueueTable() {
           <Tag
             className="m-0 border-0 text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-900/30 text-indigo-400 uppercase tracking-wider"
           >
-            {products?.length || 0} Items
+            {total} Items
           </Tag>
         </div>
         <Button
@@ -79,7 +89,7 @@ function PriorityQueueTable() {
                   />
                 </div>
 
-            
+
                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-slate-700 overflow-hidden flex-shrink-0 border border-slate-600">
                   <img
                     src={product.image?.url}
@@ -102,17 +112,16 @@ function PriorityQueueTable() {
                   </span>
                 </div>
 
-              
+
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <span className="text-[14px] md:text-[16px] font-bold text-slate-100">
                     ${product.price}
                   </span>
                   <Tag
-                    className={`m-0 border-0 text-[9px] md:text-[10px] font-bold px-1.5 py-0 rounded-md ${
-                      product.status === "active"
+                    className={`m-0 border-0 text-[9px] md:text-[10px] font-bold px-1.5 py-0 rounded-md ${product.status === "active"
                         ? "bg-green-900/30 text-green-400"
                         : "bg-slate-800 text-slate-400"
-                    }`}
+                      }`}
                   >
                     {product.status}
                   </Tag>
@@ -121,10 +130,24 @@ function PriorityQueueTable() {
             </div>
           ))}
         </div>
-      )}
 
-      
+
+
+      )}
+      <div className="border-t border-slate-800 px-2 py-3 md:px-4">
+        <SellerProductPagination
+          page={page}
+          limit={limit}
+          total={total}
+          onChange={(nextPage, nextLimit) => {
+            setPage(nextLimit !== limit ? 1 : nextPage);
+            setLimit(nextLimit);
+          }}
+        />
+      </div>
+
     </div>
+
   );
 }
 

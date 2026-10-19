@@ -13,8 +13,8 @@ function InventoryDonut() {
             type="circle" 
             percent={92} 
             strokeColor="#818CF8" 
-            trailColor="#334155"
-            width={160}
+            railColor="#334155"
+            size={160}
             strokeWidth={12}
             format={(percent) => (
                <div className="flex flex-col items-center">

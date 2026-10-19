@@ -12,10 +12,10 @@ import {
 const QUERY_KEY = ["seller-products"];
 const STATS_QUERY_KEY = ["seller-product-stats"];
 
-export function useSellerProducts() {
+export function useSellerProducts(filters) {
   return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: getSellerProducts,
+    queryKey: [...QUERY_KEY, filters],
+    queryFn: () => getSellerProducts(filters),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 5,
   });

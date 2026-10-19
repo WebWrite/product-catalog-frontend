@@ -74,6 +74,13 @@ function SellerProducts() {
             },
         });
     };
+    const handleFiltersChange = useCallback((newFilters) => {
+        setFilters((prev) => ({
+            ...prev,
+            ...newFilters,
+            page: 1,
+        }));
+    }, []);
 
     const handleProductSelection = (productId, checked) => {
         setSelectedProductIds((current) =>
@@ -223,9 +230,7 @@ function SellerProducts() {
 
             <SellerProductFilters
                 filters={filters}
-                onChange={(newFilters) =>
-                    setFilters((prev) => ({ ...prev, ...newFilters, page: 1, }))
-                }
+                onChange={handleFiltersChange}
             />
 
             <div
@@ -238,7 +243,7 @@ function SellerProducts() {
                     </span>
                     <span className="text-[11px] font-bold text-slate-500 tracking-wider w-32">
                         CATEGORY
-                        
+
                     </span>
                     <span className="text-[11px] font-bold text-slate-500 tracking-wider w-24 text-right">
                         PRICE

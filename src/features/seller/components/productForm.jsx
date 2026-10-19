@@ -18,6 +18,8 @@ import {
 } from "../constants/productConstants";
 import { productFieldRule } from "../validations/productSchema";
 
+import imageCompression from "browser-image-compression";
+
 const { TextArea } = Input;
 
 const SIZE_OPTIONS = PRODUCT_SIZES.map((value) => ({
@@ -59,6 +61,7 @@ function ProductForm({
   const [imageFile, setImageFile] = useState(null);
   const [imageError, setImageError] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
+  const [isCompressing, setIsCompressing] = useState(false);
 
   useEffect(() => {
     if (!imageFile) {
@@ -89,29 +92,54 @@ function ProductForm({
     setImageError("");
   }, [form, isEdit, product]);
 
-  const beforeUpload = (file) => {
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
+ const beforeUpload = async (file) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  const maxSize = 5 * 1024 * 1024;
 
-    if (!allowedTypes.includes(file.type)) {
-      setImageError("Only JPG, PNG, and WEBP images are allowed.");
+  if (!allowedTypes.includes(file.type)) {
+    setImageError("Only JPG, PNG, and WEBP images are allowed.");
+    return Upload.LIST_IGNORE;
+  }
+
+  if (file.size > maxSize) {
+    setImageError("Image must be 5 MB or smaller.");
+    return Upload.LIST_IGNORE;
+  }
+
+  setImageError("");
+  setIsCompressing(true);
+
+  try {
+    const blob = await imageCompression(file, {
+      maxSizeMB: 5,
+      maxWidthOrHeight: 1280,
+      initialQuality: 0.78,
+      fileType: "image/webp",
+      useWebWorker: true,
+    });
+
+    if (blob.type !== "image/webp" || blob.size > maxSize) {
+      setImageError("Could not prepare the image. Please try another image.");
       return Upload.LIST_IGNORE;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setImageError("Image must be 5 MB or smaller.");
-      return Upload.LIST_IGNORE;
-    }
+    const compressedFile = new File([blob],`${file.name.replace(/\.[^/.]+$/, "")}.webp`,
+      {
+        type: "image/webp",
+        lastModified: file.lastModified,
+      },
+    );
+  setImageFile(compressedFile);
+  } catch (error){
+    setImageError("Image compression failed. Please try another image.");
+    console.log("error of image compression is :",error)
+    return Upload.LIST_IGNORE;
+  } finally {
+    setIsCompressing(false);
+  }
 
-    setImageError("");
-    setImageFile(file);
-
-    // Upload manually through the API after form submission.
-    return false;
-  };
+  return false;
+};
 
   const handleFinish = (values) => {
     if (!isEdit && !imageFile) {
@@ -352,7 +380,8 @@ function ProductForm({
               size="large"
               type="primary"
               htmlType="submit"
-              loading={isPending}
+              loading={isPending || isCompressing}
+              disabled={isCompressing}
               className="bg-indigo-600 hover:bg-indigo-700 rounded-xl w-full sm:w-auto px-6"
             >
               {isEdit ? "Save Changes" : "Add Product"}
