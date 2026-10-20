@@ -2,7 +2,7 @@ import { Progress } from "antd";
 
 function InventoryDonut() {
   return (
-    <div className="p-6 rounded-2xl border border-slate-800 flex-1 shadow-sm flex flex-col" style={{ background: '#1E293B' }}>
+    <div className="p-6 rounded-2xl border border-slate-800 flex-1 shadow-sm flex flex-col" style={{ background: "var(--workspace-surface)" }}>
       <div className="mb-6">
          <h3 className="m-0 font-bold text-lg text-slate-100">Inventory Health</h3>
          <p className="text-xs text-slate-400 mt-1 font-medium">Kiln yield vs active marketplace commitments</p>

@@ -14,6 +14,8 @@
   --shadow:
     rgba(31, 45, 71, 0.08) 0 10px 24px -8px,
     rgba(31, 45, 71, 0.05) 0 4px 8px -2px;
+  --workspace-bg: #f6f8fc;
+  --workspace-surface: #ffffff;
 
   --sans: system-ui, "Segoe UI", Roboto, sans-serif;
   --heading: system-ui, "Segoe UI", Roboto, sans-serif;
@@ -46,13 +48,17 @@
   --social-bg: rgba(47, 48, 58, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  --workspace-bg: #0f172a;
+  --workspace-surface: #1e293b;
 }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  transition: background-color 180ms ease, color 180ms ease;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
 }
 
 .theme-page {
@@ -114,6 +120,61 @@ body {
 
 .theme-muted {
   color: var(--text);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--text-h);
+  background: var(--workspace-surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+[data-theme="light"] .seller-admin-shell .bg-slate-800 {
+  background-color: #eef2f7 !important;
+}
+
+[data-theme="light"] .seller-admin-shell .bg-slate-700 {
+  background-color: #e4e9f2 !important;
+}
+
+[data-theme="light"] .seller-admin-shell .bg-slate-900 {
+  background-color: #f6f8fc !important;
+}
+
+[data-theme="light"] .seller-admin-shell .text-slate-100,
+[data-theme="light"] .seller-admin-shell .text-slate-200,
+[data-theme="light"] .seller-admin-shell .text-slate-300 {
+  color: var(--text-h) !important;
+}
+
+[data-theme="light"] .seller-admin-shell .text-slate-400,
+[data-theme="light"] .seller-admin-shell .text-slate-500 {
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .seller-admin-shell .border-slate-700,
+[data-theme="light"] .seller-admin-shell .border-slate-800 {
+  border-color: var(--border) !important;
+}
+
+[data-theme="light"] .seller-admin-shell .hover\:bg-slate-700:hover,
+[data-theme="light"] .seller-admin-shell .hover\:bg-slate-800:hover {
+  background-color: #e8edff !important;
 }
 
 [data-theme="dark"] .bg-white,
@@ -187,7 +248,8 @@ body {
 [data-theme="dark"] .to-purple-50 {
   --tw-gradient-from: var(--bg) !important;
   --tw-gradient-to: var(--bg) !important;
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  --tw-gradient-stops:
+    var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
 .theme-outline-button {
@@ -202,8 +264,16 @@ body {
 
 .landing-page {
   background:
-    radial-gradient(circle at 8% 12%, rgba(147, 197, 253, 0.28), transparent 28rem),
-    radial-gradient(circle at 92% 42%, rgba(196, 181, 253, 0.2), transparent 26rem),
+    radial-gradient(
+      circle at 8% 12%,
+      rgba(147, 197, 253, 0.28),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 92% 42%,
+      rgba(196, 181, 253, 0.2),
+      transparent 26rem
+    ),
     var(--bg);
 }
 
@@ -213,8 +283,16 @@ body {
 
 [data-theme="dark"] .landing-page {
   background:
-    radial-gradient(circle at 8% 12%, rgba(79, 70, 229, 0.12), transparent 28rem),
-    radial-gradient(circle at 92% 42%, rgba(124, 58, 237, 0.1), transparent 26rem),
+    radial-gradient(
+      circle at 8% 12%,
+      rgba(79, 70, 229, 0.12),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 92% 42%,
+      rgba(124, 58, 237, 0.1),
+      transparent 26rem
+    ),
     var(--bg);
 }
 

@@ -204,7 +204,7 @@ function ProductForm({
 
       <div
         className="rounded-2xl border border-slate-800 p-4 md:p-6 w-full"
-        style={{ background: "#1E293B" }}
+        style={{ background: "var(--workspace-surface)" }}
       >
         <Form
           form={form}
