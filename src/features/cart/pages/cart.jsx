@@ -27,7 +27,7 @@ import {
   removeItem,
   updateItem,
 } from "../../../app/store/cart/cart";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function CartPage() {
   const assurance = [
@@ -54,6 +54,7 @@ function CartPage() {
   const editItem = useEditItem();
   const deleteItem = useDeleteItem();
   const deleteCart = useDeleteCart();
+  const navigate=useNavigate();
 
   const { data, isLoading, isError } = useCartQuery();
   const {
@@ -286,6 +287,7 @@ function CartPage() {
           </div>
 
           <CustomButton
+          onClick={() => navigate("/orders/new")}
             className="w-full! py-5! text-xs! sm:text-sm! bg-indigo-700! text-white! rounded-lg! hover:bg-indigo-800!"
             variant="solid"
             icon={<CiLock className="size-4" />}

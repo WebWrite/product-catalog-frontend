@@ -8,9 +8,11 @@ import {
   bulkDeleteSellerProducts,
   getSellerProductStats,
 } from "../api/products";
+import { getSellerOrders, updateSellerOrderStatus } from "../api/orders";
 
 const QUERY_KEY = ["seller-products"];
 const STATS_QUERY_KEY = ["seller-product-stats"];
+const ORDERS_QUERY_KEY = ["seller-orders"];
 
 export function useSellerProducts(filters) {
   return useQuery({
@@ -88,5 +90,27 @@ export function useSellerProductStats() {
     queryFn: getSellerProductStats,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 5,
+  });
+}
+
+
+
+export function useSellerOrders() {
+  return useQuery({
+    queryKey: ORDERS_QUERY_KEY,
+    queryFn: getSellerOrders,
+    staleTime: 1000 * 60,
+  });
+}
+
+export function useUpdateOrderStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateSellerOrderStatus,
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ORDERS_QUERY_KEY,
+      }),
   });
 }
