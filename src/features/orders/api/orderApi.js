@@ -24,3 +24,11 @@ export const cancelOrderItem = async ({ orderId, itemId }) => {
 
   return data;
 };
+
+export const createStripeCheckout = async (shippingAddress) => {
+  const { data } = await api.post("/orders/stripe", {
+    shippingAddress,
+  })
+
+  return data
+}
