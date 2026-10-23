@@ -194,7 +194,7 @@ function SellerProducts() {
             <div className="flex flex-wrap gap-3 md:gap-4 w-full">
                 <div
                     className="p-4 md:p-5 rounded-2xl w-[calc(50%-6px)] lg:flex-1 border border-slate-800"
-                    style={{ background: "#1E293B" }}
+                    style={{ background: "var(--workspace-surface)" }}
                 >
                     <p className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-wider m-0">
                         Total Products
@@ -211,7 +211,7 @@ function SellerProducts() {
 
                 <div
                     className="p-4 md:p-5 rounded-2xl w-[calc(50%-6px)] lg:flex-1 border border-slate-800"
-                    style={{ background: "#1E293B" }}
+                    style={{ background: "var(--workspace-surface)" }}
                 >
                     <p className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-wider m-0">
                         Active
@@ -235,7 +235,7 @@ function SellerProducts() {
 
             <div
                 className="rounded-2xl border border-slate-800 overflow-hidden w-full min-w-0"
-                style={{ background: "#1E293B" }}
+                style={{ background: "var(--workspace-surface)" }}
             >
                 <div className="hidden md:flex items-center gap-4 px-5 py-3 border-b border-slate-800">
                     <span className="text-[11px] font-bold text-slate-500 tracking-wider flex-1">
