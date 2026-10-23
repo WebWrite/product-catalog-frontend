@@ -1,6 +1,6 @@
 function StatCard({ title, value, subtext, tag, icon, isAlert }) {
   return (
-    <div className="p-4 md:p-5 rounded-2xl w-[calc(50%-8px)] lg:w-auto lg:flex-1 min-w-[160px] border border-slate-800 shadow-sm" style={{ background: '#1E293B' }}>
+    <div className="p-4 md:p-5 rounded-2xl w-[calc(50%-8px)] lg:w-auto lg:flex-1 min-w-[160px] border border-slate-800 shadow-sm" style={{ background: "var(--workspace-surface)" }}>
       <div className="flex justify-between items-start mb-3">
         <span className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-wider">{title}</span>
         {icon && (

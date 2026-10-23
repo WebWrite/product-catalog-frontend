@@ -117,7 +117,7 @@ function SellerDashboard() {
       <div className="flex flex-col lg:flex-row gap-4 md:gap-5 w-full min-w-0">
         <div
           className="p-3 md:p-4 lg:p-6 rounded-2xl border border-slate-800 flex-[2] shadow-sm min-w-0"
-          style={{ background: "#1E293B" }}
+          style={{ background: "var(--workspace-surface)" }}
         >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
             <div className="min-w-0">
