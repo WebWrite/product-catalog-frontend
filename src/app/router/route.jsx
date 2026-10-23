@@ -33,7 +33,9 @@ const UpdateAdminProduct = lazy(
 );
 const Login = lazy(() => import("../../features/auth/pages/login"));
 const Register = lazy(() => import("../../features/auth/pages/register"));
-const Verification = lazy( () => import("../../features/auth/pages/verification"),);
+const Verification = lazy(
+  () => import("../../features/auth/pages/verification"),
+);
 
 const AdminDashboard = lazy(
   () => import("../../features/admin/pages/dashboard"),
@@ -55,7 +57,7 @@ const ProductDetail = lazy(
 );
 const ExplorePage = lazy(() => import("../../features/shop/pages/explorePage"));
 const CartPage = lazy(() => import("../../features/cart/pages/cart"));
-const NewOrder =lazy(()=>import("../../features/orders/pages/newOrder"))
+const NewOrder = lazy(() => import("../../features/orders/pages/newOrder"));
 
 const renderPage = (Component) => (
   <Suspense fallback={<PageLoader />}>
@@ -123,41 +125,42 @@ export const router = createBrowserRouter([
     ],
   },
   {
-  path: "/orders",
-  element: (
-    <ProtectedRoutes allowedRoles={["customer"]}>
-      <ShopLayout />
-    </ProtectedRoutes>
-  ),
-  children: [
-    {
-      path: "new",
-      element: renderPage(NewOrder),
-    },
-    {
-      path: "myorders",
-      element: renderPage(MyOrders),
-    },
-  ],
-},
-{
-  path: "/payment",
-  element: (
-    <ProtectedRoutes allowedRoles={["customer"]}>
-      <ShopLayout />
-    </ProtectedRoutes>
-  ),
-  children: [
-    {
-      path: "success",
-      element: renderPage(PaymentSuccess),
-    },
-    {
-      path: "cancelled",
-      element: renderPage(PaymentCancelled),
-    },
-  ],
-},
+    path: "/orders",
+    element: (
+      <ProtectedRoutes allowedRoles={["customer"]}>
+        <ShopLayout />
+      </ProtectedRoutes>
+    ),
+    children: [
+      {
+        path: "new",
+        element: renderPage(NewOrder),
+      },
+      {
+        path: "myorders",
+        element: renderPage(MyOrders),
+      },
+    ],
+  },
+  {
+    path: "/payment",
+    element: (
+      <ProtectedRoutes allowedRoles={["customer"]}>
+        <ShopLayout />
+      </ProtectedRoutes>
+    ),
+    children: [
+      {
+        path: "success",
+        element: renderPage(PaymentSuccess),
+      },
+      {
+        path: "cancelled",
+        element: renderPage(PaymentCancelled),
+      },
+    ],
+  },
+  {
     path: "/admin",
     element: (
       <ProtectedRoutes allowedRoles={["admin"]}>
