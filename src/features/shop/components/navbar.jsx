@@ -36,8 +36,7 @@ import { clearLoginMarker } from "../../../shared/utils/authStorage";
 const NAV_LINKS = [
   { label: "Home", to: "/", end: true },
   { label: "Shop", to: "/shop" },
-  { label: "Categories", to: "/categories" },
-  { label: "New Arrivals", to: "/new-arrivals" },
+  { label: "my Orders", to: "/orders/myorders" },
 ];
 
 const SEARCH_CATEGORIES = [

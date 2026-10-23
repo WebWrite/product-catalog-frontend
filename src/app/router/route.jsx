@@ -6,6 +6,9 @@ import NotFound from "../../shared/components/notFound";
 import ShopLayout from "../../features/shop/layouts/shopLayout";
 import SellerLayout from "../../features/seller/layouts/sellerLayout";
 import PageLoader from "../../shared/components/pageLoader";
+import MyOrders from "../../features/orders/pages/myOrders";
+import SellerOrders from "../../features/seller/pages/sellerOrders";
+
 import AdminLayout from "../../features/admin/layout/layout";
 const CustomerManagement = lazy(
   () => import("../../features/admin/pages/customer"),
@@ -28,9 +31,7 @@ const UpdateAdminProduct = lazy(
 );
 const Login = lazy(() => import("../../features/auth/pages/login"));
 const Register = lazy(() => import("../../features/auth/pages/register"));
-const Verification = lazy(
-  () => import("../../features/auth/pages/verification"),
-);
+const Verification = lazy( () => import("../../features/auth/pages/verification"),);
 
 const AdminDashboard = lazy(
   () => import("../../features/admin/pages/dashboard"),
@@ -52,6 +53,7 @@ const ProductDetail = lazy(
 );
 const ExplorePage = lazy(() => import("../../features/shop/pages/explorePage"));
 const CartPage = lazy(() => import("../../features/cart/pages/cart"));
+const NewOrder =lazy(()=>import("../../features/orders/pages/newOrder"))
 
 const renderPage = (Component) => (
   <Suspense fallback={<PageLoader />}>
@@ -112,9 +114,30 @@ export const router = createBrowserRouter([
         path: "products/edit/:productId",
         element: renderPage(EditProduct),
       },
+      {
+        path: "orders",
+        element: renderPage(SellerOrders),
+      },
     ],
   },
   {
+  path: "/orders",
+  element: (
+    <ProtectedRoutes allowedRoles={["customer"]}>
+      <ShopLayout />
+    </ProtectedRoutes>
+  ),
+  children: [
+    {
+      path: "new",
+      element: renderPage(NewOrder),
+    },
+    {
+      path: "myorders",
+      element: renderPage(MyOrders),
+    },
+  ],
+},
     path: "/admin",
     element: (
       <ProtectedRoutes allowedRoles={["admin"]}>
