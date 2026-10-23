@@ -1,7 +1,14 @@
+import { Modal } from "antd";
 
-import { Button, Modal } from "antd";
-
-function DeleteConfirmationModal({ open,onCancel,onConfirm,loading = false, title,description,confirmText = "Delete",}) {
+function DeleteConfirmationModal({
+  open,
+  onCancel,
+  onConfirm,
+  loading = false,
+  title,
+  description,
+  confirmText = "Delete",
+}) {
   return (
     <Modal
       open={open}

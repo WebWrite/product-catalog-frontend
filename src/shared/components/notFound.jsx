@@ -5,7 +5,9 @@ function NotFound() {
   return (
     <div className="theme-page min-h-screen">
       <div className="flex justify-center items-center flex-col min-h-screen">
-        <h3 className="theme-heading text-xl font-bold font-raleway">404 - Not Found</h3>
+        <h3 className="theme-heading text-xl font-bold font-raleway">
+          404 - Not Found
+        </h3>
         <p className="theme-muted text-center mt-2 font-sans text-xs">
           The page you're looking for doesn't exist.
         </p>

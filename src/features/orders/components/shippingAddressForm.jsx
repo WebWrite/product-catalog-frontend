@@ -56,11 +56,7 @@ const ShippingAddressForm = ({ form }) => (
     requiredMark={false}
     className="shipping-address-form"
   >
-    <Form.Item
-      name="fullName"
-      label="Full name"
-      rules={[yupRule("fullName")]}
-    >
+    <Form.Item name="fullName" label="Full name" rules={[yupRule("fullName")]}>
       <Input
         size="large"
         placeholder="Ahmed Khan"
@@ -100,11 +96,7 @@ const ShippingAddressForm = ({ form }) => (
     </Form.Item>
 
     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-      <Form.Item
-        name="city"
-        label="City"
-        rules={[yupRule("city")]}
-      >
+      <Form.Item name="city" label="City" rules={[yupRule("city")]}>
         <Input
           size="large"
           placeholder="Lahore"

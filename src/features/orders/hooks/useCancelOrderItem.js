@@ -6,7 +6,6 @@ export const useCancelOrderItem = () => {
 
   return useMutation({
     mutationFn: cancelOrderItem,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["my-orders"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-orders"] }),
   });
 };

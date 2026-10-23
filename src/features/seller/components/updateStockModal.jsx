@@ -48,7 +48,6 @@ function UpdateStockModal({ open, onClose, product }) {
     );
   };
 
- 
   if (!product) return null;
 
   return (
@@ -66,7 +65,6 @@ function UpdateStockModal({ open, onClose, product }) {
           </span>
         </div>
       }
-      
       footer={[
         <Button
           key="cancel"

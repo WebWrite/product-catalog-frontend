@@ -1,4 +1,13 @@
-import {Button,Card,Empty,Flex,Select,Tag,Typography,notification,} from "antd";
+import {
+  Button,
+  Card,
+  Empty,
+  Flex,
+  Select,
+  Tag,
+  Typography,
+  notification,
+} from "antd";
 import Loader from "../../../shared/components/loader";
 import {
   useSellerOrders,
@@ -35,14 +44,10 @@ const formatPrice = (amount) =>
   }).format(amount);
 
 export default function SellerOrders() {
-  const {
-    data: orders = [],
-    isPending,
-    isError,
-    refetch,
-  } = useSellerOrders();
+  const { data: orders = [], isPending, isError, refetch } = useSellerOrders();
 
-  const {mutate: updateStatus,isPending: isUpdating,} = useUpdateOrderStatus();
+  const { mutate: updateStatus, isPending: isUpdating } =
+    useUpdateOrderStatus();
 
   const handleStatusChange = (orderId, itemId, status) => {
     updateStatus(
@@ -55,8 +60,7 @@ export default function SellerOrders() {
         onError: (error) =>
           notification.error({
             message: "Unable to update item status",
-            description:
-              error.response?.data?.message || "Please try again.",
+            description: error.response?.data?.message || "Please try again.",
           }),
       },
     );
@@ -87,10 +91,7 @@ export default function SellerOrders() {
         <Empty description="No orders for your products yet." />
       ) : (
         orders.map((order) => (
-          <Card
-            key={order._id}
-            title={<Text strong>Order #{order._id}</Text>}
-          >
+          <Card key={order._id} title={<Text strong>Order #{order._id}</Text>}>
             <Flex vertical gap={16}>
               {order.items.map((item) => {
                 const isFinal = finalStatuses.includes(item.status);

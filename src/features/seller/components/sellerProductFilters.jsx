@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Input, Select } from "antd";
 import { MdSearch } from "react-icons/md";
-import { PRODUCT_CATEGORIES, PRODUCT_SORT_OPTIONS } from "../constants/productConstants";
+import {
+  PRODUCT_CATEGORIES,
+  PRODUCT_SORT_OPTIONS,
+} from "../constants/productConstants";
 
-const CATEGORIES = PRODUCT_CATEGORIES
+const CATEGORIES = PRODUCT_CATEGORIES;
 
-const SORT_OPTIONS = PRODUCT_SORT_OPTIONS
+const SORT_OPTIONS = PRODUCT_SORT_OPTIONS;
 
 function SellerProductFilters({ filters, onChange }) {
   const [searchInput, setSearchInput] = useState(filters.search);

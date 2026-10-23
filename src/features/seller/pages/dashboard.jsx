@@ -42,7 +42,6 @@ function SellerDashboard() {
             verification.
           </p>
         </div>
-      
       </div>
 
       <div className="flex flex-wrap gap-3 md:gap-4 w-full min-w-0">

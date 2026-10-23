@@ -1,11 +1,18 @@
-
-import { Button, Card, Empty, Flex, Modal, Skeleton, Tag, Typography, notification } from "antd";
+import {
+  Button,
+  Card,
+  Empty,
+  Flex,
+  Modal,
+  Tag,
+  Typography,
+  notification,
+} from "antd";
 import { useGetMyOrders } from "../hooks/useGetMyOrders";
 import { useCancelOrderItem } from "../hooks/useCancelOrderItem";
 import Loader from "../../../shared/components/loader";
 
 const { Title, Text } = Typography;
-
 
 const statusColors = {
   pending: "gold",
@@ -33,7 +40,9 @@ const MyOrders = () => {
             { orderId, itemId },
             {
               onSuccess: () => {
-                notification.success({ message: "Item cancelled successfully" });
+                notification.success({
+                  message: "Item cancelled successfully",
+                });
                 resolve();
               },
               onError: (error) => {
@@ -53,7 +62,7 @@ const MyOrders = () => {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-4xl p-4">
-        <Loader/>
+        <Loader />
       </div>
     );
   }
@@ -85,7 +94,6 @@ const MyOrders = () => {
                 </Text>
               </Flex>
             }
-            
           >
             <Flex vertical gap={16}>
               {order.items.map((item) => (
@@ -95,13 +103,11 @@ const MyOrders = () => {
                   align="center"
                   className="min-w-0"
                 >
-
                   <img
                     src={item.productId?.image?.url}
                     alt={item.name}
                     className="h-16 w-16 shrink-0 rounded object-cover"
                   />
-
                   <Flex flex={1} vertical gap={4} className="min-w-0">
                     <Text strong>{item.name}</Text>
                     <Text type="secondary">
@@ -111,13 +117,12 @@ const MyOrders = () => {
 
                     <Text>{item.itemTotal}</Text>
                   </Flex>
-                 Status
+                  Status
                   {item.status === "pending" ? (
                     <Button
                       type="link"
                       danger
                       disabled={isCancelling}
-
                       onClick={() => handleCancel(order._id, item._id)}
                     >
                       Pending

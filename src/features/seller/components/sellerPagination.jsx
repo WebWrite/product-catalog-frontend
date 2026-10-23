@@ -1,11 +1,6 @@
 import { Pagination } from "antd";
 
-const SellerProductPagination = ({
-  page,
-  limit,
-  total,
-  onChange,
-}) => {
+const SellerProductPagination = ({ page, limit, total, onChange }) => {
   if (total === 0) return null;
 
   return (

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -47,12 +46,7 @@ const normalizeProduct = (values) => ({
   status: values.status ?? "active",
 });
 
-function ProductForm({
-  mode,
-  product,
-  onSubmit,
-  isPending = false,
-}) {
+function ProductForm({ mode, product, onSubmit, isPending = false }) {
   const isEdit = mode === "edit";
   const navigate = useNavigate();
   const { notification } = AntdApp.useApp();
@@ -92,54 +86,56 @@ function ProductForm({
     setImageError("");
   }, [form, isEdit, product]);
 
- const beforeUpload = async (file) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-  const maxSize = 5 * 1024 * 1024;
+  const beforeUpload = async (file) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const maxSize = 5 * 1024 * 1024;
 
-  if (!allowedTypes.includes(file.type)) {
-    setImageError("Only JPG, PNG, and WEBP images are allowed.");
-    return Upload.LIST_IGNORE;
-  }
-
-  if (file.size > maxSize) {
-    setImageError("Image must be 5 MB or smaller.");
-    return Upload.LIST_IGNORE;
-  }
-
-  setImageError("");
-  setIsCompressing(true);
-
-  try {
-    const blob = await imageCompression(file, {
-      maxSizeMB: 5,
-      maxWidthOrHeight: 1280,
-      initialQuality: 0.78,
-      fileType: "image/webp",
-      useWebWorker: true,
-    });
-
-    if (blob.type !== "image/webp" || blob.size > maxSize) {
-      setImageError("Could not prepare the image. Please try another image.");
+    if (!allowedTypes.includes(file.type)) {
+      setImageError("Only JPG, PNG, and WEBP images are allowed.");
       return Upload.LIST_IGNORE;
     }
 
-    const compressedFile = new File([blob],`${file.name.replace(/\.[^/.]+$/, "")}.webp`,
-      {
-        type: "image/webp",
-        lastModified: file.lastModified,
-      },
-    );
-  setImageFile(compressedFile);
-  } catch (error){
-    setImageError("Image compression failed. Please try another image.");
-    console.log("error of image compression is :",error)
-    return Upload.LIST_IGNORE;
-  } finally {
-    setIsCompressing(false);
-  }
+    if (file.size > maxSize) {
+      setImageError("Image must be 5 MB or smaller.");
+      return Upload.LIST_IGNORE;
+    }
 
-  return false;
-};
+    setImageError("");
+    setIsCompressing(true);
+
+    try {
+      const blob = await imageCompression(file, {
+        maxSizeMB: 5,
+        maxWidthOrHeight: 1280,
+        initialQuality: 0.78,
+        fileType: "image/webp",
+        useWebWorker: true,
+      });
+
+      if (blob.type !== "image/webp" || blob.size > maxSize) {
+        setImageError("Could not prepare the image. Please try another image.");
+        return Upload.LIST_IGNORE;
+      }
+
+      const compressedFile = new File(
+        [blob],
+        `${file.name.replace(/\.[^/.]+$/, "")}.webp`,
+        {
+          type: "image/webp",
+          lastModified: file.lastModified,
+        },
+      );
+      setImageFile(compressedFile);
+    } catch (error) {
+      setImageError("Image compression failed. Please try another image.");
+      console.log("error of image compression is :", error);
+      return Upload.LIST_IGNORE;
+    } finally {
+      setIsCompressing(false);
+    }
+
+    return false;
+  };
 
   const handleFinish = (values) => {
     if (!isEdit && !imageFile) {
@@ -158,8 +154,7 @@ function ProductForm({
       const updatedValues = normalizeProduct(payload);
 
       const hasFieldChanges =
-        JSON.stringify(currentValues) !==
-        JSON.stringify(updatedValues);
+        JSON.stringify(currentValues) !== JSON.stringify(updatedValues);
 
       if (!hasFieldChanges && !imageFile) {
         notification.warning({
@@ -227,9 +222,7 @@ function ProductForm({
                   alt={product.name}
                   className="w-28 h-28 rounded-lg object-cover border border-slate-700"
                 />
-                <p className="text-xs text-slate-400 mt-1">
-                  Current image
-                </p>
+                <p className="text-xs text-slate-400 mt-1">Current image</p>
               </div>
             )}
 
@@ -245,13 +238,13 @@ function ProductForm({
               fileList={
                 imageFile
                   ? [
-                    {
-                      uid: imageFile.uid,
-                      name: imageFile.name,
-                      status: "done",
-                      ...(previewUrl ? { url: previewUrl } : {}),
-                    },
-                  ]
+                      {
+                        uid: imageFile.uid,
+                        name: imageFile.name,
+                        status: "done",
+                        ...(previewUrl ? { url: previewUrl } : {}),
+                      },
+                    ]
                   : []
               }
               accept="image/jpeg,image/png,image/webp"
@@ -323,7 +316,6 @@ function ProductForm({
                 step={1}
                 precision={0}
                 stringMode={false}
-               
                 placeholder="100"
                 style={{ width: "100%" }}
               />

@@ -1,13 +1,12 @@
 import api from "../../../shared/utils/api";
 
-
 export async function getSellerProducts(params = {}) {
   const res = await api.get("/seller/products", { params });
- return {
-        products: res.data.data,
-        pagination: res.data.pagination,
-    };}
-
+  return {
+    products: res.data.data,
+    pagination: res.data.pagination,
+  };
+}
 
 export async function createSellerProduct(payload) {
   const formData = new FormData();
@@ -29,7 +28,6 @@ export async function createSellerProduct(payload) {
   return res.data.data;
 }
 
-
 export async function deleteSellerProduct(productId) {
   const res = await api.delete(`/seller/delete-product/${productId}`);
   return res.data;
@@ -44,17 +42,14 @@ export async function updateSellerProduct({ productId, data }) {
   formData.append("stock", String(data.stock));
   formData.append("status", data.status);
 
-(data.sizes ?? []).forEach((size) => {
-  formData.append("sizes", size);
-});
+  (data.sizes ?? []).forEach((size) => {
+    formData.append("sizes", size);
+  });
   if (data.image) {
     formData.append("image", data.image);
   }
 
-  const res = await api.patch(
-    `/seller/update-product/${productId}`,
-    formData,
-  );
+  const res = await api.patch(`/seller/update-product/${productId}`, formData);
 
   return res.data.data;
 }
@@ -63,7 +58,6 @@ export async function updateSellerProductStock(productId, stock) {
   const res = await api.patch(`/seller/update-stock/${productId}`, { stock });
   return res.data;
 }
-
 
 export async function bulkDeleteSellerProducts(productIds) {
   const res = await api.delete("/seller/bulk-delete", {

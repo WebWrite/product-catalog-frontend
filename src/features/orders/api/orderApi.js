@@ -1,7 +1,5 @@
 import api from "../../../shared/utils/api";
 
-
-
 export const createCODOrder = async (shippingAddress) => {
   const { data } = await api.post("/orders/cod", {
     shippingAddress,
@@ -15,7 +13,6 @@ export const getMyOrders = async () => {
   return data.data.orders;
 };
 
-
 export const cancelOrderItem = async ({ orderId, itemId }) => {
   const { data } = await api.patch("/orders/cancel-item", {
     orderId,
@@ -28,7 +25,7 @@ export const cancelOrderItem = async ({ orderId, itemId }) => {
 export const createStripeCheckout = async (shippingAddress) => {
   const { data } = await api.post("/orders/stripe", {
     shippingAddress,
-  })
+  });
 
-  return data
-}
+  return data;
+};

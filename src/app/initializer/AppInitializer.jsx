@@ -6,7 +6,10 @@ import { useCurrentUser } from "../../features/auth/hooks/useCurrentUser";
 import { setuser, removeUser } from "../store/user/userSlice";
 import { router } from "../router/route";
 
-import { clearLoginMarker, hasLoginMarker } from "../../shared/utils/authStorage";
+import {
+  clearLoginMarker,
+  hasLoginMarker,
+} from "../../shared/utils/authStorage";
 import PageLoader from "../../shared/components/pageLoader";
 
 function AppInitializer() {

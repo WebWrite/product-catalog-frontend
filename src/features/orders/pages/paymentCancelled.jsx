@@ -1,8 +1,8 @@
-import { Button, Result } from "antd"
-import { useNavigate } from "react-router-dom"
+import { Button, Result } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const PaymentCancelled = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center p-4 sm:p-6">
@@ -19,17 +19,13 @@ const PaymentCancelled = () => {
           >
             Try Again
           </Button>,
-          <Button
-            key="shop"
-            size="large"
-            onClick={() => navigate("/shop")}
-          >
+          <Button key="shop" size="large" onClick={() => navigate("/shop")}>
             Continue Shopping
           </Button>,
         ]}
       />
     </main>
-  )
-}
+  );
+};
 
-export default PaymentCancelled
+export default PaymentCancelled;

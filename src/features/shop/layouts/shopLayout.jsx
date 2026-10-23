@@ -6,7 +6,7 @@ function ShopLayout({ children }) {
   return (
     <div className="theme-page flex min-h-screen flex-col">
       <NavBar></NavBar>
-      <main className="flex-1">{children || <Outlet/>}</main>
+      <main className="flex-1">{children || <Outlet />}</main>
       <Footer></Footer>
     </div>
   );

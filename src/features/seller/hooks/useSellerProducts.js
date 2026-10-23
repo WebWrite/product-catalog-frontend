@@ -63,11 +63,9 @@ export function useUpdateSellerProduct() {
 
   return useMutation({
     mutationFn: updateSellerProduct,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
   });
 }
-
 
 export function useBulkDeleteSellerProducts() {
   const queryClient = useQueryClient();
@@ -83,7 +81,6 @@ export function useBulkDeleteSellerProducts() {
   });
 }
 
-
 export function useSellerProductStats() {
   return useQuery({
     queryKey: STATS_QUERY_KEY,
@@ -92,8 +89,6 @@ export function useSellerProductStats() {
     gcTime: 1000 * 60 * 5,
   });
 }
-
-
 
 export function useSellerOrders() {
   return useQuery({

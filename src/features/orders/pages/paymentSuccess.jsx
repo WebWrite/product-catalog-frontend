@@ -1,11 +1,11 @@
-import { Button, Result } from "antd"
-import { useSearchParams, useNavigate } from "react-router-dom"
+import { Button, Result } from "antd";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const PaymentSuccess = () => {
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const sessionId = searchParams.get("session_id")
+  const sessionId = searchParams.get("session_id");
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center p-4 sm:p-6">
@@ -26,17 +26,13 @@ const PaymentSuccess = () => {
           >
             View My Orders
           </Button>,
-          <Button
-            key="shop"
-            size="large"
-            onClick={() => navigate("/shop")}
-          >
+          <Button key="shop" size="large" onClick={() => navigate("/shop")}>
             Continue Shopping
           </Button>,
         ]}
       />
     </main>
-  )
-}
+  );
+};
 
-export default PaymentSuccess
+export default PaymentSuccess;
