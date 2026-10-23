@@ -6,12 +6,6 @@ import Loader from "../../../shared/components/loader";
 
 const { Title, Text } = Typography;
 
-const formatPrice = (amount) =>
-  new Intl.NumberFormat("en-PK", {
-    style: "currency",
-    currency: "PKR",
-    maximumFractionDigits: 0,
-  }).format(amount);
 
 const statusColors = {
   pending: "gold",
@@ -23,7 +17,7 @@ const statusColors = {
 };
 
 const MyOrders = () => {
-  const { data: orders = [], isPending, isError, refetch } = useGetMyOrders();
+  const { data: orders = [], isLoading, isError, refetch } = useGetMyOrders();
   const { mutate: cancelItem, isPending: isCancelling } = useCancelOrderItem();
 
   const handleCancel = (orderId, itemId) => {
@@ -56,7 +50,7 @@ const MyOrders = () => {
     });
   };
 
-  if (isPending) {
+  if (isLoading) {
     return (
       <div className="mx-auto max-w-4xl p-4">
         <Loader/>
@@ -114,7 +108,8 @@ const MyOrders = () => {
                       Qty: {item.quantity}
                       {item.size ? ` · Size: ${item.size}` : ""}
                     </Text>
-                    <Text>{formatPrice(item.itemTotal)}</Text>
+
+                    <Text>{item.itemTotal}</Text>
                   </Flex>
                  Status
                   {item.status === "pending" ? (
@@ -145,17 +140,17 @@ const MyOrders = () => {
 
                 <Flex justify="space-between" className="mt-2">
                   <Text type="secondary">Subtotal</Text>
-                  <Text>{formatPrice(order.subtotal)}</Text>
+                  <Text>{order.subtotal}</Text>
                 </Flex>
 
                 <Flex justify="space-between" className="mt-1">
                   <Text type="secondary">Shipping</Text>
-                  <Text>{formatPrice(order.shippingCost)}</Text>
+                  <Text>{order.shippingCost}</Text>
                 </Flex>
 
                 <Flex justify="space-between" className="mt-2">
                   <Text strong>Order total</Text>
-                  <Text strong>{formatPrice(order.total)}</Text>
+                  <Text strong>{order.total}</Text>
                 </Flex>
               </div>
             </Flex>

@@ -8,6 +8,8 @@ import SellerLayout from "../../features/seller/layouts/sellerLayout";
 import PageLoader from "../../shared/components/pageLoader";
 import MyOrders from "../../features/orders/pages/myOrders";
 import SellerOrders from "../../features/seller/pages/sellerOrders";
+import PaymentSuccess from "../../features/orders/pages/paymentSuccess";
+import PaymentCancelled from "../../features/orders/pages/paymentCancelled";
 
 import AdminLayout from "../../features/admin/layout/layout";
 const CustomerManagement = lazy(
@@ -135,6 +137,24 @@ export const router = createBrowserRouter([
     {
       path: "myorders",
       element: renderPage(MyOrders),
+    },
+  ],
+},
+{
+  path: "/payment",
+  element: (
+    <ProtectedRoutes allowedRoles={["customer"]}>
+      <ShopLayout />
+    </ProtectedRoutes>
+  ),
+  children: [
+    {
+      path: "success",
+      element: renderPage(PaymentSuccess),
+    },
+    {
+      path: "cancelled",
+      element: renderPage(PaymentCancelled),
     },
   ],
 },
