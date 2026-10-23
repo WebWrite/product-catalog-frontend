@@ -11,6 +11,7 @@ import {
 } from "react-icons/md";
 import AnalyticalCard from "../components/analyticalCard";
 import { money } from "../../../shared/utils/currency";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { getAdminSellerSummary, getAdminSellers } from "../api/api";
 
 const PAGE_SIZE = 10;
@@ -92,17 +93,18 @@ function SellerManagement() {
     category: "all",
     page: 1,
   });
+  const debouncedSearch = useDebounce(filters.search);
   const summaryQuery = useQuery({
     queryKey: ["admin", "sellers", "summary"],
     queryFn: getAdminSellerSummary,
   });
   const sellersQuery = useQuery({
-    queryKey: ["admin", "sellers", filters],
+    queryKey: ["admin", "sellers", { ...filters, search: debouncedSearch }],
     queryFn: () =>
       getAdminSellers({
         page: filters.page,
         limit: PAGE_SIZE,
-        search: filters.search.trim(),
+        search: debouncedSearch.trim(),
         status: filters.status,
         ...(filters.category !== "all" ? { category: filters.category } : {}),
       }),
