@@ -24,7 +24,7 @@ function PriorityQueueTable() {
   return (
     <div
       className="rounded-2xl border border-slate-800 shadow-sm overflow-hidden mt-2 w-full min-w-0"
-      style={{ background: "#1E293B" }}
+      style={{ background: "var(--workspace-surface)" }}
     >
       <div className="p-4 md:p-6 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
         <div className="flex items-center gap-2 md:gap-3 flex-wrap min-w-0">

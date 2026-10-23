@@ -9,6 +9,26 @@ import PageLoader from "../../shared/components/pageLoader";
 import MyOrders from "../../features/orders/pages/myOrders";
 import SellerOrders from "../../features/seller/pages/sellerOrders";
 
+import AdminLayout from "../../features/admin/layout/layout";
+const CustomerManagement = lazy(
+  () => import("../../features/admin/pages/customer"),
+);
+const SellerDetail = lazy(
+  () => import("../../features/admin/pages/sellerDetail"),
+);
+const SellerManagement = lazy(
+  () => import("../../features/admin/pages/seller"),
+);
+const OrderDetail = lazy(
+  () => import("../../features/admin/pages/orderDetails"),
+);
+const OrdersFulfillment = lazy(
+  () => import("../../features/admin/pages/orders"),
+);
+const ProductCatalog = lazy(() => import("../../features/admin/pages/product"));
+const UpdateAdminProduct = lazy(
+  () => import("../../features/admin/pages/updateProduct"),
+);
 const Login = lazy(() => import("../../features/auth/pages/login"));
 const Register = lazy(() => import("../../features/auth/pages/register"));
 const Verification = lazy( () => import("../../features/auth/pages/verification"),);
@@ -71,15 +91,6 @@ export const router = createBrowserRouter([
     element: <ShopLayout>{renderPage(ProductDetail)}</ShopLayout>,
   },
   {
-    element: <ProtectedRoutes allowedRoles={["admin"]} />,
-    children: [
-      {
-        path: "/admin/dashboard",
-        element: renderPage(AdminDashboard),
-      },
-    ],
-  },
-  {
     path: "/seller",
     element: (
       <ProtectedRoutes allowedRoles={["seller"]}>
@@ -127,6 +138,47 @@ export const router = createBrowserRouter([
     },
   ],
 },
+    path: "/admin",
+    element: (
+      <ProtectedRoutes allowedRoles={["admin"]}>
+        <AdminLayout />
+      </ProtectedRoutes>
+    ),
+    children: [
+      {
+        path: "dashboard",
+        element: renderPage(AdminDashboard),
+      },
+      {
+        path: "products",
+        element: renderPage(ProductCatalog),
+      },
+      {
+        path: "products/:productId/edit",
+        element: renderPage(UpdateAdminProduct),
+      },
+      {
+        path: "orders",
+        element: renderPage(OrdersFulfillment),
+      },
+      {
+        path: "orders/:orderId",
+        element: renderPage(OrderDetail),
+      },
+      {
+        path: "sellers",
+        element: renderPage(SellerManagement),
+      },
+      {
+        path: "sellers/:id",
+        element: renderPage(SellerDetail),
+      },
+      {
+        path: "customers",
+        element: renderPage(CustomerManagement),
+      },
+    ],
+  },
   {
     path: "*",
     element: <NotFound />,

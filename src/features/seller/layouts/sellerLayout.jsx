@@ -25,12 +25,13 @@ import {
   MdSearch,
   MdViewInAr,
 } from "react-icons/md";
-import Footer from "../../../shared/components/footer";
 import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
 import { useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 import { clearLoginMarker } from "../../../shared/utils/authStorage";
+import { useTheme } from "../../../app/theme/useTheme";
+import ThemeToggle from "../../../shared/components/themeToggle";
 
 const { Sider, Content } = Layout;
 
@@ -79,6 +80,7 @@ function SellerLayout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const { isDarkMode } = useTheme();
   const handleLogout = async () => {
     const res = await logout();
     if (res.status === 200) {
@@ -135,43 +137,49 @@ function SellerLayout() {
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme.darkAlgorithm,
+        algorithm: [
+          isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+          theme.compactAlgorithm,
+        ],
         token: {
           colorPrimary: "#6366F1",
-          colorBgContainer: "#1E293B",
-          colorBorder: "#334155",
-          colorText: "#F1F5F9",
-          colorTextSecondary: "#94A3B8",
+          colorBgContainer: isDarkMode ? "#1E293B" : "#FFFFFF",
+          colorBorder: isDarkMode ? "#334155" : "#E4E9F2",
+          colorText: isDarkMode ? "#F1F5F9" : "#172033",
+          colorTextSecondary: isDarkMode ? "#94A3B8" : "#667085",
           fontFamily: "inherit",
           borderRadius: 8,
         },
         components: {
-          Layout: { siderBg: "#0F172A", bodyBg: "#0F172A" },
+          Layout: {
+            siderBg: isDarkMode ? "#0F172A" : "#FFFFFF",
+            bodyBg: isDarkMode ? "#0F172A" : "#F6F8FC",
+          },
           Menu: {
             darkItemBg: "transparent",
             darkItemSelectedBg: "#4F46E5",
             darkItemSelectedColor: "#FFFFFF",
-            darkItemColor: "#94A3B8",
-            darkItemHoverBg: "#1E293B",
-            darkItemHoverColor: "#F1F5F9",
+            darkItemColor: isDarkMode ? "#94A3B8" : "#667085",
+            darkItemHoverBg: isDarkMode ? "#1E293B" : "#EEF2FF",
+            darkItemHoverColor: isDarkMode ? "#F1F5F9" : "#172033",
             itemHeight: 44,
             itemMarginInline: 12,
             itemBorderRadius: 8,
           },
           Table: {
-            headerBg: "#1E293B",
-            headerColor: "#94A3B8",
-            rowHoverBg: "#334155",
-            borderColor: "#334155",
-            colorBgContainer: "#1E293B",
-            colorText: "#F1F5F9",
+            headerBg: isDarkMode ? "#1E293B" : "#FFFFFF",
+            headerColor: isDarkMode ? "#94A3B8" : "#667085",
+            rowHoverBg: isDarkMode ? "#334155" : "#F6F8FC",
+            borderColor: isDarkMode ? "#334155" : "#E4E9F2",
+            colorBgContainer: isDarkMode ? "#1E293B" : "#FFFFFF",
+            colorText: isDarkMode ? "#F1F5F9" : "#172033",
           },
         },
       }}
     >
       <div
-        className="min-h-screen font-sans flex w-full overflow-x-hidden"
-        style={{ background: "#0F172A" }}
+        className="seller-admin-shell min-h-screen font-sans flex w-full overflow-x-hidden"
+        style={{ background: "var(--workspace-bg)" }}
       >
         {isMobile && !collapsed && (
           <div
@@ -219,7 +227,7 @@ function SellerLayout() {
             mode="inline"
             selectedKeys={[location.pathname]}
             items={MENU_ITEMS}
-            theme="dark"
+            theme={isDarkMode ? "dark" : "light"}
             onClick={handleMenuClick}
           />
 
@@ -252,12 +260,12 @@ function SellerLayout() {
           style={{
             marginLeft: isMobile ? 0 : collapsed ? 80 : 260,
             transition: "all 0.2s",
-            background: "#0F172A",
+            background: "var(--workspace-bg)",
           }}
         >
           <header
             className="sticky top-0 z-20 w-full border-b border-slate-800"
-            style={{ background: "#0F172A" }}
+            style={{ background: "var(--workspace-surface)" }}
           >
             <div className="h-16 px-3 md:px-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 md:gap-3 shrink-0">
@@ -288,6 +296,7 @@ function SellerLayout() {
               </div>
 
               <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+                <ThemeToggle />
                 <Badge dot color="red" offset={[-2, 2]}>
                   <MdNotificationsNone
                     size={22}
@@ -321,10 +330,6 @@ function SellerLayout() {
           <Content className="p-3 md:p-4 lg:p-6 flex-1 min-w-0 overflow-x-hidden">
             <Outlet />
           </Content>
-
-          <div className="border-t border-slate-800">
-            <Footer />
-          </div>
         </div>
       </div>
     </ConfigProvider>
