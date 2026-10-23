@@ -83,11 +83,7 @@ function CustomerManagement() {
     queryFn: getAdminCustomerSummary,
   });
   const customersQuery = useQuery({
-    queryKey: [
-      "admin",
-      "customers",
-      { ...filters, search: debouncedSearch },
-    ],
+    queryKey: ["admin", "customers", { ...filters, search: debouncedSearch }],
     queryFn: () =>
       getAdminCustomers({
         page: filters.page,
@@ -202,9 +198,15 @@ function CustomerManagement() {
 
   const handleSavePassword = async () => {
     const values = await form.validateFields();
-    updateCustomer({ password: values.password });
-    setPasswordOpen(false);
-    form.resetFields();
+    updateMutation.mutate(
+      { id: inspectedId, payload: { password: values.password } },
+      {
+        onSuccess: () => {
+          setPasswordOpen(false);
+          form.resetFields();
+        },
+      },
+    );
   };
 
   return (
