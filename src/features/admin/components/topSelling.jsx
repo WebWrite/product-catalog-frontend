@@ -1,4 +1,5 @@
 import { MdDonutLarge } from "react-icons/md";
+import { money } from "../../../shared/utils/currency";
 
 const DEFAULT_CATEGORIES = [
   { name: "Home & Ceramics", percent: 42, amount: 53949, color: "#2e1fb0" },
@@ -22,14 +23,11 @@ const DEFAULT_CATEGORIES = [
   },
 ];
 
-const money = (n) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(n);
-
-function TopSelling({ categories = DEFAULT_CATEGORIES, className = "" }) {
+function TopSelling({
+  categories = DEFAULT_CATEGORIES,
+  className = "",
+  isLoading = false,
+}) {
   return (
     <section
       className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-6 ${className}`}
@@ -46,27 +44,31 @@ function TopSelling({ categories = DEFAULT_CATEGORIES, className = "" }) {
         <MdDonutLarge className="mt-1 text-xl text-slate-500" />
       </div>
 
-      <ul className="m-0 mt-6 flex list-none flex-col gap-5 p-0">
-        {categories.map((c) => (
-          <li key={c.name}>
-            <div className="flex items-center justify-between gap-2 text-xs">
-              <span className="font-medium text-slate-800">{c.name}</span>
-              <span className="shrink-0 font-bold text-slate-900">
-                {c.percent}%{" "}
-                <span className="font-normal text-slate-600">
-                  ({money(c.amount)})
+      {isLoading ? (
+        <p className="mt-6 text-sm text-slate-500">Loading categories...</p>
+      ) : (
+        <ul className="m-0 mt-6 flex list-none flex-col gap-5 p-0">
+          {categories.map((c) => (
+            <li key={c.name}>
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="font-medium text-slate-800">{c.name}</span>
+                <span className="shrink-0 font-bold text-slate-900">
+                  {c.percent}%{" "}
+                  <span className="font-normal text-slate-600">
+                    ({money(c.amount)})
+                  </span>
                 </span>
-              </span>
-            </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-indigo-100">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{ width: `${c.percent}%`, backgroundColor: c.color }}
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
+              </div>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-indigo-100">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${c.percent}%`, backgroundColor: c.color }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

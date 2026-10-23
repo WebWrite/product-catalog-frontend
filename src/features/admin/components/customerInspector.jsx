@@ -28,7 +28,10 @@ function CustomerInspector({
     );
   }
 
-  const tag = STATUS_TAG[customer.status];
+  const tag = STATUS_TAG[customer.status] ?? {
+    label: customer.status,
+    color: "default",
+  };
 
   return (
     <aside className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
@@ -89,6 +92,9 @@ function CustomerInspector({
         </button>
       </div>
       <div className="mt-2 rounded-xl bg-indigo-50/60 p-3 text-xs text-slate-700">
+        {customer.address.length === 0 && (
+          <p className="m-0 text-slate-500">No shipping address available.</p>
+        )}
         {customer.address.map((line) => (
           <p key={line} className="m-0">
             {line}
@@ -167,14 +173,7 @@ function CustomerInspector({
             : "Deactivate Account"}
         </Button>
 
-        <Button
-          danger
-          variant="solid"
-          icon={<MdDeleteOutline />}
-          onClick={onDeactivate}
-        >
-          Account Delete
-        </Button>
+        
       </div>
 
       {customer.memo && (

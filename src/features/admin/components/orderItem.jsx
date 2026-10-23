@@ -1,9 +1,7 @@
 import {
-  MdBlock,
   MdLockOutline,
   MdOutlineInventory2,
   MdOutlineLocalShipping,
-  MdOutlineReplay,
   MdOutlineStorefront,
 } from "react-icons/md";
 import { money } from "../../../shared/utils/currency";
@@ -14,9 +12,8 @@ import {
   STATUS,
 } from "../constant/constant";
 
-function ItemRow({ item, onStatus }) {
-  const st = STATUS[item.status];
-  const refunded = item.status === "refunded";
+function ItemRow({ item, onStatus, isUpdating = false }) {
+  const st = STATUS[item.status] ?? STATUS.pending;
 
   return (
     <div className="flex flex-col gap-4 border-b border-slate-100 p-4 last:border-0 lg:flex-row lg:items-center lg:justify-between">
@@ -37,7 +34,9 @@ function ItemRow({ item, onStatus }) {
           <p className="m-0 flex flex-wrap items-center gap-2">
             <span
               className={`text-sm font-bold ${
-                refunded ? "text-slate-500 line-through" : "text-slate-900"
+                item.status === "cancelled"
+                  ? "text-slate-500 line-through"
+                  : "text-slate-900"
               }`}
             >
               {item.name}
@@ -52,12 +51,6 @@ function ItemRow({ item, onStatus }) {
             )}
           </p>
 
-          {refunded && (
-            <p className="m-0 mt-1 text-[10px] font-semibold text-red-600">
-              Refunded ({money(lineTotal(item))})
-            </p>
-          )}
-
           <p className="m-0 mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-slate-600">
             <MdOutlineStorefront className="text-sm text-indigo-700" />
             Seller: <span className="font-semibold">{item.seller}</span> (
@@ -69,7 +62,13 @@ function ItemRow({ item, onStatus }) {
             {item.qty > 1 ? (
               <>
                 {money(item.unitPrice)} ea •{" "}
-                <b className={refunded ? "text-red-600" : "text-slate-900"}>
+                <b
+                  className={
+                    item.status === "cancelled"
+                      ? "text-red-600"
+                      : "text-slate-900"
+                  }
+                >
                   Total: {money(lineTotal(item))}
                 </b>
               </>
@@ -78,11 +77,6 @@ function ItemRow({ item, onStatus }) {
             )}
           </p>
 
-          {refunded && (
-            <p className="m-0 mt-2 inline-block rounded-md bg-red-50 px-2 py-1 text-[10px] font-medium text-red-600">
-              Refund issued {item.refundedAt}
-            </p>
-          )}
           {item.note && (
             <p className="m-0 mt-2 rounded-md bg-indigo-50 px-2 py-1 text-[10px] text-slate-600">
               {item.note}
@@ -94,7 +88,7 @@ function ItemRow({ item, onStatus }) {
       <div className="flex shrink-0 flex-wrap items-center gap-3 rounded-xl bg-indigo-50/60 p-3 lg:w-[22rem]">
         <div className="min-w-36 flex-1">
           <p className="m-0 mb-1.5 flex items-center gap-2 text-[9px] font-semibold uppercase tracking-wider text-slate-600">
-            {refunded ? "Lifecycle Stage" : "Current Status"}
+            Current Status
             <Tag color={st.color} className="m-0! text-[9px]!">
               {st.label}
             </Tag>
@@ -104,26 +98,13 @@ function ItemRow({ item, onStatus }) {
             className="w-full"
             value={item.status}
             options={DELIEVERY_STATUS_OPTIONS}
-            disabled={refunded}
-            suffixIcon={refunded ? <MdLockOutline /> : undefined}
+            loading={isUpdating}
+            disabled={isUpdating}
+            suffixIcon={isUpdating ? <MdLockOutline /> : undefined}
             onChange={(v) => onStatus(item.id, v)}
           />
         </div>
 
-        {item.status === "shipped" && (
-          <>
-            <Button
-              size="small"
-              icon={<MdOutlineReplay />}
-              onClick={() => onStatus(item.id, "refunded")}
-            >
-              Item Refund
-            </Button>
-            <Button size="small" disabled icon={<MdBlock />}>
-              Cancel
-            </Button>
-          </>
-        )}
         {item.status === "processing" && (
           <>
             <Button
@@ -132,6 +113,7 @@ function ItemRow({ item, onStatus }) {
               icon={<MdOutlineLocalShipping />}
               className="bg-indigo-700!"
               onClick={() => onStatus(item.id, "shipped")}
+              loading={isUpdating}
             >
               Dispatch Item
             </Button>
@@ -139,6 +121,7 @@ function ItemRow({ item, onStatus }) {
               size="small"
               danger
               onClick={() => onStatus(item.id, "cancelled")}
+              disabled={isUpdating}
             >
               Cancel Item
             </Button>

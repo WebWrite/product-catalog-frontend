@@ -370,7 +370,7 @@ function ProductForm({
           <div className="flex flex-col sm:flex-row justify-end gap-2 pt-2">
             <Button
               size="large"
-              onClick={() => navigate("/seller/products")}
+              onClick={() => navigate(-1)}
               className="bg-slate-800 border-slate-700 text-slate-300 rounded-xl w-full sm:w-auto"
             >
               Cancel

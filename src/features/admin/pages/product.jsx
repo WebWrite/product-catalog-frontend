@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Button, Input, Select, Table, Tag } from "antd";
+import { useNavigate } from "react-router-dom";
+import { App, Button, Input, Pagination, Select, Table, Tag } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MdCheckCircleOutline,
   MdOpenInNew,
@@ -10,111 +12,12 @@ import {
 } from "react-icons/md";
 import ProductView from "../components/productView";
 import AnalyticalCard from "../components/analyticalCard";
-
-const SAMPLE_PRODUCTS = [
-  {
-    id: 1,
-    name: "Handcrafted Ceramic Carafe & Cups Set",
-    sku: "CR-90214-WHT",
-    category: "Ceramics",
-    seller: "Studio Kanso",
-    image: "/images/products/carafe.jpg",
-    price: 148,
-    tier: "High-Value",
-    stock: 24,
-    velocity: "Healthy velocity",
-    commissionRate: 12,
-    rating: 4.9,
-    reviews: 128,
-    returnRate: 0.8,
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Washed Belgian Linen Duvet Cover",
-    sku: "TX-44182-NAT",
-    category: "Textiles",
-    seller: "Loom & Warp Co.",
-    image: "/images/products/duvet.jpg",
-    price: 210,
-    tier: "High-Value",
-    stock: 41,
-    velocity: "Healthy velocity",
-    commissionRate: 12,
-    rating: 4.8,
-    reviews: 96,
-    returnRate: 1.2,
-    status: "active",
-  },
-  {
-    id: 3,
-    name: 'Cast Iron Dutch Skillet 11"',
-    sku: "KW-10992-BLK",
-    category: "Kitchenware",
-    seller: "Apex Metals",
-    image: "/images/products/skillet.jpg",
-    price: 89,
-    tier: "Standard",
-    stock: 12,
-    velocity: "Steady velocity",
-    commissionRate: 10,
-    rating: 3.9,
-    reviews: 22,
-    returnRate: 6.4,
-    status: "flagged",
-  },
-  {
-    id: 4,
-    name: "Sculptural Oak Lounge Stool",
-    sku: "FN-55100-OAK",
-    category: "Furniture",
-    seller: "Nordic Atelier",
-    image: "",
-    price: 320,
-    tier: "Premium",
-    stock: 6,
-    velocity: "Low stock",
-    commissionRate: 12,
-    rating: 4.7,
-    reviews: 38,
-    returnRate: 0.5,
-    status: "active",
-  },
-  {
-    id: 5,
-    name: "Raw Terracotta Planter Basin",
-    sku: "CR-31002-TER",
-    category: "Ceramics",
-    seller: "Terracotta Works",
-    image: "/images/products/planter.jpg",
-    price: 64,
-    tier: "Standard",
-    stock: 0,
-    velocity: "Restock required",
-    commissionRate: 10,
-    rating: 4.6,
-    reviews: 51,
-    returnRate: 1.9,
-    status: "out-of-stock",
-  },
-  {
-    id: 6,
-    name: "Smoke Glass Coupes (Set of 4)",
-    sku: "KW-88219-SMK",
-    category: "Kitchenware",
-    seller: "Studio Kanso",
-    image: "/images/products/coupes.jpg",
-    price: 96,
-    tier: "Standard",
-    stock: 33,
-    velocity: "Healthy velocity",
-    commissionRate: 10,
-    rating: 4.8,
-    reviews: 74,
-    returnRate: 0.9,
-    status: "active",
-  },
-];
+import {
+  getAdminProductById,
+  getAdminProducts,
+  getAdminProductSummary,
+  deleteAdminProduct,
+} from "../api/api";
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All Statuses" },
@@ -122,50 +25,110 @@ const STATUS_OPTIONS = [
   { value: "inactive", label: "Inactive" },
 ];
 
-function ProductCatalog({ initialProducts = SAMPLE_PRODUCTS }) {
-  const [products, setProducts] = useState(initialProducts);
+const PAGE_SIZE = 15;
+
+function normalizeProduct(product) {
+  return {
+    ...product,
+    id: product._id,
+    sku: product.sku ?? product._id,
+    seller: product.seller?.storeName ?? product.sellerId?.name ?? "Unknown seller",
+    image: product.image?.url ?? product.image ?? "",
+    tier: product.tier ?? "Standard",
+    velocity:
+      product.stock === 0
+        ? "Restock required"
+        : product.stock < 10
+          ? "Low stock"
+          : "Healthy velocity",
+    commissionRate: product.commissionRate ?? 0,
+    rating: product.rating ?? "-",
+    reviews: product.reviews ?? 0,
+    returnRate: product.returnRate ?? 0,
+  };
+}
+
+function ProductCatalog() {
+  const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState("all");
+  const [page, setPage] = useState(1);
   const [selectedKeys, setSelectedKeys] = useState([]);
-  const [inspectedId, setInspectedId] = useState(
-    initialProducts[0]?.id ?? null,
-  );
+  const [inspectedId, setInspectedId] = useState(null);
+  const { modal, notification } = App.useApp();
+  const queryClient = useQueryClient();
 
-  const inspected = products.find((p) => p.id === inspectedId) ?? null;
-  const filteredProducts = products.filter((p) => {
-    const search = keyword.toLowerCase();
-
-    const matchesKeyword =
-      p.name.toLowerCase().includes(search) ||
-      p.sku.toLowerCase().includes(search) ||
-      p.seller.toLowerCase().includes(search);
-
-    const matchesStatus = status === "all" || p.status === status;
-
-    return matchesKeyword && matchesStatus;
+  const summaryQuery = useQuery({
+    queryKey: ["admin", "products", "summary"],
+    queryFn: getAdminProductSummary,
   });
-  const activeCount = products.filter((p) => p.status === "active").length;
-  const outCount = products.filter((p) => p.status === "out-of-stock").length;
+  const productsQuery = useQuery({
+    queryKey: ["admin", "products", { page, keyword, status }],
+    queryFn: () =>
+      getAdminProducts({
+        page,
+        limit: PAGE_SIZE,
+        search: keyword,
+        ...(status === "active" ? { inStock: true } : {}),
+      }),
+  });
+  const inspectedQuery = useQuery({
+    queryKey: ["admin", "product", inspectedId],
+    queryFn: () => getAdminProductById(inspectedId),
+    enabled: !!inspectedId,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteAdminProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "products", "summary"] });
+      setInspectedId(null);
+      notification.success({
+        title: "Product deleted",
+        description: "The product was deleted successfully.",
+        placement: "bottomRight",
+      });
+    },
+    onError: (error) => {
+      notification.error({
+        title: "Could not delete product",
+        description: error?.response?.data?.message ?? "Failed to delete product.",
+        placement: "bottomRight",
+      });
+    },
+  });
+
+  const products = (productsQuery.data?.products ?? []).map(normalizeProduct);
+  const filteredProducts =
+    status === "inactive"
+      ? products.filter((product) => product.status === "inactive")
+      : products;
+  const inspected = inspectedQuery.data
+    ? normalizeProduct(inspectedQuery.data)
+    : null;
+  const confirmDelete = () => {
+    if (!inspectedId) return;
+    modal.confirm({
+      title: "Delete this product?",
+      content: "This action cannot be undone.",
+      okText: "Delete",
+      okButtonProps: { danger: true },
+      onOk: () => deleteMutation.mutate(inspectedId),
+    });
+  };
+  const summary = summaryQuery.data ?? {};
 
   const changeFilter = (setter) => (value) => {
     setter(value);
+    setPage(1);
+    setSelectedKeys([]);
   };
 
   const handleDeactivate = () => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        selectedKeys.includes(p.id) ? { ...p, status: "inactive" } : p,
-      ),
-    );
     setSelectedKeys([]);
   };
 
   const handleActivate = () => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        selectedKeys.includes(p.id) ? { ...p, status: "inactive" } : p,
-      ),
-    );
     setSelectedKeys([]);
   };
 
@@ -251,21 +214,19 @@ function ProductCatalog({ initialProducts = SAMPLE_PRODUCTS }) {
         <AnalyticalCard
           icon={<MdOutlineInventory2 className="size-4" />}
           title="Total Products"
-          amount={products.length.toLocaleString()}
-          note="+4.2%"
-          noteClass="text-indigo-700"
+          amount={summaryQuery.isLoading ? "..." : (summary.totalProduct ?? 0).toLocaleString()}
           percent={100}
           barColor="#3730a3"
         />
         <AnalyticalCard
           icon={<MdCheckCircleOutline className="size-4" />}
           title="Active Listings"
-          amount={activeCount.toLocaleString()}
+          amount={summaryQuery.isLoading ? "..." : (summary.activeProduct ?? 0).toLocaleString()}
         />
         <AnalyticalCard
           icon={<MdOutlineShoppingCart className="size-4" />}
           title="Out of Stock"
-          amount={outCount.toLocaleString()}
+          amount={summaryQuery.isLoading ? "..." : (summary.outOfStock ?? 0).toLocaleString()}
         />
       </div>
 
@@ -323,6 +284,8 @@ function ProductCatalog({ initialProducts = SAMPLE_PRODUCTS }) {
             rowKey="id"
             columns={columns}
             dataSource={filteredProducts}
+            loading={productsQuery.isLoading}
+            pagination={false}
             scroll={{ x: 520 }}
             rowSelection={{
               selectedRowKeys: selectedKeys,
@@ -341,12 +304,24 @@ function ProductCatalog({ initialProducts = SAMPLE_PRODUCTS }) {
             locale={{ emptyText: "No products match your filters" }}
             className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-table-tbody>tr.row-flagged>td]:bg-red-50/60! [&_.ant-table-thead>tr>th]:p-4!  "
           />
+          <div className="flex justify-end border-t border-slate-100 p-4">
+            <Pagination
+              current={productsQuery.data?.page ?? page}
+              pageSize={productsQuery.data?.limit ?? PAGE_SIZE}
+              total={productsQuery.data?.total ?? 0}
+              onChange={setPage}
+              showSizeChanger={false}
+            />
+          </div>
         </div>
 
         <div className="lg:sticky lg:top-24">
           <ProductView
             product={inspected}
             onClose={() => setInspectedId(null)}
+            onEdit={() => navigate(`/admin/products/${inspectedId}/edit`)}
+            onDelete={confirmDelete}
+            isDeleting={deleteMutation.isPending}
           />
         </div>
       </div>

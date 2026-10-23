@@ -1,371 +1,278 @@
 import { useState } from "react";
 import { App, Button, Form, Input, Modal, Select, Table, Tag } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MdOutlineGroups,
+  MdOutlineMonitorHeart,
   MdOutlineRepeat,
   MdOutlineTrendingUp,
-  MdOutlineMonitorHeart,
   MdRefresh,
   MdSearch,
 } from "react-icons/md";
 import AnalyticalCard from "../components/analyticalCard";
+import CustomerInspector from "../components/customerInspector";
 import { money } from "../../../shared/utils/currency";
 import { initials } from "../constant/constant";
-import CustomerInspector from "../components/customerInspector";
 import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
+import {
+  getAdminCustomerOrders,
+  getAdminCustomers,
+  getAdminCustomerSummary,
+  updateAdminCustomer,
+} from "../api/api";
 
-const CUSTOMERS = [
-  {
-    id: "USR-9901",
-    name: "Elena Vance",
-    email: "elena.vance@auramarket.design",
-    joined: "Jan 12, 2023",
-    orders: 14,
-    spent: 1450,
-    lastOrder: "2 hours ago",
-    lastOrderId: "AURA-89240",
-    status: "active",
-    tier: "vip",
-    tierNote: "Tier: High Value",
-    disputes: 0,
-    isNew: false,
-    address: ["142 Water Street, Loft 4B", "Brooklyn, NY 11201, United States"],
-    recent: [
-      {
-        id: "AURA-89240",
-        meta: "2 hours ago • 3 items",
-        amount: 240,
-        state: "Processing",
-      },
-      {
-        id: "AURA-86419",
-        meta: "Apr 24, 2024 • 1 item",
-        amount: 590,
-        state: "Delivered",
-      },
-      {
-        id: "AURA-81092",
-        meta: "Mar 10, 2024 • 1 item",
-        amount: 620,
-        state: "Delivered",
-      },
-    ],
-    memo: "Customer requested expedited courier routing on high-ticket decor orders. VIP expedited delivery badge applied automatically.",
-  },
-  {
-    id: "USR-9902",
-    name: "Marcus Kane",
-    email: "m.kane@nexuslogik.io",
-    joined: "Aug 04, 2023",
-    orders: 8,
-    spent: 840,
-    lastOrder: "Yesterday",
-    lastOrderId: "AURA-89104",
-    status: "flagged",
-    tier: "high",
-    tierNote: "Frequent Buyer",
-    disputes: 1,
-    isNew: false,
-    address: ["88 Market Street", "San Francisco, CA 94103, United States"],
-    recent: [],
-    memo: "",
-  },
-  {
-    id: "USR-9903",
-    name: "Sara Lin",
-    email: "sara.lin@creatives.co",
-    joined: "Nov 12, 2023",
-    orders: 5,
-    spent: 610.5,
-    lastOrder: "May 12",
-    lastOrderId: "AURA-88401",
-    status: "active",
-    tier: "mid",
-    tierNote: "Mid Tier",
-    disputes: 0,
-    isNew: true,
-    address: ["12 Pine Avenue", "Seattle, WA 98101, United States"],
-    recent: [],
-    memo: "",
-  },
-  {
-    id: "USR-9904",
-    name: "Alexandre H.",
-    email: "alex.h@rivegauche.fr",
-    joined: "Feb 28, 2024",
-    orders: 1,
-    spent: 120,
-    lastOrder: "May 10",
-    lastOrderId: "AURA-82019",
-    status: "suspended",
-    tier: "regular",
-    tierNote: "Chargeback Risk",
-    disputes: 2,
-    isNew: false,
-    address: ["5 Rue de Rivoli", "Paris 75004, France"],
-    recent: [],
-    memo: "",
-  },
-  {
-    id: "USR-9905",
-    name: "Julian Wu",
-    email: "julian.wu@atelierwu.com",
-    joined: "Jan 30, 2024",
-    orders: 3,
-    spent: 360,
-    lastOrder: "May 09",
-    lastOrderId: "AURA-81988",
-    status: "active",
-    tier: "regular",
-    tierNote: "Regular",
-    disputes: 0,
-    isNew: true,
-    address: ["77 Queen Street", "Toronto, ON M5C 2B6, Canada"],
-    recent: [],
-    memo: "",
-  },
-];
-
+const PAGE_SIZE = 10;
 const STATUS_TAG = {
   active: { label: "Active", color: "green" },
-  flagged: { label: "Flagged", color: "orange" },
+  blocked: { label: "Blocked", color: "orange" },
   suspended: { label: "Suspended", color: "red" },
 };
-
 const STATUS_OPTIONS = [
   { value: "all", label: "Status: All Accounts" },
   { value: "active", label: "Active" },
-  { value: "flagged", label: "Flagged" },
+  { value: "blocked", label: "Blocked" },
   { value: "suspended", label: "Suspended" },
 ];
 
-const DEFAULTS = { keyword: "", status: "all", tier: "all", page: 1 };
-
-const columns = [
-  {
-    title: "CUSTOMER",
-    render: (_, c) => (
-      <div className="flex items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
-          {initials(c.name)}
-        </span>
-        <div className="min-w-0">
-          <p className="m-0 flex items-center gap-1.5 text-xs font-bold text-slate-900">
-            {c.name}
-            {c.tier === "vip" && (
-              <Tag
-                color="#EAEDFF"
-                className="m-0! text-[9px]! text-indigo-700!"
-              >
-                VIP
-              </Tag>
-            )}
-          </p>
-          <p className="m-0 truncate text-[10px] text-slate-500">{c.email}</p>
-          <p className="m-0 text-[10px] text-slate-400">Joined {c.joined}</p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "ORDERS",
-    dataIndex: "orders",
-    render: (n) => `${n} ${n === 1 ? "order" : "orders"}`,
-  },
-  {
-    title: "LIFETIME SPENT",
-    render: (_, c) => (
-      <>
-        <b className="text-xs">{money(c.spent)}</b>
-        <p
-          className={`m-0 text-[10px] font-semibold ${c.tierNote === "Chargeback Risk" ? "text-red-600" : "text-indigo-700"}`}
-        >
-          {c.tierNote}
-        </p>
-      </>
-    ),
-  },
-  {
-    title: "LAST ORDER",
-    render: (_, c) => (
-      <>
-        <p className="m-0 text-xs">{c.lastOrder}</p>
-        <p className="m-0 font-mono text-[10px] text-slate-500">
-          {c.lastOrderId}
-        </p>
-      </>
-    ),
-  },
-  {
-    title: "STATUS",
-    dataIndex: "status",
-    render: (s) => (
-      <Tag
-        color={STATUS_TAG[s].color}
-        bordered={false}
-        className="text-[10px]!"
-      >
-        {STATUS_TAG[s].label}
-      </Tag>
-    ),
-  },
-];
+function normalizeCustomer(customer, orders = []) {
+  const firstOrder = orders[0];
+  const address = firstOrder?.shippingAddress;
+  return {
+    ...customer,
+    id: customer._id,
+    joined: customer.createdAt
+      ? new Date(customer.createdAt).toLocaleDateString()
+      : "-",
+    orders: customer.totalOrders ?? orders.length,
+    spent: customer.lifetimeSpent ?? 0,
+    tier: (customer.lifetimeSpent ?? 0) >= 50000 ? "vip" : "regular",
+    tierNote: (customer.lifetimeSpent ?? 0) >= 50000 ? "High Value" : "Regular",
+    disputes: 0,
+    address: address
+      ? [
+          address.address,
+          [address.city, address.postalCode].filter(Boolean).join(", "),
+        ].filter(Boolean)
+      : [],
+    recent: orders.slice(0, 3).map((order) => ({
+      id: order._id,
+      meta: `${new Date(order.createdAt).toLocaleDateString()} • ${order.items?.length ?? 0} items`,
+      amount: order.total,
+      state: order.paymentStatus,
+    })),
+    memo: "",
+  };
+}
 
 function CustomerManagement() {
   const { notification } = App.useApp();
-  const [customers, setCustomers] = useState(CUSTOMERS);
-  const [f, setF] = useState(DEFAULTS);
-  const [inspectedId, setInspectedId] = useState(CUSTOMERS[0].id);
+  const queryClient = useQueryClient();
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "all",
+    page: 1,
+  });
+  const [inspectedId, setInspectedId] = useState(null);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [form] = Form.useForm();
 
-  const update = (patch) => setF((prev) => ({ ...prev, page: 1, ...patch }));
-  const patchCustomer = (id, patch) =>
-    setCustomers((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...patch } : c)),
-    );
-
-  const q = f.keyword.trim().toLowerCase();
-  const filtered = customers.filter(
-    (c) =>
-      (!q ||
-        [c.name, c.email, c.id].some((v) => v.toLowerCase().includes(q))) &&
-      (f.status === "all" || c.status === f.status) &&
-      (f.tier === "all" || c.tier === f.tier),
+  const summaryQuery = useQuery({
+    queryKey: ["admin", "customers", "summary"],
+    queryFn: getAdminCustomerSummary,
+  });
+  const customersQuery = useQuery({
+    queryKey: ["admin", "customers", filters],
+    queryFn: () =>
+      getAdminCustomers({
+        page: filters.page,
+        limit: PAGE_SIZE,
+        search: filters.search.trim(),
+        ...(filters.status !== "all" ? { status: filters.status } : {}),
+      }),
+  });
+  const selectedCustomer = (customersQuery.data?.customers ?? []).find(
+    (customer) => customer._id === inspectedId,
   );
+  const ordersQuery = useQuery({
+    queryKey: ["admin", "customer", inspectedId, "orders"],
+    queryFn: () => getAdminCustomerOrders(inspectedId),
+    enabled: !!inspectedId,
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }) => updateAdminCustomer(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "customers"] });
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "customers", "summary"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "customer", inspectedId],
+      });
+      notification.success({
+        title: "Customer updated",
+        description: "Customer account was updated successfully.",
+        placement: "bottomRight",
+      });
+    },
+    onError: () =>
+      notification.error({
+        title: "Update failed",
+        description: "Unable to update this customer.",
+        placement: "bottomRight",
+      }),
+  });
 
-  const inspected = customers.find((c) => c.id === inspectedId) ?? null;
-  const repeat = customers.filter((c) => c.orders > 1).length;
+  const customer = selectedCustomer
+    ? normalizeCustomer(selectedCustomer, ordersQuery.data ?? [])
+    : null;
+  const summary = summaryQuery.data ?? {};
+  const data = customersQuery.data ?? {};
+  const pagination = data.pagination ?? {};
+  const customers = data.customers ?? [];
+  const updateFilters = (patch) =>
+    setFilters((current) => ({ ...current, ...patch, page: 1 }));
+
+  const columns = [
+    {
+      title: "CUSTOMER",
+      render: (_, item) => (
+        <div className="flex items-center gap-3">
+          <span className="flex size-10 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+            {initials(item.name)}
+          </span>
+          <div>
+            <p className="m-0 text-xs font-bold text-slate-900">{item.name}</p>
+            <p className="m-0 text-[10px] text-slate-500">{item.email}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "ORDERS",
+      dataIndex: "totalOrders",
+      render: (value) => `${value ?? 0} orders`,
+    },
+    {
+      title: "LIFETIME SPENT",
+      dataIndex: "lifetimeSpent",
+      render: (value) => money(value ?? 0),
+    },
+    {
+      title: "STATUS",
+      dataIndex: "status",
+      render: (status) => (
+        <Tag color={STATUS_TAG[status]?.color ?? "default"}>
+          {STATUS_TAG[status]?.label ?? status}
+        </Tag>
+      ),
+    },
+  ];
 
   const stats = [
     {
       icon: MdOutlineGroups,
       title: "Total Customers",
-      amount: customers.length.toLocaleString(),
+      amount: summary.totalCustomers ?? 0,
     },
     {
       icon: MdOutlineMonitorHeart,
-      title: "Active (Last 30 Days)",
-      amount: customers.filter((c) => c.status === "active").length,
+      title: "Active Customers",
+      amount: summary.activeCustomers ?? 0,
     },
     {
       icon: MdOutlineRepeat,
       title: "Repeat Buyers",
-      amount: `${customers.length ? ((repeat / customers.length) * 100).toFixed(1) : 0}%`,
+      amount: summary.repeatBuyers ?? 0,
     },
     {
       icon: MdOutlineTrendingUp,
-      title: "New This Week",
-      amount: `+${customers.filter((c) => c.isNew).length}`,
+      title: "Total Spend",
+      amount: money(summary.totalSpend ?? 0),
     },
   ];
 
-  const handleDeactivate = () => {
-    patchCustomer(inspected.id, { status: "suspended" });
-    notification.success({
-      title: "Account deactivated",
-      description: inspected.name,
-      placement: "bottomRight",
-    });
-  };
+  const updateCustomer = (payload) =>
+    updateMutation.mutate({ id: inspectedId, payload });
 
   const handleSavePassword = async () => {
     const values = await form.validateFields();
-
-    console.log("Password validated:", values.password);
+    updateCustomer({ password: values.password });
     setPasswordOpen(false);
     form.resetFields();
   };
 
-  const handleMessage = () => window.open(`mailto:${inspected.email}`);
-
   return (
-    <div className="mx-auto w-full max-w-7xl p-4 ">
+    <div className="mx-auto w-full max-w-7xl p-4">
       <h1 className="m-0 text-2xl font-bold text-slate-900 sm:text-3xl">
         Customer &amp; User Management
       </h1>
       <p className="theme-muted m-0 mt-2 max-w-xl text-xs">
-        View customer profiles, purchase history, saved addresses, and manage
-        account statuses across all global storefronts.
+        View customer profiles, purchase history, and manage account statuses.
       </p>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => (
+        {stats.map((stat) => (
           <AnalyticalCard
-            key={s.title}
-            icon={<s.icon className="size-4" />}
-            title={s.title}
-            amount={s.amount}
+            key={stat.title}
+            icon={<stat.icon className="size-4" />}
+            title={stat.title}
+            amount={summaryQuery.isLoading ? "..." : stat.amount}
           />
         ))}
       </div>
 
-      <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1fr_22rem] ">
-        <div className="min-w-0">
-          <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 xl:flex-row xl:items-center">
+      <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1fr_22rem]">
+        <div>
+          <div className="flex gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
             <Input
               allowClear
               variant="filled"
-              placeholder="Search by Name, Email, or Customer ID"
-              value={f.keyword}
-              onChange={(e) => update({ keyword: e.target.value })}
+              placeholder="Search by name or email"
+              value={filters.search}
+              onChange={(event) => updateFilters({ search: event.target.value })}
               prefix={<MdSearch className="text-lg text-slate-500" />}
-              className="xl:max-w-64"
             />
             <Select
               variant="filled"
-              value={f.status}
-              onChange={(status) => update({ status })}
+              value={filters.status}
+              onChange={(status) => updateFilters({ status })}
               options={STATUS_OPTIONS}
-              className="xl:w-44"
+              className="w-44"
             />
-
             <Button
               type="text"
-              aria-label="Reset filters"
-              className="xl:ml-auto"
-              icon={<MdRefresh className="text-lg" />}
-              onClick={() => setF(DEFAULTS)}
+              icon={<MdRefresh />}
+              onClick={() => setFilters({ search: "", status: "all", page: 1 })}
             />
           </div>
-
           <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
             <Table
-              rowKey="id"
+              rowKey="_id"
               columns={columns}
-              dataSource={filtered}
-              scroll={{ x: 640 }}
-              onRow={(c) => ({
-                className: `cursor-pointer ${c.id === inspectedId ? "row-active" : ""}`,
-                onClick: () => setInspectedId(c.id),
+              dataSource={customers}
+              loading={customersQuery.isLoading}
+              onRow={(item) => ({
+                className: `cursor-pointer ${item._id === inspectedId ? "row-active" : ""}`,
+                onClick: () => setInspectedId(item._id),
               })}
-              locale={{ emptyText: "No customers match your filters" }}
               pagination={{
-                current: f.page,
-                pageSize: 10,
+                current: pagination.page ?? filters.page,
+                pageSize: pagination.limit ?? PAGE_SIZE,
+                total: pagination.totalCustomers ?? 0,
                 showSizeChanger: false,
-                showLessItems: true,
-                onChange: (page) => setF((prev) => ({ ...prev, page })),
-                showTotal: (total, [from, to]) =>
-                  `Showing ${from} - ${to} of ${total.toLocaleString()} `,
-                itemRender: (_, type, original) =>
-                  type === "prev"
-                    ? "Previous"
-                    : type === "next"
-                      ? "Next"
-                      : original,
+                onChange: (page) =>
+                  setFilters((current) => ({ ...current, page })),
               }}
-              className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:p-4! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-pagination]:px-4! [&_.ant-table-tbody>tr>td]:pl-4!"
+              locale={{ emptyText: "No customers match your filters" }}
             />
           </div>
         </div>
-
         <div className="lg:sticky lg:top-24">
           <CustomerInspector
-            customer={inspected}
+            customer={customer}
             onClose={() => setInspectedId(null)}
-            onDeactivate={handleDeactivate}
-            onMessage={handleMessage}
+            onDeactivate={() => updateCustomer({ status: "suspended" })}
+            onMessage={() => window.open(`mailto:${customer?.email}`)}
             onNote={() => setPasswordOpen(true)}
           />
         </div>
@@ -375,50 +282,43 @@ function CustomerManagement() {
         title="Change user password"
         open={passwordOpen}
         okText="Save Password"
+        confirmLoading={updateMutation.isPending}
         onOk={handleSavePassword}
         onCancel={() => setPasswordOpen(false)}
       >
-        <Form layout="vertical" className="theme-form" form={form}>
+        <Form layout="vertical" form={form}>
           <Form.Item
             label="Password"
             name="password"
-            required={false}
-            className="theme-form-label mt-3! font-semibold"
             rules={[
               { required: true, message: "Password is required" },
               { max: 128, message: "Password must be less than 128 character" },
               {
                 validator: (_, value) =>
-                  !value || PASSWORD_CHECKS.every((c) => c.test(value))
+                  !value || PASSWORD_CHECKS.every((check) => check.test(value))
                     ? Promise.resolve()
-                    : Promise.reject(
-                        new Error("Password doesn't meet all requirements"),
-                      ),
+                    : Promise.reject(new Error("Password is too weak")),
               },
             ]}
           >
-            <Input.Password size="large" className="font-normal" />
+            <Input.Password />
           </Form.Item>
-
           <Form.Item
             label="Confirm Password"
             name="confirmPassword"
-            required={false}
             dependencies={["password"]}
-            className="theme-form-label font-semibold"
             rules={[
               { required: true, message: "Confirm Password is required" },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue("password") === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error("The password not match!"));
+                  return !value || value === getFieldValue("password")
+                    ? Promise.resolve()
+                    : Promise.reject(new Error("Passwords do not match"));
                 },
               }),
             ]}
           >
-            <Input.Password size="large" className="font-normal" />
+            <Input.Password />
           </Form.Item>
         </Form>
       </Modal>

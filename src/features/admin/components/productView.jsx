@@ -1,8 +1,9 @@
-import { Tag } from "antd";
-import { MdClose, MdOpenInNew, MdStar, MdVerified } from "react-icons/md";
+import { Button, Tag } from "antd";
+import { MdClose, MdDelete, MdOpenInNew, MdStar, MdVerified } from "react-icons/md";
 import { money } from "../../../shared/utils/currency";
+import { FaEdit } from "react-icons/fa";
 
-function ProductView({ product, onClose }) {
+function ProductView({ product, onClose, onEdit, onDelete, isDeleting = false }) {
   if (!product) {
     return (
       <aside className="rounded-2xl bg-white p-6 text-center text-xs text-slate-500 shadow-sm ring-1 ring-slate-100">
@@ -11,9 +12,6 @@ function ProductView({ product, onClose }) {
     );
   }
 
-  const commission = (product.price * product.commissionRate) / 100;
-  const payout = product.price - commission;
-
   return (
     <aside className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
       <div className="flex items-center justify-between">
@@ -21,19 +19,35 @@ function ProductView({ product, onClose }) {
           <span className="size-1.5 rounded-full bg-indigo-600" />
           Active Inspector
         </p>
-        <div className="flex items-center gap-2 text-base text-slate-500">
-          <MdOpenInNew />
-          <button
-            type="button"
-            aria-label="Close inspector"
-            onClick={onClose}
-            className="flex cursor-pointer items-center hover:text-slate-800"
-          >
-            <MdClose />
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label="Close inspector"
+          onClick={onClose}
+          className="flex cursor-pointer items-center hover:text-slate-800"
+        >
+          <MdClose />
+        </button>
+
       </div>
 
+        <div className="mt-3 gap-3 flex justify-end items-end">
+          <Button
+            size="small"
+            type="text"
+            icon={<FaEdit className="size-4" />}
+            onClick={onEdit}
+            className=""
+          ></Button>
+          <Button
+            size="small"
+            danger
+            type="text"
+            icon={<MdDelete className="size-4" />}
+            loading={isDeleting}
+            onClick={onDelete}
+            className=""
+          ></Button>
+        </div>
       <div className="mt-4 flex gap-3">
         <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
           {product.image && (
@@ -87,24 +101,6 @@ function ProductView({ product, onClose }) {
           >
             {product.velocity}
           </p>
-        </div>
-        <div className="bg-white p-3">
-          <p className="m-0 text-[9px] font-semibold uppercase tracking-wider text-slate-500">
-            Commission ({product.commissionRate}%)
-          </p>
-          <p className="m-0 mt-1 text-lg font-bold text-indigo-700">
-            {money(commission)}
-          </p>
-          <p className="m-0 text-[10px] text-slate-500">Fee / transaction</p>
-        </div>
-        <div className="bg-white p-3">
-          <p className="m-0 text-[9px] font-semibold uppercase tracking-wider text-slate-500">
-            Seller Payout
-          </p>
-          <p className="m-0 mt-1 text-lg font-bold text-slate-900">
-            {money(payout)}
-          </p>
-          <p className="m-0 text-[10px] text-slate-500">Automated Escrow</p>
         </div>
       </div>
 

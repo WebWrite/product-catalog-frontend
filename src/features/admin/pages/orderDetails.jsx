@@ -1,95 +1,104 @@
-import { useState } from "react";
-import { Tag } from "antd";
+import { useMemo } from "react";
+import { useParams } from "react-router-dom";
+import { Tag, message } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MdOutlineInventory2 } from "react-icons/md";
 import ItemRow from "../components/orderItem";
 import Ledger from "../components/ledger";
 import Recipient from "../components/orderRecipient";
+import {
+  getAdminOrderById,
+  updateAdminOrderItemStatus,
+} from "../api/api";
 
-const initialOrder = {
-  id: "ORD-89421",
-  placedAt: "Oct 29, 2024 at 10:42 AM",
-  customer: {
-    name: "Elena Vance",
-    vip: true,
-    email: "elena.vance@auramarket.design",
-    phone: "+1 (917) 555-0192",
-    ltv: "$4.2K",
-  },
-  items: [
-    {
-      id: 1,
-      name: "Handcrafted Ceramic Carafe & Cups Set",
-      seller: "Studio Kanso",
-      location: "Kyoto, JP",
-      qty: 1,
-      unitPrice: 148,
-      status: "shipped",
-      image: "/images/products/carafe.jpg",
+function normalizeOrder(order) {
+  if (!order) return null;
+
+  return {
+    ...order,
+    id: order._id,
+    customer: {
+      ...order.customerId,
+      phone: order.shippingAddress?.phone ?? "-",
+      ltv: "-",
     },
-    {
-      id: 2,
-      name: "Linen Tea Towel Set",
-      variant: "Slate Grey",
-      seller: "Pure Linen Lab",
-      location: "Lisbon, PT",
-      qty: 2,
-      unitPrice: 31,
-      status: "refunded",
-      refundedAt: "Oct 29, 2:30 PM",
-      image: "/images/products/towel.jpg",
+    items: (order.items ?? []).map((item) => ({
+      ...item,
+      id: item._id,
+      seller: item.sellerId?.name ?? "Unknown seller",
+      location: "",
+      qty: item.quantity,
+      unitPrice: item.price,
+      image: item.productId?.image?.url ?? "",
+      variant: item.size,
+    })),
+    shipping: {
+      address: [
+        order.shippingAddress?.fullName,
+        order.shippingAddress?.address,
+        [
+          order.shippingAddress?.city,
+          order.shippingAddress?.postalCode,
+        ]
+          .filter(Boolean)
+          .join(", "),
+      ].filter(Boolean),
+      instructions: `Phone: ${order.shippingAddress?.phone ?? "-"}`,
     },
-    {
-      id: 3,
-      name: "Raw Terracotta Planter Basin",
-      seller: "Terracotta Works",
-      location: "Valencia, ES",
-      qty: 1,
-      unitPrice: 89.5,
-      status: "processing",
-      note: "Seller notified Oct 29 • Packing slip downloaded by vendor 3 hrs ago",
-      image: "/images/products/planter.jpg",
-    },
-  ],
-  shipping: {
-    address: [
-      "Elena Vance c/o Dwell Loft",
-      "142 Water Street, Loft 4B",
-      "Brooklyn, NY 11201 — United States",
-    ],
-    instructions: "Leave with Doorman or 4th fl vestibule",
-  },
-};
+  };
+}
 
 function OrderDetail() {
-  const [items, setItems] = useState(initialOrder.items);
-  const { customer } = initialOrder;
+  const { orderId } = useParams();
+  const queryClient = useQueryClient();
+  const orderQuery = useQuery({
+    queryKey: ["admin", "order", orderId],
+    queryFn: () => getAdminOrderById(orderId),
+    enabled: !!orderId,
+  });
+  const statusMutation = useMutation({
+    mutationFn: updateAdminOrderItemStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "order", orderId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      message.success("Item status updated.");
+    },
+    onError: () => {
+      message.error("Unable to update item status.");
+    },
+  });
 
-  const changeStatus = (id, status) =>
-    setItems((prev) =>
-      prev.map((i) =>
-        i.id === id
-          ? {
-              ...i,
-              status,
-              refundedAt: status === "refunded" ? "Just now" : i.refundedAt,
-            }
-          : i,
-      ),
+  const order = useMemo(() => normalizeOrder(orderQuery.data), [orderQuery.data]);
+
+  if (orderQuery.isLoading) {
+    return <div className="p-6 text-sm text-slate-500">Loading order...</div>;
+  }
+
+  if (orderQuery.isError || !order) {
+    return (
+      <div className="p-6 text-sm text-red-600">
+        Unable to load this order.
+      </div>
     );
+  }
+
+  const changeStatus = (itemId, status) => {
+    statusMutation.mutate({ orderId, itemId, status });
+  };
 
   return (
-    <div className="mx-auto w-full max-w-6xl p-4 ">
+    <div className="mx-auto w-full max-w-6xl p-4">
       <h1 className="m-0 mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
-        Order #{initialOrder.id}
+        Order #{order.id}
       </h1>
       <p className="m-0 mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-600">
-        Placed {initialOrder.placedAt} • Customer:
-        <span className="font-semibold text-slate-900">{customer.name}</span>
-        {customer.vip && (
-          <Tag color="#EAEDFF" className="m-0! text-[10px]! text-indigo-700!">
-            VIP
-          </Tag>
-        )}
+        Placed {new Date(order.createdAt).toLocaleString()} • Customer:
+        <span className="font-semibold text-slate-900">
+          {order.customer.name}
+        </span>
+        <Tag color="#EAEDFF" className="m-0! text-[10px]! text-indigo-700!">
+          {order.paymentMethod} / {order.paymentStatus}
+        </Tag>
       </p>
 
       <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
@@ -105,17 +114,30 @@ function OrderDetail() {
           </Tag>
         </div>
 
-        {items.map((item) => (
-          <ItemRow key={item.id} item={item} onStatus={changeStatus} />
+        {order.items.map((item) => (
+          <ItemRow
+            key={item.id}
+            item={item}
+            onStatus={changeStatus}
+            isUpdating={
+              statusMutation.isPending &&
+              statusMutation.variables?.itemId === item.id
+            }
+          />
         ))}
       </section>
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-2">
-        <Ledger items={items} />
+        <Ledger
+          items={order.items}
+          subtotal={order.subtotal}
+          shippingCost={order.shippingCost}
+          total={order.total}
+        />
         <Recipient
-          customer={customer}
-          shipping={initialOrder.shipping}
-          payment={initialOrder.payment}
+          customer={order.customer}
+          shipping={order.shipping}
+          payment={order.paymentMethod}
         />
       </div>
     </div>

@@ -1,133 +1,25 @@
 import { useState } from "react";
 import { Button, Input, Pagination, Select, Table } from "antd";
+import { useQuery } from "@tanstack/react-query";
 import {
   MdCreditCard,
-  MdErrorOutline,
   MdOutlineLocalShipping,
   MdOutlinePayments,
   MdOutlineReceiptLong,
-  MdOutlineReplay,
   MdRefresh,
   MdSearch,
 } from "react-icons/md";
 import AnalyticalCard from "../components/analyticalCard";
 import { money } from "../../../shared/utils/currency";
 import { useNavigate } from "react-router-dom";
+import { getAdminOrderSummary, getAdminOrders } from "../api/api";
 
 const PAGE_SIZE = 10;
 
-const ORDERS = [
-  {
-    id: "ORD-89421",
-    date: "Today, 10:42 AM",
-    name: "Elena Vance",
-    email: "elena.vance@auram.io",
-    store: "Studio Kanso",
-    items: 1,
-    total: 279.8,
-    payment: "paid",
-    method: "Stripe",
-    fulfillment: "in-transit",
-    tracking: "DHL #864102",
-  },
-  {
-    id: "ORD-89420",
-    date: "Today, 09:15 AM",
-    name: "Marcus Kane",
-    email: "m.kane@nexus.io",
-    store: "Echizen Craft",
-    items: 1,
-    total: 340,
-    payment: "paid",
-    method: "ApplePay",
-    fulfillment: "preparing",
-  },
-  {
-    id: "ORD-89419",
-    date: "Yesterday, 19:30",
-    name: "Sara Lin",
-    email: "sara@designcraft.org",
-    store: "Forma Atelier",
-    items: 3,
-    total: 512.5,
-    payment: "paid",
-    method: "Stripe",
-    fulfillment: "delivered",
-    tracking: "FedEx #81523",
-  },
-  {
-    id: "ORD-89418",
-    date: "Yesterday, 14:02",
-    name: "Alexandra H.",
-    email: "alex.h@luxegoods.fr",
-    store: "Studio Kanso",
-    items: 1,
-    total: 120,
-    payment: "refund",
-    method: "Refund",
-    fulfillment: "return-pending",
-  },
-  {
-    id: "ORD-89417",
-    date: "May 12, 11:10",
-    name: "Julian Wu",
-    email: "jwu@cdldd.com",
-    store: "Nordic Lines",
-    items: 4,
-    total: 890,
-    payment: "paid",
-    method: "PayPal",
-    fulfillment: "delivered",
-  },
-];
-
-const FULFILLMENT = {
-  "in-transit": { label: "In Transit", color: "bg-indigo-50 text-indigo-700" },
-  preparing: { label: "Preparing", color: "bg-amber-50 text-amber-700" },
-  shipped: { label: "Shipped", color: "bg-sky-50 text-sky-700" },
-  delivered: { label: "Delivered", color: "bg-emerald-50 text-emerald-700" },
-  "return-pending": {
-    label: "Return Pending",
-    color: "bg-red-50 text-red-600",
-  },
-  cancelled: { label: "Cancelled", color: "bg-slate-100 text-slate-600" },
-};
-
-const STATUS_CHIPS = [
-  { value: "all", label: "All", test: () => true },
-  { value: "paid", label: "Paid", test: (o) => o.payment === "paid" },
-  {
-    value: "preparing",
-    label: "Preparing",
-    test: (o) => o.fulfillment === "preparing",
-  },
-  {
-    value: "shipped",
-    label: "Shipped",
-    test: (o) => o.fulfillment === "shipped",
-  },
-  {
-    value: "delivered",
-    label: "Delivered",
-    test: (o) => o.fulfillment === "delivered",
-  },
-  {
-    value: "problem",
-    label: "Disputed / Cancelled",
-    test: (o) => ["return-pending", "cancelled"].includes(o.fulfillment),
-  },
-];
-
 const PAYMENT_OPTIONS = [
   { value: "all", label: "Payment: All Types" },
-  { value: "stripe", label: "Stripe" },
-  { value: "cod", label: "COD" },
-];
-
-const RANGE_OPTIONS = [
-  { value: 7, label: "Last 7 Days" },
-  { value: 30, label: "Last 30 Days" },
-  { value: 90, label: "Last 90 Days" },
+  { value: "COD", label: "COD" },
+  { value: "card", label: "Card" },
 ];
 
 const columns = [
@@ -169,39 +61,38 @@ const columns = [
     render: (_, o) => (
       <span
         className={`rounded-lg px-2 py-1 text-[10px] font-semibold ${
-          o.payment === "paid"
+          o.payment === "paid" || o.payment === "completed"
             ? "bg-emerald-50 text-emerald-700"
-            : "bg-red-50 text-red-600"
+            : "bg-amber-50 text-amber-700"
         }`}
       >
-        {o.payment === "paid" ? `Paid (${o.method})` : "Refund Req."}
+        {`${o.payment ?? "Unknown"} (${o.method ?? "Unknown"})`}
       </span>
     ),
   },
-  {
-    title: "FULFILLMENT",
-    render: (_, o) => (
-      <>
-        <span
-          className={`rounded-md px-2 py-1 text-[9px] font-bold uppercase ${FULFILLMENT[o.fulfillment].color}`}
-        >
-          {FULFILLMENT[o.fulfillment].label}
-        </span>
-        {o.tracking && (
-          <p className="m-0 mt-1 text-[10px] text-slate-500">{o.tracking}</p>
-        )}
-      </>
-    ),
-  },
+  
 ];
 
 function OrdersFulfillment() {
   const [keyword, setKeyword] = useState("");
-  const [range, setRange] = useState(30);
   const [payment, setPayment] = useState("all");
-  const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
+
+  const summaryQuery = useQuery({
+    queryKey: ["admin", "orders", "summary"],
+    queryFn: getAdminOrderSummary,
+  });
+  const ordersQuery = useQuery({
+    queryKey: ["admin", "orders", { page, keyword, payment }],
+    queryFn: () =>
+      getAdminOrders({
+        page,
+        limit: PAGE_SIZE,
+        search: keyword.trim(),
+        ...(payment !== "all" ? { payment } : {}),
+      }),
+  });
 
   const filter = (setter) => (value) => {
     setter(value);
@@ -210,56 +101,49 @@ function OrdersFulfillment() {
 
   const reset = () => {
     setKeyword("");
-    setRange(30);
     setPayment("all");
-    setStatus("all");
     setPage(1);
   };
 
-  const q = keyword.trim().toLowerCase().replace("#", "");
-  const activeChip = STATUS_CHIPS.find((c) => c.value === status);
-
-  const filtered = ORDERS.filter(
-    (o) =>
-      (!q ||
-        o.id.toLowerCase().includes(q) ||
-        o.name.toLowerCase().includes(q) ||
-        o.email.toLowerCase().includes(q)) &&
-      (payment === "all" || o.method === payment) &&
-      activeChip.test(o),
-  );
-
-  const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const from = filtered.length ? (page - 1) * PAGE_SIZE + 1 : 0;
-  const to = Math.min(page * PAGE_SIZE, filtered.length);
-
-  const count = (fn) => ORDERS.filter(fn).length;
-  const payouts = ORDERS.filter((o) => o.payment === "paid").reduce(
-    (sum, o) => sum + o.total,
-    0,
-  );
+  const summary = summaryQuery.data ?? {};
+  const pagination = ordersQuery.data?.pagination ?? {};
+  const rows = (ordersQuery.data?.orders ?? []).map((order) => ({
+    ...order,
+    id: order._id,
+    date: new Date(order.createdAt).toLocaleString(),
+    name: order.customerId?.name ?? "Unknown customer",
+    email: order.customerId?.email ?? "-",
+    store: order.items?.[0]?.sellerId ?? "-",
+    items: order.items?.length ?? 0,
+    total: order.total,
+    payment: order.paymentStatus,
+    method: order.paymentMethod,
+  }));
+  const from = rows.length ? (pagination.page - 1) * PAGE_SIZE + 1 : 0;
+  const to = rows.length ? from + rows.length - 1 : 0;
 
   const stats = [
-    { icon: MdOutlineReceiptLong, title: "All Orders", amount: ORDERS.length },
     {
-      icon: MdErrorOutline,
-      title: "Unfulfilled >48h",
-      amount: count((o) => o.fulfillment === "preparing"),
+      icon: MdOutlineReceiptLong,
+      title: "All Orders",
+      amount: summaryQuery.isLoading ? "..." : (summary.totalOrders ?? 0),
     },
     {
       icon: MdOutlineLocalShipping,
       title: "In Transit",
-      amount: count((o) => o.fulfillment === "in-transit"),
+      amount: summaryQuery.isLoading ? "..." : (summary.inTransit ?? 0),
     },
     {
-      icon: MdOutlineReplay,
-      title: "Refund Requests",
-      amount: count((o) => o.payment === "refund"),
+      icon: MdOutlineLocalShipping,
+      title: "Delivered",
+      amount: summaryQuery.isLoading ? "..." : (summary.deliveredOrders ?? 0),
     },
     {
       icon: MdOutlinePayments,
-      title: "Monthly Payouts",
-      amount: money(payouts),
+      title: "Last Month Subtotal",
+      amount: summaryQuery.isLoading
+        ? "..."
+        : money(summary.lastMonthSubtotal ?? 0),
     },
   ];
 
@@ -273,7 +157,7 @@ function OrdersFulfillment() {
         delivery statuses.
       </p>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <AnalyticalCard
             key={s.title}
@@ -295,13 +179,6 @@ function OrdersFulfillment() {
             prefix={<MdSearch className="text-lg text-slate-500" />}
             className="lg:max-w-60"
           />
-          <Select
-            variant="filled"
-            value={range}
-            onChange={setRange}
-            options={RANGE_OPTIONS}
-            className="lg:w-40"
-          />
           <div className="flex items-center gap-3 lg:ml-auto">
             <Select
               variant="filled"
@@ -319,28 +196,6 @@ function OrdersFulfillment() {
             />
           </div>
         </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">
-            Status:
-          </span>
-          {STATUS_CHIPS.map((c) => (
-            <button
-              key={c.value}
-              type="button"
-              onClick={() => filter(setStatus)(c.value)}
-              className={`cursor-pointer rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-                status === c.value
-                  ? "bg-indigo-700 text-white"
-                  : c.value === "problem"
-                    ? "bg-red-50 text-red-600"
-                    : "bg-indigo-50 text-slate-700"
-              }`}
-            >
-              {c.label} ({count(c.test)})
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
@@ -349,7 +204,7 @@ function OrdersFulfillment() {
             Active Orders Listing
           </span>
           <span className="text-[10px] text-slate-500">
-            Showing {from}-{to} of {filtered.length}
+            Showing {from}-{to} of {pagination.total ?? 0}
           </span>
         </div>
 
@@ -357,6 +212,7 @@ function OrdersFulfillment() {
           rowKey="id"
           columns={columns}
           dataSource={rows}
+          loading={ordersQuery.isLoading}
           onRow={(s) => ({
             className: "cursor-pointer",
             onClick: (e) => {
@@ -374,7 +230,7 @@ function OrdersFulfillment() {
           <Pagination
             current={page}
             pageSize={PAGE_SIZE}
-            total={filtered.length}
+            total={pagination.total ?? 0}
             showSizeChanger={false}
             showLessItems
             onChange={setPage}

@@ -23,6 +23,9 @@ const OrdersFulfillment = lazy(
   () => import("../../features/admin/pages/orders"),
 );
 const ProductCatalog = lazy(() => import("../../features/admin/pages/product"));
+const UpdateAdminProduct = lazy(
+  () => import("../../features/admin/pages/updateProduct"),
+);
 const Login = lazy(() => import("../../features/auth/pages/login"));
 const Register = lazy(() => import("../../features/auth/pages/register"));
 const Verification = lazy(
@@ -126,6 +129,10 @@ export const router = createBrowserRouter([
       {
         path: "products",
         element: renderPage(ProductCatalog),
+      },
+      {
+        path: "products/:productId/edit",
+        element: renderPage(UpdateAdminProduct),
       },
       {
         path: "orders",

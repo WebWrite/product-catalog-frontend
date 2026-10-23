@@ -5,16 +5,20 @@ export const COMMISSION_RATE = 0.12;
 export const lineTotal = (i) => i.qty * i.unitPrice;
 
 export const STATUS = {
+  pending: { label: "Pending", color: "default" },
+  confirmed: { label: "Confirmed", color: "cyan" },
+  delivered: { label: "Delivered", color: "green" },
   shipped: { label: "Shipped", color: "blue" },
   processing: { label: "Processing", color: "orange" },
-  refunded: { label: "Refund Closed", color: "red" },
   cancelled: { label: "Cancelled", color: "default" },
 };
 
 export const DELIEVERY_STATUS_OPTIONS = [
+  { value: "pending", label: "Status: Pending" },
+  { value: "confirmed", label: "Status: Confirmed" },
   { value: "processing", label: "Status: Processing" },
   { value: "shipped", label: "Status: Shipped" },
-  { value: "refunded", label: "Status: Refunded" },
+  { value: "delivered", label: "Status: Delivered" },
   { value: "cancelled", label: "Status: Cancelled" },
 ];
 

@@ -15,13 +15,14 @@ function Row({ label, value, className = "" }) {
 const isActive = (i) => i.status !== "refunded" && i.status !== "cancelled";
 const lineTotal = (i) => i.qty * i.unitPrice;
 
-function Ledger({ items }) {
-  const subtotal = items.reduce((n, i) => n + lineTotal(i), 0);
+function Ledger({ items, subtotal: orderSubtotal, shippingCost, total }) {
+  const subtotal =
+    orderSubtotal ?? items.reduce((n, i) => n + lineTotal(i), 0);
   const tax = subtotal * TAX_RATE;
   const refunds = items
     .filter((i) => i.status === "refunded")
     .reduce((n, i) => n + lineTotal(i), 0);
-  const netPaid = subtotal + SHIPPING + tax - refunds;
+  const netPaid = total ?? subtotal + (shippingCost ?? SHIPPING) + tax - refunds;
 
   const sellers = [...new Set(items.map((i) => i.seller))].map((name) => {
     const own = items.filter((i) => i.seller === name);
@@ -57,7 +58,10 @@ function Ledger({ items }) {
 
       <div className="mt-4 flex flex-col gap-2.5">
         <Row label="Items subtotal" value={money(subtotal)} />
-        <Row label="Calculated Combined Shipping" value={money(SHIPPING)} />
+        <Row
+          label="Shipping"
+          value={money(shippingCost ?? SHIPPING)}
+        />
         <Row label="State Sales Tax (NY 8.875%)" value={money(tax)} />
         {refunds > 0 && (
           <Row
