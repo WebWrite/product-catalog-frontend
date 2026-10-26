@@ -32,11 +32,12 @@ import { removeUser } from "../../../app/store/user/userSlice";
 import { useTheme } from "../../../app/theme/useTheme";
 import { logout } from "../../../shared/utils/api";
 import { clearLoginMarker } from "../../../shared/utils/authStorage";
+import { useCartQuery } from "../../cart/hooks/useCart";
 
 const NAV_LINKS = [
   { label: "Home", to: "/", end: true },
   { label: "Shop", to: "/shop" },
-  { label: "my Orders", to: "/orders/myorders" },
+  { label: "Orders", to: "/orders/myorders" },
 ];
 
 const SEARCH_CATEGORIES = [
@@ -64,13 +65,21 @@ function NavBar() {
   const { notification } = App.useApp();
   const user = useSelector((state) => state.user);
   const { isDarkMode, toggleTheme } = useTheme();
+  const { data: cartData } = useCartQuery();
 
   const favCount = 0;
   const isLoggedIn = !!user?.email;
 
-  const cartCount = useSelector((state) =>
+  const guestCartCount = useSelector((state) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0),
   );
+  const serverCartItems = cartData?.cart?.items;
+  const cartCount = isLoggedIn
+    ? (serverCartItems?.reduce(
+        (total, item) => total + Number(item.quantity ?? 0),
+        0,
+      ) ?? Number(user?.cart ?? 0))
+    : guestCartCount;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
@@ -225,11 +234,7 @@ function NavBar() {
           />
         </Badge>
 
-        <Badge
-          count={isLoggedIn ? (user?.cart ?? 0) : cartCount}
-          size="small"
-          color="#4f46e5"
-        >
+        <Badge count={cartCount} size="small" color="#4f46e5">
           <Button
             className={iconButtonClass}
             onClick={() => navigate("/cart")}
@@ -260,11 +265,7 @@ function NavBar() {
       </div>
 
       <div className="flex items-center gap-3 md:hidden">
-        <Badge
-          count={isLoggedIn ? user?.cart : cartCount}
-          size="small"
-          color="#4f46e5"
-        >
+        <Badge count={cartCount} size="small" color="#4f46e5">
           <Button
             className={iconButtonClass}
             onClick={() => navigate("/cart")}

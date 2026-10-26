@@ -75,17 +75,20 @@ function RecentOrder({ orders = [], isLoading = false }) {
   }));
 
   return (
-    <div className="rounded-xl bg-white p-6">
+    <div className="rounded-xl bg-white p-4 sm:p-6">
       <p className="theme-muted text-xs">Live Transaction Feed</p>
       <h2 className="text-black text-lg mb-3 font-medium">Recent Orders</h2>
-      <Table
-        columns={columns}
-        size="large"
-        className="[&_.ant-table-thead>tr>th]:bg-violet-50! [&_.ant-table-thead>tr>th]:p-4! [&_.ant-table-thead>tr>th]:text-xs!"
-        loading={isLoading}
-        dataSource={data}
-        locale={{ emptyText: "No recent orders found." }}
-      />
+      <div className="overflow-x-auto">
+        <Table
+          columns={columns}
+          size="large"
+          scroll={{ x: 760 }}
+          className="[&_.ant-table-thead>tr>th]:bg-violet-50! [&_.ant-table-thead>tr>th]:p-4! [&_.ant-table-thead>tr>th]:text-xs!"
+          loading={isLoading}
+          dataSource={data}
+          locale={{ emptyText: "No recent orders found." }}
+        />
+      </div>
     </div>
   );
 }

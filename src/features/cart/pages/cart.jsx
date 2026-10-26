@@ -100,8 +100,9 @@ function CartPage() {
         unitPrice: i.productId?.price ?? 0,
         sellerName: i.productId?.sellerId?.name ?? "Unknown Seller",
         size: i.size,
-        quantity: i.quantity,
-        inStock: (i.productId?.stock ?? 0) > 0,
+        quantity: Number(i.quantity ?? 0),
+        stock: Number(i.productId?.stock ?? 0),
+        inStock: Number(i.productId?.stock ?? 0) > 0,
         image: i.productId?.image?.url,
       }))
     : guestItems.flatMap((i) => {
@@ -120,8 +121,9 @@ function CartPage() {
               product.sellerId?.name ||
               "Unknown Seller",
             size: i.size,
-            quantity: i.quantity,
-            inStock: (product.stock ?? 0) > 0,
+            quantity: Number(i.quantity ?? 0),
+            stock: Number(product.stock ?? 0),
+            inStock: Number(product.stock ?? 0) > 0,
             image: product.image?.url,
           },
         ];
@@ -175,6 +177,33 @@ function CartPage() {
     navigate("/orders/new");
   };
 
+  const handleCheckOut = () => {
+    const unavailableItems = items.filter(
+      (item) => item.quantity > item.stock || item.stock <= 0,
+    );
+
+    if (unavailableItems.length > 0) {
+      const description = unavailableItems
+        .map((item) =>
+          item.stock > 0
+            ? `${item.name}: you can only add ${item.stock} item${
+                item.stock === 1 ? "" : "s"
+              }`
+            : `${item.name} is out of stock`,
+        )
+        .join(". ");
+
+      notification.error({
+        message: "Insufficient stock",
+        description,
+        placement: "bottomRight",
+      });
+
+      return;
+    }
+
+    navigate("/orders/new");
+  };
   return (
     <div className="font-sans min-h-screen p-3 sm:p-4 md:p-6 max-w-7xl mx-auto">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-2 mb-4 mt-2 sm:mt-4">

@@ -64,7 +64,7 @@ function AdminDashboard() {
           Some dashboard data could not be loaded. Please refresh and try again.
         </p>
       )}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
         <AnalyticalCard
           amount={summaryQuery.isLoading ? "..." : money(summary.grossValue ?? 0)}
           icon={<GrCurrency className="size-5" />}
@@ -91,8 +91,8 @@ function AdminDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-4 mt-10 gap-3 w-full">
-        <div className="col-span-3">
+      <div className="mt-8 grid w-full grid-cols-1 gap-4 xl:mt-10 xl:grid-cols-4 xl:gap-3">
+        <div className="min-w-0 xl:col-span-3">
           <RevenueChart data={revenue} isLoading={revenueQuery.isLoading} />
         </div>
         <TopSelling
