@@ -1,49 +1,13 @@
-import {
-  Button,
-  Card,
-  Empty,
-  Flex,
-  Select,
-  Tag,
-  Typography,
-  notification,
-} from "antd";
-import Loader from "../../../shared/components/loader";
+import { Button, notification } from "antd";
+import { CheckOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
 import {
   useSellerOrders,
   useUpdateOrderStatus,
 } from "../hooks/useSellerProducts";
+import OrdersList from "../../../shared/components/ordersList";
+import confirmCancelItem from "../../../shared/components/confirmCancelItem";
 
-const { Title, Text } = Typography;
-
-const editableStatuses = [
-  "pending",
-  "confirmed",
-  "processing",
-  "shipped",
-  "delivered",
-  "cancelled",
-];
-
-const statusColors = {
-  pending: "gold",
-  confirmed: "blue",
-  processing: "cyan",
-  shipped: "purple",
-  delivered: "green",
-  cancelled: "red",
-};
-
-const finalStatuses = ["delivered", "cancelled"];
-
-const formatPrice = (amount) =>
-  new Intl.NumberFormat("en-PK", {
-    style: "currency",
-    currency: "PKR",
-    maximumFractionDigits: 0,
-  }).format(amount);
-
-export default function SellerOrders() {
+const SellerOrders = () => {
   const { data: orders = [], isPending, isError, refetch } = useSellerOrders();
 
   const { mutate: updateStatus, isPending: isUpdating } =
@@ -53,113 +17,76 @@ export default function SellerOrders() {
     updateStatus(
       { orderId, itemId, status },
       {
-        onSuccess: () =>
+        onSuccess: () => {
           notification.success({
             message: "Item status updated successfully",
-          }),
-        onError: (error) =>
+          });
+        },
+        onError: (error) => {
           notification.error({
             message: "Unable to update item status",
             description: error.response?.data?.message || "Please try again.",
-          }),
+          });
+        },
       },
     );
   };
 
-  if (isPending) {
-    return (
-      <div className="mx-auto max-w-4xl p-4">
-        <Loader />
-      </div>
+  const handleCancel = (orderId, itemId) =>
+    confirmCancelItem((callbacks) =>
+      updateStatus({ orderId, itemId, status: "cancelled" }, callbacks),
     );
-  }
 
-  if (isError) {
+  const renderItemActions = (order, item) => {
+    const canDeliver =
+      (order.paymentMethod === "COD" && item.status === "pending") ||
+      (order.paymentMethod === "STRIPE" && item.status === "confirmed");
+
+    const canCancel = item.status === "pending";
+
+    if (!canDeliver && !canCancel) return null;
+
     return (
-      <Flex vertical align="center" gap={12} className="p-8">
-        <Text>Unable to load seller orders.</Text>
-        <Button onClick={() => refetch()}>Try again</Button>
-      </Flex>
+      <>
+        {canDeliver && (
+          <Button
+            type="primary"
+            icon={<CheckOutlined />}
+            loading={isUpdating}
+            onClick={() => handleStatusChange(order._id, item._id, "delivered")}
+          >
+            Mark delivered
+          </Button>
+        )}
+
+        {canCancel && (
+          <Button
+            danger
+            icon={<CloseOutlined />}
+            loading={isUpdating}
+            onClick={() => handleCancel(order._id, item._id)}
+          >
+            Cancel
+          </Button>
+        )}
+      </>
     );
-  }
+  };
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4">
-      <Title level={2}>Seller Orders</Title>
-
-      {orders.length === 0 ? (
-        <Empty description="No orders for your products yet." />
-      ) : (
-        orders.map((order) => (
-          <Card key={order._id} title={<Text strong>Order #{order._id}</Text>}>
-            <Flex vertical gap={16}>
-              {order.items.map((item) => {
-                const isFinal = finalStatuses.includes(item.status);
-
-                return (
-                  <Flex
-                    key={item._id}
-                    align="center"
-                    gap={12}
-                    className="min-w-0"
-                    wrap="wrap"
-                  >
-                    <img
-                      src={item.productId?.image?.url}
-                      alt={item.name}
-                      className="h-16 w-16 shrink-0 rounded object-cover"
-                    />
-
-                    <Flex flex={1} vertical gap={4} className="min-w-0">
-                      <Text strong>{item.name}</Text>
-
-                      <Text type="secondary">
-                        Qty: {item.quantity}
-                        {item.size ? ` · Size: ${item.size}` : ""}
-                      </Text>
-
-                      <Text>{formatPrice(item.itemTotal)}</Text>
-                    </Flex>
-
-                    {isFinal ? (
-                      <Tag color={statusColors[item.status] || "default"}>
-                        {item.status}
-                      </Tag>
-                    ) : (
-                      <Select
-                        value={item.status}
-                        loading={isUpdating}
-                        disabled={isUpdating}
-                        style={{ width: 140 }}
-                        options={editableStatuses.map((status) => ({
-                          label:
-                            status.charAt(0).toUpperCase() + status.slice(1),
-                          value: status,
-                        }))}
-                        onChange={(status) =>
-                          handleStatusChange(order._id, item._id, status)
-                        }
-                      />
-                    )}
-                  </Flex>
-                );
-              })}
-
-              <div className="border-t pt-3">
-                <Flex justify="space-between">
-                  <Text type="secondary">Payment method</Text>
-                  <Text>{order.paymentMethod}</Text>
-                </Flex>
-
-                <Flex justify="space-between" className="mt-2">
-                  <Text type="secondary">Payment status</Text>
-                  <Text>{order.paymentStatus}</Text>
-                </Flex>
-              </div>
-            </Flex>
-          </Card>
-        ))
-      )}
-    </div>
+    <OrdersList
+      title="Seller Orders"
+      subtitle="Update the status of items in orders placed with your workshop"
+      emptyText="No orders for your products yet."
+      errorText="Unable to load seller orders."
+      orders={orders}
+      isLoading={isPending}
+      isError={isError}
+      onRetry={refetch}
+      HeaderIcon={UserOutlined}
+      renderItemActions={renderItemActions}
+    />
   );
-}
+};
+
+export default SellerOrders;

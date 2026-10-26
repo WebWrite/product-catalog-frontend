@@ -29,3 +29,8 @@ export const createStripeCheckout = async (shippingAddress) => {
 
   return data;
 };
+
+export const retryStripePayment = async (orderId) => {
+  const { data } = await api.post("/orders/stripe/retry", { orderId });
+  return data.data;
+};
