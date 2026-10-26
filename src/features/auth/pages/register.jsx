@@ -24,7 +24,7 @@ function Register() {
   const [userType, setUserType] = useState("Buyer");
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-purple-50">
+    <div className="relative min-h-screen overflow-x-hidden scrollbar-none bg-purple-50">
       <Link
         to={"/"}
         className="fixed top-4 left-0 z-50 flex items-center gap-2 rounded-r-lg! bg-blue-600! p-2 text-white! shadow-lg! transition-colors! hover:bg-blue-700! sm:top-20 sm:-translate-y-1/2 sm:p-3"

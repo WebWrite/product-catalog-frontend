@@ -15,6 +15,7 @@ function CartItem({
   name,
   variant,
   inStock = true,
+  stock,
   note,
   unitPrice,
   quantity,
@@ -100,7 +101,7 @@ function CartItem({
                 <button
                   type="button"
                   aria-label="Increase quantity"
-                  disabled={quantity >= maxQuantity}
+                  disabled={quantity >= maxQuantity || stock <= quantity}
                   onClick={() => onQuantityChange(id, 1)}
                   className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-white text-base text-slate-700 shadow-sm transition-colors hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >

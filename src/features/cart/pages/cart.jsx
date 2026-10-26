@@ -162,43 +162,47 @@ function CartPage() {
     if (isLoggedIn) deleteCart.mutate();
     else dispatch(clearCart());
   };
+
   const handleCheckout = () => {
+    if (!items.length) {
+      notification.warning({
+        title: "Cart is empty",
+        description: "Add some items before checking out.",
+        placement: "bottomRight",
+        pauseOnHover: true,
+        showProgress: true,
+      });
+      return;
+    }
     if (!isLoggedIn) {
       notification.warning({
-        message: "Login required",
-        description: "Please log in to proceed to checkout.",
+        description: "Please log in or register  to proceed to checkout.",
         placement: "bottomRight",
+        pauseOnHover: true,
+        showProgress: true,
       });
-
-      navigate("/auth/login");
+      navigate("/auth/register");
       return;
     }
 
-    navigate("/orders/new");
-  };
-
-  const handleCheckOut = () => {
     const unavailableItems = items.filter(
-      (item) => item.quantity > item.stock || item.stock <= 0,
+      (item) => item.stock <= 0 || item.quantity > item.stock,
     );
 
     if (unavailableItems.length > 0) {
       const description = unavailableItems
         .map((item) =>
           item.stock > 0
-            ? `${item.name}: you can only add ${item.stock} item${
-                item.stock === 1 ? "" : "s"
-              }`
+            ? `${item.name}: only ${item.stock} item${item.stock === 1 ? "" : "s"} available`
             : `${item.name} is out of stock`,
         )
         .join(". ");
 
       notification.error({
-        message: "Insufficient stock",
+        title: "Insufficient stock",
         description,
         placement: "bottomRight",
       });
-
       return;
     }
 
@@ -246,9 +250,10 @@ function CartPage() {
                 quantity={item.quantity}
                 sellerName={item.sellerName}
                 inStock={item.inStock}
+                stock={item.stock}
                 unitPrice={item.unitPrice}
                 variant={item.size || "Default"}
-                note={"Made in Small Batches"}
+                note={" "}
                 name={item.name}
                 onQuantityChange={handleEditItem}
                 onRemove={handleRemoveItem}

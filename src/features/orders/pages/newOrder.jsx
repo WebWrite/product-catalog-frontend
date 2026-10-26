@@ -25,6 +25,9 @@ const NewOrder = () => {
           notification.success({
             message: "Order placed successfully",
             description: "Your Cash on Delivery order has been created.",
+            pauseOnHover: true,
+            showProgress: true,
+            placement: "bottomRight",
           });
 
           navigate("/orders/myorders");
@@ -33,6 +36,9 @@ const NewOrder = () => {
           notification.error({
             message: "Unable to place order",
             description: error.response?.data?.message || "Please try again.",
+            pauseOnHover: true,
+            showProgress: true,
+            placement: "bottomRight",
           });
         },
       });
@@ -42,6 +48,9 @@ const NewOrder = () => {
       notification.error({
         message: "Something went wrong",
         description: "Please try again.",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
       });
     }
   };
@@ -58,6 +67,9 @@ const NewOrder = () => {
             notification.error({
               message: "Unable to start payment",
               description: "Stripe Checkout URL was not returned.",
+              pauseOnHover: true,
+              showProgress: true,
+              placement: "bottomRight",
             });
             return;
           }
@@ -68,6 +80,9 @@ const NewOrder = () => {
           notification.error({
             message: "Unable to start payment",
             description: error.response?.data?.message || "Please try again.",
+            pauseOnHover: true,
+            showProgress: true,
+            placement: "bottomRight",
           });
         },
       });
@@ -77,6 +92,9 @@ const NewOrder = () => {
       notification.error({
         message: "Something went wrong",
         description: "Please try again.",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
       });
     }
   };
