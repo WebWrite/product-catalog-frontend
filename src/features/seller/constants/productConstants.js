@@ -20,3 +20,8 @@ export const PRODUCT_SORT_OPTIONS = [
   { label: "Name: A to Z", value: "a-z" },
   { label: "Name: Z to A", value: "z-a" },
 ];
+
+export const liveTotal = (order) =>
+  order.items
+    .filter((i) => i.status !== "cancelled")
+    .reduce((sum, i) => sum + i.itemTotal, 0);
