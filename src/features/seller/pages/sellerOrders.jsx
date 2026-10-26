@@ -23,8 +23,7 @@ import { money } from "../../../shared/utils/currency";
 const FILTERS = [
   { value: "all", label: "All" },
   { value: "pending", label: "Pending" },
-  { value: "processing", label: "Processing" },
-  { value: "shipped", label: "Shipped" },
+  { value: "confirmed", label: "Confirmed" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -45,6 +44,7 @@ const SellerOrders = () => {
   const { data: orders = [], isLoading, isError, refetch } = useSellerOrders();
   const { mutate: updateStatus, isPending: isUpdating } =
     useUpdateOrderStatus();
+  console.log(orders);
 
   const q = keyword.trim().toLowerCase().replace("#", "");
   const visible = orders.filter(
@@ -76,8 +76,8 @@ const SellerOrders = () => {
     },
     {
       icon: MdOutlineLocalShipping,
-      title: "In Transit",
-      amount: countItems("shipped"),
+      title: "To Deliver",
+      amount: countItems("confirmed"),
     },
     { icon: MdOutlinePayments, title: "Sales Value", amount: money(revenue) },
   ];

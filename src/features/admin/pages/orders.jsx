@@ -62,7 +62,7 @@ const columns = [
     render: (_, o) => (
       <span
         className={`rounded-lg px-2 py-1 text-[10px] font-semibold ${
-          o.payment === "paid" || o.payment === "completed"
+          o.payment === "completed"
             ? "bg-emerald-50 text-emerald-700"
             : "bg-amber-50 text-amber-700"
         }`}
