@@ -3,6 +3,7 @@ import { money } from "../utils/currency";
 import {
   getOrderStage,
   GetOrderStatus,
+  canCancelOrderItem,
   PAYMENT_STATUS,
   sellerName,
   shortId,
@@ -46,6 +47,8 @@ function Row({ label, value, valueClass = "text-slate-900" }) {
 
 function OrderDetail({ order, onCancel, onRetry, isCancelling, isRetrying }) {
   const status = GetOrderStatus(order);
+  console.log(order);
+
   const stage = getOrderStage(order);
   const payment = PAYMENT_STATUS[order.paymentStatus];
   const address = order.shippingAddress;
@@ -187,7 +190,7 @@ function OrderDetail({ order, onCancel, onRetry, isCancelling, isRetrying }) {
                   <Tag color={tag.color} className="m-0! text-[10px]!">
                     {tag.label}
                   </Tag>
-                  {item.status === "pending" && (
+                  {canCancelOrderItem(item.status) && (
                     <Button
                       danger
                       size="small"

@@ -9,9 +9,10 @@ import {
   MdOutlineReceiptLong,
 } from "react-icons/md";
 import {
-  FLOW,
   getOrderStage,
+  getSellerNextStatus,
   GetOrderStatus,
+  canCancelOrderItem,
   PAYMENT_STATUS,
   shortId,
   statusTag,
@@ -20,12 +21,6 @@ import {
 import { formatDate } from "../../../shared/utils/formatDate";
 import { liveTotal } from "../constants/productConstants";
 import { money } from "../../../shared/utils/currency";
-
-const NEXT = {
-  pending: { to: "processing", label: "Start Processing" },
-  processing: { to: "shipped", label: "Mark as Shipped" },
-  shipped: { to: "delivered", label: "Mark as Delivered" },
-};
 
 function Card({ title, icon, children }) {
   return (
@@ -56,12 +51,24 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
   const customer = order.customerId;
 
   const blocked =
-    order.paymentMethod === "STRIPE" && order.paymentStatus !== "paid";
+    order.paymentMethod?.toUpperCase() === "STRIPE" &&
+    order.paymentStatus?.toLowerCase() !== "completed";
   const blockedReason = "Waiting for the customer's Stripe payment";
 
-  const currentKey = stage === -1 ? null : FLOW[stage];
-  const bulk = currentKey ? NEXT[currentKey] : null;
-  const bulkItems = order.items.filter((i) => i.status === currentKey);
+  const bulkItems = order.items.filter((item) =>
+    getSellerNextStatus(
+      order.paymentMethod,
+      item.status,
+      order.paymentStatus,
+    ),
+  );
+  const bulk = bulkItems.length
+    ? getSellerNextStatus(
+        order.paymentMethod,
+        bulkItems[0].status,
+        order.paymentStatus,
+      )
+    : null;
 
   const advanceAll = () =>
     bulkItems.forEach((item) => onUpdate(order._id, item._id, bulk.to));
@@ -192,8 +199,12 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
         <div className="flex flex-col gap-3">
           {order.items.map((item) => {
             const tag = statusTag(item.status);
-            const next = NEXT[item.status];
-            const canCancel = ["pending", "processing"].includes(item.status);
+            const next = getSellerNextStatus(
+              order.paymentMethod,
+              item.status,
+              order.paymentStatus,
+            );
+            const canCancel = canCancelOrderItem(item.status);
 
             return (
               <div

@@ -9,19 +9,18 @@ export const getOrderStage = (order) => {
   return Math.min(...active.map((i) => Math.max(FLOW.indexOf(i.status), 0)));
 };
 
-export const FLOW = ["pending", "processing", "shipped", "delivered"];
+export const FLOW = ["pending", "confirmed", "delivered"];
 
 export const ITEM_STATUS = {
   pending: { label: "Pending", color: "orange" },
-  processing: { label: "Processing", color: "blue" },
-  shipped: { label: "Shipped", color: "geekblue" },
+  confirmed: { label: "Confirmed", color: "blue" },
   delivered: { label: "Delivered", color: "green" },
   cancelled: { label: "Cancelled", color: "red" },
 };
 
 export const PAYMENT_STATUS = {
   pending: { label: "Payment pending", color: "text-amber-700" },
-  paid: { label: "Paid", color: "text-emerald-700" },
+  completed: { label: "Payment completed", color: "text-emerald-700" },
   failed: { label: "Payment failed", color: "text-red-600" },
 };
 
@@ -36,4 +35,25 @@ export const sellerName = (item) =>
 
 export const shortId = (order) => `#${order._id.slice(-6).toUpperCase()}`;
 
-export const STEPS = ["Order Placed", "Processing", "Shipped", "Delivered"];
+export const STEPS = ["Order Placed", "Confirmed", "Delivered"];
+
+export const getSellerNextStatus = (
+  paymentMethod,
+  itemStatus,
+  paymentStatus,
+) => {
+  const method = paymentMethod?.toUpperCase();
+  const status = itemStatus?.toLowerCase();
+  const payment = paymentStatus?.toLowerCase();
+
+  if (
+    (method === "STRIPE" && payment === "completed" && status === "confirmed") ||
+    (method === "COD" && status === "pending")
+  ) {
+    return { to: "delivered", label: "Mark as Delivered" };
+  }
+
+  return null;
+};
+
+export const canCancelOrderItem = (itemStatus) => itemStatus === "pending";

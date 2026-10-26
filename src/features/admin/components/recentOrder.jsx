@@ -48,7 +48,7 @@ function RecentOrder({ orders = [], isLoading = false }) {
       dataIndex: "paymentStatus",
       render: (paymentStatus) => (
         <Flex gap="small" align="center" wrap>
-          <Tag color={paymentStatus === "paid" ? "green" : "gold"}>
+          <Tag color={paymentStatus === "completed" ? "green" : "gold"}>
             {paymentStatus?.toUpperCase() ?? "UNKNOWN"}
           </Tag>
         </Flex>
