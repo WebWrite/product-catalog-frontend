@@ -20,19 +20,19 @@ import ProductCard from "../../../shared/components/product";
 import ProductSkeleton from "../components/productSkeleton";
 import ProductNotFound from "../components/productNotFound";
 import { useDispatch, useSelector } from "react-redux";
-import { useAddToCart } from "../../cart/hooks/useCart";
+import { useAddToCart, useCartQuery } from "../../cart/hooks/useCart";
 import { addItem } from "../../../app/store/cart/cart";
 
 function ProductDetail() {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(0);
-  const [liked, setLiked] = useState(false);
   const isLoggedIn = useSelector((state) => !!state.user?.email);
   const cart = useSelector((state) => state.cart);
 
   let dispatch = useDispatch();
   let addItemMutation = useAddToCart();
+  const { data: serverCart } = useCartQuery();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["product", id],
@@ -59,20 +59,43 @@ function ProductDetail() {
   //   const sellerLink = `/sellers/${seller?._id ?? ""}`;
   const sellerLink = "/";
   const sizes = product.sizes ?? [];
+  const selectedSizeOption = sizes[selectedSize];
+  const selectedSizeValue =
+    typeof selectedSizeOption === "string"
+      ? selectedSizeOption
+      : selectedSizeOption?.label;
   const badge = getBadge(product);
   const outOfStock = product.stock === 0;
   const maxQuantity = 25;
   const total = product.price * quantity;
+  const cartItemCount = isLoggedIn
+    ? (serverCart?.cart?.items ?? [])
+        .filter((item) => {
+          const productId =
+            typeof item.productId === "object"
+              ? item.productId?._id
+              : item.productId;
+          const sameSize =
+            item.size === selectedSizeValue ||
+            (!item.size && !selectedSizeValue);
+          return productId === id && sameSize;
+        })
+        .reduce((sum, item) => sum + Number(item.quantity ?? 0), 0)
+    : cart.items.reduce(
+        (sum, item) =>
+          item.productId === id &&
+          (item.size === selectedSizeValue ||
+            (!item.size && !selectedSizeValue))
+            ? sum + Number(item.quantity ?? 0)
+            : sum,
+        0,
+      );
 
   const relatedProducts = (related?.data?.products ?? [])
     .filter((p) => p._id !== product._id)
     .slice(0, 4);
 
   const handleAddToCart = () => {
-    const sizeOption = sizes[selectedSize];
-    const selectedSizeValue =
-      typeof sizeOption === "string" ? sizeOption : sizeOption?.label;
-
     if (sizes.length > 0 && !selectedSizeValue) {
       message.error("Please select a size.");
       return;
@@ -225,39 +248,38 @@ function ProductDetail() {
                 </button>
               </div>
             </div>
+            {(!sizes.length || selectedSizeValue) && (
+              <div className="mt-3 flex justify-end">
+                <span className="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700 ring-1 ring-indigo-100">
+                  In cart: {cartItemCount}
+                </span>
+              </div>
+            )}
 
             <Button
               type="primary"
               size="large"
               block
-              disabled={outOfStock}
+              disabled={outOfStock || cartItemCount >= 25}
               onClick={handleAddToCart}
-              className="mt-5 h-11! bg-indigo-700! text-xs! font-semibold! hover:bg-indigo-800!"
+              className="mt-5 h-11! bg-indigo-700! text-xs! font-semibold! hover:bg-indigo-800! disabled:text-gray-500! disabled:bg-gray-100! disabled:opacity-100!"
             >
-              {outOfStock ? "Out of Stock" : `Add to Cart — ${money(total)}`}
+              {outOfStock
+                ? "Out of Stock"
+                : cartItemCount >= 25
+                  ? "Your item cart is full"
+                  : `Add to Cart — ${money(total)}`}
             </Button>
 
             <div className="mt-3 flex gap-3">
               <Link
-                to="/checkout"
+                to="/cart"
                 className={`flex h-11 flex-1 items-center justify-center rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-700! transition-colors hover:bg-indigo-100 ${
                   outOfStock ? "pointer-events-none opacity-60" : ""
                 }`}
               >
                 Buy Now • Start Checkout
               </Link>
-              <button
-                type="button"
-                aria-label="Toggle favourite"
-                onClick={() => setLiked(!liked)}
-                className="flex size-11 cursor-pointer items-center justify-center rounded-lg bg-white text-lg ring-1 ring-slate-200 hover:text-red-500"
-              >
-                {liked ? (
-                  <MdFavorite className="text-red-500" />
-                ) : (
-                  <MdFavoriteBorder />
-                )}
-              </button>
             </div>
 
             <ul className="m-0 mt-5 flex list-none flex-col gap-2.5 rounded-xl bg-indigo-50/60 p-4 text-[11px] text-slate-600">
