@@ -162,6 +162,20 @@ function CartPage() {
     if (isLoggedIn) deleteCart.mutate();
     else dispatch(clearCart());
   };
+  const handleCheckout = () => {
+    if (!isLoggedIn) {
+      notification.warning({
+        message: "Login required",
+        description: "Please log in to proceed to checkout.",
+        placement: "bottomRight",
+      });
+
+      navigate("/auth/login");
+      return;
+    }
+
+    navigate("/orders/new");
+  };
 
   const handleCheckOut = () => {
     const unavailableItems = items.filter(
@@ -316,7 +330,7 @@ function CartPage() {
           </div>
 
           <CustomButton
-            onClick={handleCheckOut}
+            onClick={handleCheckout}
             className="w-full! py-5! text-xs! sm:text-sm! bg-indigo-700! text-white! rounded-lg! hover:bg-indigo-800!"
             variant="solid"
             icon={<CiLock className="size-4" />}
