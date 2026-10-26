@@ -18,6 +18,7 @@ import {
   getAdminProductSummary,
   deleteAdminProduct,
 } from "../api/api";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All Statuses" },
@@ -55,6 +56,7 @@ function ProductCatalog() {
   const [page, setPage] = useState(1);
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [inspectedId, setInspectedId] = useState(null);
+  const debouncedKeyword = useDebounce(keyword);
   const { modal, notification } = App.useApp();
   const queryClient = useQueryClient();
 
@@ -63,12 +65,16 @@ function ProductCatalog() {
     queryFn: getAdminProductSummary,
   });
   const productsQuery = useQuery({
-    queryKey: ["admin", "products", { page, keyword, status }],
+    queryKey: [
+      "admin",
+      "products",
+      { page, keyword: debouncedKeyword, status },
+    ],
     queryFn: () =>
       getAdminProducts({
         page,
         limit: PAGE_SIZE,
-        search: keyword,
+        search: debouncedKeyword,
         ...(status === "active" ? { inStock: true } : {}),
       }),
   });

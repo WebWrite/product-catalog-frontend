@@ -18,6 +18,7 @@ import CustomTag from "../../../shared/components/customTag";
 import { clearCart } from "../../../app/store/cart/cart";
 import { mergeCart } from "../../cart/api/cartApi";
 import { setLoginMarker } from "../../../shared/utils/authStorage";
+import { IoHome } from "react-icons/io5";
 
 function Login() {
   const dispatch = useDispatch();
@@ -140,13 +141,19 @@ function Login() {
   const busy = mutation.isPending || otpMutation.isPending;
 
   return (
-    <div className="min-h-screen bg-purple-50">
+    <div className="min-h-screen bg-purple-50 relative ">
+      <Link
+        to={"/"}
+        className="fixed top-4 left-0 z-50 flex items-center gap-2 rounded-r-lg! bg-blue-600! p-2 text-white! shadow-lg! transition-colors! hover:bg-blue-700! sm:top-20 sm:-translate-y-1/2 sm:p-3"
+      >
+        <IoHome size={20} />
+      </Link>
       <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10 font-sans">
         <div className="z-10 w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl shadow-indigo-100 sm:p-8">
-          <div className="flex items-center justify-center gap-2">
+          <Link to={"/"} className="flex items-center justify-center gap-2">
             <MdViewInAr className="text-3xl text-indigo-700" />
             <span className="text-2xl font-bold text-slate-900">Aura</span>
-          </div>
+          </Link>
 
           <p className="mx-auto mt-3 max-w-64 text-center text-[11px] leading-snug text-slate-500">
             Your Marketplace for Quality Products, Trusted Sellers & Everyday

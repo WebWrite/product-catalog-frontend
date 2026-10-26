@@ -2,7 +2,6 @@ import { Button, Tag } from "antd";
 import {
   MdBlock,
   MdClose,
-  MdDeleteOutline,
   MdOutlineMessage,
   MdOutlineNoteAdd,
   MdOutlinePlace,
@@ -73,7 +72,7 @@ function CustomerInspector({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
         <Stat label="Orders" value={customer.orders} />
         <Stat label="Lifetime" value={money(customer.spent)} />
         <Stat label="Disputes" value={customer.disputes} />
@@ -107,12 +106,6 @@ function CustomerInspector({
           <MdOutlineShoppingBag className="text-sm" />
           Recent Orders ({customer.recent.length})
         </p>
-        <button
-          type="button"
-          className="cursor-pointer text-[11px] font-semibold text-indigo-600"
-        >
-          View All {customer.orders}
-        </button>
       </div>
       <div className="mt-2 flex flex-col gap-2">
         {customer.recent.length === 0 && (
@@ -172,8 +165,6 @@ function CustomerInspector({
             ? "Account Deactivated"
             : "Deactivate Account"}
         </Button>
-
-        
       </div>
 
       {customer.memo && (

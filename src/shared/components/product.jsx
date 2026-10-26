@@ -3,14 +3,10 @@ import { Link } from "react-router-dom";
 import {
   MdFavorite,
   MdFavoriteBorder,
-  MdOutlineShoppingBag,
+  MdKeyboardDoubleArrowRight,
   MdStar,
   MdVerified,
 } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
-import { useAddToCart } from "../../features/cart/hooks/useCart";
-import { addItem } from "../../app/store/cart/cart";
-import { message } from "antd";
 
 function ProductCard({
   id,
@@ -26,53 +22,6 @@ function ProductCard({
   sizes = [],
 }) {
   const [liked, setLiked] = useState(false);
-
-  const cart = useSelector((state) => state.cart);
-  const isLoggedIn = useSelector((state) => !!state.user?.email);
-
-  const dispatch = useDispatch();
-  const addItemMutation = useAddToCart();
-
-  const onAddToCart = () => {
-    if (isLoggedIn) {
-      const item = {
-        id,
-        quantity: 1,
-      };
-
-      if (sizes[0]) {
-        item.size = sizes[0];
-      }
-
-      addItemMutation.mutate(item);
-      return;
-    }
-
-    const item = {
-      productId: id,
-      quantity: 1,
-    };
-
-    if (sizes[0]) {
-      item.size = sizes[0];
-    }
-
-    const currentItem = cart.items.find(
-      (i) => i.productId === item.productId && i.size === item.size,
-    );
-
-    if (currentItem && currentItem.quantity + item.quantity > 25) {
-      message.error("Maximum quantity of 25 reached!");
-      return;
-    }
-
-    if (item.quantity > 25) {
-      message.error("You can add a maximum of 25 items!");
-      return;
-    }
-
-    dispatch(addItem(item));
-  };
 
   return (
     <div className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-lg">
@@ -134,14 +83,12 @@ function ProductCard({
             )}
           </p>
 
-          <button
-            type="button"
-            aria-label={`Add ${name} to cart`}
-            onClick={onAddToCart}
-            className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-indigo-50 text-base text-indigo-700 transition-colors hover:bg-indigo-100"
+          <Link
+            to={to}
+            className="flex size-8 cursor-pointer items-center justify-center rounded-lg! bg-indigo-50! text-base! text-indigo-700! transition-colors! hover:bg-indigo-100!"
           >
-            <MdOutlineShoppingBag />
-          </button>
+            <MdKeyboardDoubleArrowRight />
+          </Link>
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ import AnalyticalCard from "../components/analyticalCard";
 import { money } from "../../../shared/utils/currency";
 import { useNavigate } from "react-router-dom";
 import { getAdminOrderSummary, getAdminOrders } from "../api/api";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 
 const PAGE_SIZE = 10;
 
@@ -78,18 +79,19 @@ function OrdersFulfillment() {
   const [payment, setPayment] = useState("all");
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
+  const debouncedKeyword = useDebounce(keyword);
 
   const summaryQuery = useQuery({
     queryKey: ["admin", "orders", "summary"],
     queryFn: getAdminOrderSummary,
   });
   const ordersQuery = useQuery({
-    queryKey: ["admin", "orders", { page, keyword, payment }],
+    queryKey: ["admin", "orders", { page, keyword: debouncedKeyword, payment }],
     queryFn: () =>
       getAdminOrders({
         page,
         limit: PAGE_SIZE,
-        search: keyword.trim(),
+        search: debouncedKeyword.trim(),
         ...(payment !== "all" ? { payment } : {}),
       }),
   });

@@ -14,6 +14,7 @@ import CustomerInspector from "../components/customerInspector";
 import { money } from "../../../shared/utils/currency";
 import { initials } from "../constant/constant";
 import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import {
   getAdminCustomerOrders,
   getAdminCustomers,
@@ -75,18 +76,19 @@ function CustomerManagement() {
   const [inspectedId, setInspectedId] = useState(null);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [form] = Form.useForm();
+  const debouncedSearch = useDebounce(filters.search);
 
   const summaryQuery = useQuery({
     queryKey: ["admin", "customers", "summary"],
     queryFn: getAdminCustomerSummary,
   });
   const customersQuery = useQuery({
-    queryKey: ["admin", "customers", filters],
+    queryKey: ["admin", "customers", { ...filters, search: debouncedSearch }],
     queryFn: () =>
       getAdminCustomers({
         page: filters.page,
         limit: PAGE_SIZE,
-        search: filters.search.trim(),
+        search: debouncedSearch.trim(),
         ...(filters.status !== "all" ? { status: filters.status } : {}),
       }),
   });
@@ -196,9 +198,15 @@ function CustomerManagement() {
 
   const handleSavePassword = async () => {
     const values = await form.validateFields();
-    updateCustomer({ password: values.password });
-    setPasswordOpen(false);
-    form.resetFields();
+    updateMutation.mutate(
+      { id: inspectedId, payload: { password: values.password } },
+      {
+        onSuccess: () => {
+          setPasswordOpen(false);
+          form.resetFields();
+        },
+      },
+    );
   };
 
   return (
@@ -221,9 +229,9 @@ function CustomerManagement() {
         ))}
       </div>
 
-      <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1fr_22rem]">
-        <div>
-          <div className="flex gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+      <div className="mt-4 grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="min-w-0">
+          <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:flex-row">
             <Input
               allowClear
               variant="filled"
@@ -233,13 +241,14 @@ function CustomerManagement() {
                 updateFilters({ search: event.target.value })
               }
               prefix={<MdSearch className="text-lg text-slate-500" />}
+              className="min-w-0 flex-1"
             />
             <Select
               variant="filled"
               value={filters.status}
               onChange={(status) => updateFilters({ status })}
               options={STATUS_OPTIONS}
-              className="w-44"
+              className="w-full sm:w-44"
             />
             <Button
               type="text"
@@ -248,26 +257,29 @@ function CustomerManagement() {
             />
           </div>
           <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
-            <Table
-              rowKey="_id"
-              columns={columns}
-              dataSource={customers}
-              loading={customersQuery.isLoading}
-              className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-table-tbody>tr.row-flagged>td]:bg-red-50/60! [&_.ant-table-thead>tr>th]:p-4!  "
-              onRow={(item) => ({
-                className: `cursor-pointer ${item._id === inspectedId ? "row-active" : ""}`,
-                onClick: () => setInspectedId(item._id),
-              })}
-              pagination={{
-                current: pagination.page ?? filters.page,
-                pageSize: pagination.limit ?? PAGE_SIZE,
-                total: pagination.totalCustomers ?? 0,
-                showSizeChanger: false,
-                onChange: (page) =>
-                  setFilters((current) => ({ ...current, page })),
-              }}
-              locale={{ emptyText: "No customers match your filters" }}
-            />
+            <div className="overflow-x-auto">
+              <Table
+                rowKey="_id"
+                columns={columns}
+                dataSource={customers}
+                loading={customersQuery.isLoading}
+                scroll={{ x: 600 }}
+                className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-table-tbody>tr.row-flagged>td]:bg-red-50/60! [&_.ant-table-thead>tr>th]:p-4!"
+                onRow={(item) => ({
+                  className: `cursor-pointer ${item._id === inspectedId ? "row-active" : ""}`,
+                  onClick: () => setInspectedId(item._id),
+                })}
+                pagination={{
+                  current: pagination.page ?? filters.page,
+                  pageSize: pagination.limit ?? PAGE_SIZE,
+                  total: pagination.totalCustomers ?? 0,
+                  showSizeChanger: false,
+                  onChange: (page) =>
+                    setFilters((current) => ({ ...current, page })),
+                }}
+                locale={{ emptyText: "No customers match your filters" }}
+              />
+            </div>
           </div>
         </div>
         <div className="lg:sticky lg:top-24">
