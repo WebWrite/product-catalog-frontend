@@ -59,6 +59,7 @@ const OrderCard = ({ order, HeaderIcon, renderItemActions, colors, token }) => {
             Order #{order._id}
           </Text>
         </Flex>
+
         {date && (
           <Text style={{ color: colors.muted, fontSize: isMobile ? 12 : 14 }}>
             {date}
@@ -97,10 +98,12 @@ const OrderCard = ({ order, HeaderIcon, renderItemActions, colors, token }) => {
                   <Text strong style={{ fontSize: 16 }}>
                     {item.name}
                   </Text>
+
                   <Text style={{ color: colors.muted }}>
                     Qty {item.quantity}
                     {item.size ? ` · Size ${item.size}` : ""}
                   </Text>
+
                   <div>
                     <Tag
                       style={{
@@ -125,6 +128,7 @@ const OrderCard = ({ order, HeaderIcon, renderItemActions, colors, token }) => {
                   <Text strong style={{ fontSize: 16 }}>
                     PKR {item.itemTotal}
                   </Text>
+
                   {!isMobile && actions && (
                     <Flex gap={8} justify="flex-end">
                       {actions}
@@ -151,25 +155,31 @@ const OrderCard = ({ order, HeaderIcon, renderItemActions, colors, token }) => {
 
       {isMobile ? (
         <Flex vertical gap={10} style={{ paddingTop: 14 }}>
-          <SummaryRow label="Payment method" c={colors}>
+          <SummaryRow label="Payment method" colors={colors}>
             <CreditCardOutlined style={{ color: colors.accent }} /> {method}
           </SummaryRow>
-          <SummaryRow label="Payment status" c={colors}>
+
+          <SummaryRow label="Payment status" colors={colors}>
             {capitalize(order.paymentStatus)}
           </SummaryRow>
-          <SummaryRow label="Subtotal" c={colors}>
+
+          <SummaryRow label="Subtotal" colors={colors}>
             PKR {subtotal}
           </SummaryRow>
+
           {shipping != null && (
-            <SummaryRow label="Shipping" c={colors}>
+            <SummaryRow label="Shipping" colors={colors}>
               PKR {shipping}
             </SummaryRow>
           )}
+
           <Divider style={{ margin: "2px 0", borderColor: colors.border }} />
+
           <Flex justify="space-between" align="center">
             <Text strong style={{ fontSize: 18 }}>
               Total
             </Text>
+
             <Text strong style={{ fontSize: 20, color: colors.accent }}>
               PKR {total}
             </Text>
@@ -185,10 +195,12 @@ const OrderCard = ({ order, HeaderIcon, renderItemActions, colors, token }) => {
           <Flex gap={40}>
             <Flex vertical gap={4}>
               <Text style={labelStyle(colors)}>Payment method</Text>
+
               <Text strong>
                 <CreditCardOutlined style={{ color: colors.accent }} /> {method}
               </Text>
             </Flex>
+
             <Flex vertical gap={4}>
               <Text style={labelStyle(colors)}>Payment status</Text>
               <Text strong>{capitalize(order.paymentStatus)}</Text>
@@ -200,6 +212,7 @@ const OrderCard = ({ order, HeaderIcon, renderItemActions, colors, token }) => {
               Subtotal PKR {subtotal}
               {shipping != null ? ` · Shipping PKR ${shipping}` : ""}
             </Text>
+
             <Text strong style={{ fontSize: 20 }}>
               Total <span style={{ color: colors.accent }}>PKR {total}</span>
             </Text>
