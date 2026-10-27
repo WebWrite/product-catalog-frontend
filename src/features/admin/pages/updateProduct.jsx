@@ -2,10 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { App as AntdApp, Button, Skeleton } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ProductForm from "../../seller/components/productForm";
-import {
-  getAdminProductById,
-  updateAdminProduct,
-} from "../api/api";
+import { getAdminProductById, updateAdminProduct } from "../api/api";
 
 function UpdateProduct() {
   const { productId } = useParams();
@@ -22,7 +19,9 @@ function UpdateProduct() {
     onSuccess: (product) => {
       queryClient.setQueryData(["admin", "product", productId], product);
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
-      queryClient.invalidateQueries({ queryKey: ["admin", "products", "summary"] });
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "products", "summary"],
+      });
       notification.success({
         title: "Product updated",
         description: `"${product.name}" was updated successfully.`,

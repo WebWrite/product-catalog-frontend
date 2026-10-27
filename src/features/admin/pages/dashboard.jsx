@@ -34,9 +34,12 @@ function AdminDashboard() {
   });
 
   const summary = summaryQuery.data ?? {};
-  const errors = [summaryQuery, revenueQuery, categoriesQuery, ordersQuery].filter(
-    (query) => query.isError,
-  );
+  const errors = [
+    summaryQuery,
+    revenueQuery,
+    categoriesQuery,
+    ordersQuery,
+  ].filter((query) => query.isError);
   const revenue = (revenueQuery.data ?? []).map((item) => ({
     date: item.date,
     day: new Date(`${item.date}T00:00:00`).getDate(),
@@ -58,7 +61,7 @@ function AdminDashboard() {
   }));
 
   return (
-    <div className="theme-page min-h-screen p-4  ">
+    <div className="theme-page min-h-screen p-4 sm:p-8  ">
       {errors.length > 0 && (
         <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
           Some dashboard data could not be loaded. Please refresh and try again.
@@ -66,9 +69,11 @@ function AdminDashboard() {
       )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
         <AnalyticalCard
-          amount={summaryQuery.isLoading ? "..." : money(summary.grossValue ?? 0)}
+          amount={
+            summaryQuery.isLoading ? "..." : money(summary.grossValue ?? 0)
+          }
           icon={<GrCurrency className="size-5" />}
-          title={"Gross Value"}
+          title={"Total Sales"}
         />
         <AnalyticalCard
           amount={summaryQuery.isLoading ? "..." : (summary.totalOrder ?? 0)}
@@ -82,12 +87,10 @@ function AdminDashboard() {
         />{" "}
         <AnalyticalCard
           amount={
-            summaryQuery.isLoading
-              ? "..."
-              : (summary.totalRgisterAccount ?? 0)
+            summaryQuery.isLoading ? "..." : (summary.totalRgisterAccount ?? 0)
           }
           icon={<HiOutlineUsers className="size-5" />}
-          title={"Registered Account"}
+          title={"Registered Customers"}
         />
       </div>
 

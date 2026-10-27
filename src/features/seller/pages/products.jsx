@@ -26,6 +26,7 @@ import UpdateStockModal from "../components/updateStockModal";
 import DeleteConfirmationModal from "../components/deleteConfirmationModal";
 import SellerProductFilters from "../components/sellerProductFilters";
 import SellerProductPagination from "../components/sellerPagination";
+import { money } from "../../../shared/utils/currency";
 
 function SellerProducts() {
   const navigate = useNavigate();
@@ -179,7 +180,7 @@ function SellerProducts() {
   ];
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6 w-full min-w-0 max-w-[1600px] mx-auto">
+    <div className="flex flex-col gap-4 md:gap-6 w-full min-w-0 max-w-[1600px] mx-auto p-4 sm:p-8 ">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div className="min-w-0">
           <h1 className="text-[22px] md:text-[26px] lg:text-[30px] font-bold text-slate-100 m-0 tracking-tight">
@@ -343,7 +344,7 @@ function SellerProducts() {
                       {product.category}
                     </span>
                     <span className="text-[10px] font-bold text-slate-200">
-                      ${product.price}
+                      {money(product.price)}
                     </span>
                     <span className="text-[10px] text-slate-400">
                       Stock {product.stock}
@@ -356,7 +357,7 @@ function SellerProducts() {
                 {product.category}
               </span>
               <span className="hidden md:block text-[13px] font-bold text-slate-100 w-24 text-right">
-                ${product.price}
+                {money(product.price)}
               </span>
               <span className="hidden md:flex w-24 justify-end">
                 <Tag

@@ -86,7 +86,7 @@ function OrderDetail() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl p-4">
+    <div className="mx-auto w-full max-w-6xl p-4 sm:p-8 ">
       <h1 className="m-0 mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
         Order #{order.id}
       </h1>

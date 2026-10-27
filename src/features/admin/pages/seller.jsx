@@ -54,7 +54,9 @@ const columns = [
     title: "OWNER / CONTACT",
     render: (_, seller) => (
       <>
-        <p className="m-0 text-xs font-semibold text-slate-900">{seller.name}</p>
+        <p className="m-0 text-xs font-semibold text-slate-900">
+          {seller.name}
+        </p>
         <p className="m-0 text-[10px] text-slate-500">{seller.email}</p>
       </>
     ),
@@ -136,7 +138,7 @@ function SellerManagement() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-7xl p-4">
+    <div className="mx-auto w-full max-w-7xl p-4 sm:p-8 ">
       <h1 className="m-0 text-2xl font-bold text-slate-900 sm:text-3xl">
         Seller Management &amp; Approvals
       </h1>

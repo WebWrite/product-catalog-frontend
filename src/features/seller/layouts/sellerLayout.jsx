@@ -57,14 +57,9 @@ const MENU_ITEMS = [
     label: <Link to="/seller/orders">Orders</Link>,
   },
   {
-    key: "/seller/analytics",
-    icon: <MdBarChart size={18} />,
-    label: <Link to="/seller/analytics">Analytics</Link>,
-  },
-  {
-    key: "/seller/messages",
+    key: "/seller/chat",
     icon: <MdMessage size={18} />,
-    label: <Link to="/seller/messages">Messages</Link>,
+    label: <Link to="/seller/chat">Messages</Link>,
   },
   {
     key: "/seller/settings",
@@ -327,7 +322,7 @@ function SellerLayout() {
             </div>
           </header>
 
-          <Content className="p-3 md:p-4 lg:p-6 flex-1 min-w-0 overflow-x-hidden">
+          <Content>
             <Outlet />
           </Content>
         </div>

@@ -4,6 +4,7 @@ import { MdInventory2 } from "react-icons/md";
 import { useSellerProducts } from "../hooks/useSellerProducts";
 import { useState } from "react";
 import SellerProductPagination from "./sellerPagination";
+import { money } from "../../../shared/utils/currency";
 
 function PriorityQueueTable() {
   const navigate = useNavigate();
@@ -108,7 +109,7 @@ function PriorityQueueTable() {
 
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <span className="text-[14px] md:text-[16px] font-bold text-slate-100">
-                    ${product.price}
+                    {money(product.price)}
                   </span>
                   <Tag
                     className={`m-0 border-0 text-[9px] md:text-[10px] font-bold px-1.5 py-0 rounded-md ${

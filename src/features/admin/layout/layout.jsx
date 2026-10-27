@@ -62,9 +62,9 @@ const MENU_ITEMS = [
     label: <Link to="/admin/customers">Users / Customer</Link>,
   },
   {
-    key: "/admin/messages",
+    key: "/admin/chat",
     icon: <MdMessage size={18} />,
-    label: <Link to="/admin/messages">Messages</Link>,
+    label: <Link to="/admin/chat">Messages</Link>,
   },
   {
     key: "/admin/settings",
@@ -327,7 +327,7 @@ function AdminLayout() {
             </div>
           </header>
 
-          <Content className="p-3 md:p-4 lg:p-6 flex-1 min-w-0 overflow-x-hidden">
+          <Content className="">
             <Outlet />
           </Content>
         </div>

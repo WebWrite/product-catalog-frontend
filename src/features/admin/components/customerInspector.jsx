@@ -1,6 +1,7 @@
 import { Button, Tag } from "antd";
 import {
   MdBlock,
+  MdCheckCircle,
   MdClose,
   MdOutlineMessage,
   MdOutlineNoteAdd,
@@ -15,7 +16,7 @@ import { initials, STATUS_TAG } from "../constant/constant";
 function CustomerInspector({
   customer,
   onClose,
-  onDeactivate,
+  onStatusChange,
   onMessage,
   onNote,
 }) {
@@ -156,14 +157,17 @@ function CustomerInspector({
           Change Password
         </Button>
         <Button
-          danger
-          icon={<MdBlock />}
-          disabled={customer.status === "suspended"}
-          onClick={onDeactivate}
+          danger={customer.status === "active"}
+          icon={customer.status === "active" ? <MdBlock /> : <MdCheckCircle />}
+          onClick={() =>
+            onStatusChange({
+              status: customer.status === "active" ? "inactive" : "active",
+            })
+          }
         >
-          {customer.status === "suspended"
-            ? "Account Deactivated"
-            : "Deactivate Account"}
+          {customer.status === "active"
+            ? "Deactivate Account"
+            : "Activate Account"}
         </Button>
       </div>
 

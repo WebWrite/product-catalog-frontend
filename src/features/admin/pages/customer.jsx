@@ -12,7 +12,7 @@ import {
 import AnalyticalCard from "../components/analyticalCard";
 import CustomerInspector from "../components/customerInspector";
 import { money } from "../../../shared/utils/currency";
-import { initials } from "../constant/constant";
+import { initials, STATUS_OPTIONS, STATUS_TAG } from "../constant/constant";
 import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import {
@@ -23,17 +23,6 @@ import {
 } from "../api/api";
 
 const PAGE_SIZE = 10;
-const STATUS_TAG = {
-  active: { label: "Active", color: "green" },
-  blocked: { label: "Blocked", color: "orange" },
-  suspended: { label: "Suspended", color: "red" },
-};
-const STATUS_OPTIONS = [
-  { value: "all", label: "Status: All Accounts" },
-  { value: "active", label: "Active" },
-  { value: "blocked", label: "Blocked" },
-  { value: "suspended", label: "Suspended" },
-];
 
 function normalizeCustomer(customer, orders = []) {
   const firstOrder = orders[0];
@@ -210,7 +199,7 @@ function CustomerManagement() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl p-4">
+    <div className="mx-auto w-full max-w-7xl p-4 sm:p-8 ">
       <h1 className="m-0 text-2xl font-bold text-slate-900 sm:text-3xl">
         Customer &amp; User Management
       </h1>
@@ -264,7 +253,7 @@ function CustomerManagement() {
                 dataSource={customers}
                 loading={customersQuery.isLoading}
                 scroll={{ x: 600 }}
-                className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-table-tbody>tr.row-flagged>td]:bg-red-50/60! [&_.ant-table-thead>tr>th]:p-4!"
+                className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-table-tbody>tr.row-inactive>td]:bg-red-50/60! [&_.ant-table-thead>tr>th]:p-4!"
                 onRow={(item) => ({
                   className: `cursor-pointer ${item._id === inspectedId ? "row-active" : ""}`,
                   onClick: () => setInspectedId(item._id),
@@ -286,7 +275,7 @@ function CustomerManagement() {
           <CustomerInspector
             customer={customer}
             onClose={() => setInspectedId(null)}
-            onDeactivate={() => updateCustomer({ status: "suspended" })}
+            onStatusChange={updateCustomer}
             onMessage={() => window.open(`mailto:${customer?.email}`)}
             onNote={() => setPasswordOpen(true)}
           />

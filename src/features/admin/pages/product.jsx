@@ -202,7 +202,7 @@ function ProductCatalog() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-7xl  p-4 ">
+    <div className="mx-auto w-full max-w-7xl  p-4 sm:p-8  ">
       <p className="m-0 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-slate-600">
         Catalog &amp; Inventory
         <span className="text-slate-300">•</span>
