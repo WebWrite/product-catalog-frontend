@@ -20,7 +20,7 @@ const PAGE_SIZE = 10;
 const PAYMENT_OPTIONS = [
   { value: "all", label: "Payment: All Types" },
   { value: "COD", label: "COD" },
-  { value: "card", label: "Card" },
+  { value: "STRIPE", label: "STRIPE" },
 ];
 
 const columns = [
@@ -62,16 +62,15 @@ const columns = [
     render: (_, o) => (
       <span
         className={`rounded-lg px-2 py-1 text-[10px] font-semibold ${
-          o.payment === "completed"
+          o.method === "STRIPE"
             ? "bg-emerald-50 text-emerald-700"
             : "bg-amber-50 text-amber-700"
         }`}
       >
-        {`${o.payment ?? "Unknown"} (${o.method ?? "Unknown"})`}
+        {` (${o.method ?? "Unknown"})`}
       </span>
     ),
   },
-  
 ];
 
 function OrdersFulfillment() {

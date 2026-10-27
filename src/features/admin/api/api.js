@@ -34,7 +34,7 @@ export async function getAdminOrderById(id) {
 
 export async function updateAdminOrderItemStatus(payload) {
   const response = await api.patch("/admin/orders/item-status", payload);
-  return response.data.data.order;
+  return response.data?.data?.order;
 }
 
 export async function getAdminProductSummary() {
@@ -43,7 +43,7 @@ export async function getAdminProductSummary() {
 }
 
 export async function getAdminProducts(params = {}) {
-  const response = await api.get("/", { params });
+  const response = await api.get("/admin/products", { params });
   return response.data.data;
 }
 

@@ -47,7 +47,9 @@ export const getSellerNextStatus = (
   const payment = paymentStatus?.toLowerCase();
 
   if (
-    (method === "STRIPE" && payment === "completed" && status === "confirmed") ||
+    (method === "STRIPE" &&
+      payment === "completed" &&
+      status === "confirmed") ||
     (method === "COD" && status === "pending")
   ) {
     return { to: "delivered", label: "Mark as Delivered" };
@@ -57,3 +59,23 @@ export const getSellerNextStatus = (
 };
 
 export const canCancelOrderItem = (itemStatus) => itemStatus === "pending";
+
+export const getAdminOrderItemStatuses = (
+  paymentMethod,
+  itemStatus,
+  paymentStatus,
+) => {
+  const status = itemStatus?.toLowerCase();
+  const allowed = [status];
+  const method = paymentMethod?.toUpperCase();
+  const payment = paymentStatus?.toLowerCase();
+
+  if (
+    (method === "COD" && status === "pending") ||
+    (method === "STRIPE" && payment === "completed" && status === "confirmed")
+  ) {
+    allowed.push("delivered", "cancelled");
+  }
+
+  return allowed;
+};

@@ -4,8 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Button, message } from "antd";
 import {
   MdAdd,
-  MdFavorite,
-  MdFavoriteBorder,
   MdLocalShipping,
   MdOutlineVerified,
   MdRemove,
@@ -15,7 +13,7 @@ import {
 } from "react-icons/md";
 import { getProducts, getProductsById } from "../api/api";
 import { money } from "../../../shared/utils/currency";
-import { DEFAULT_FILTERS, getBadge } from "../utils/constant";
+import { CATEGORIES, DEFAULT_FILTERS, getBadge } from "../utils/constant";
 import ProductCard from "../../../shared/components/product";
 import ProductSkeleton from "../components/productSkeleton";
 import ProductNotFound from "../components/productNotFound";
@@ -64,9 +62,12 @@ function ProductDetail() {
     typeof selectedSizeOption === "string"
       ? selectedSizeOption
       : selectedSizeOption?.label;
+  const categoryLabel =
+    CATEGORIES.find((category) => category.value === product.category)?.label ??
+    product.category;
   const badge = getBadge(product);
   const outOfStock = product.stock === 0;
-  const maxQuantity = 25;
+  const maxQuantity = Math.min(25, product.stock);
   const total = product.price * quantity;
   const cartItemCount = isLoggedIn
     ? (serverCart?.cart?.items ?? [])
@@ -165,6 +166,12 @@ function ProductDetail() {
               {product.name}
             </h1>
 
+            {categoryLabel && (
+              <p className="m-0 mt-2 text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                {categoryLabel}
+              </p>
+            )}
+
             <div className="mt-3 flex items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2">
                 <MdStorefront className="text-base text-indigo-700" />
@@ -177,7 +184,7 @@ function ProductDetail() {
                 to={sellerLink}
                 className="font-semibold text-indigo-600 hover:underline"
               >
-                Message Artisan
+                Message Seller
               </Link>
             </div>
 
@@ -240,7 +247,9 @@ function ProductDetail() {
                 <button
                   type="button"
                   aria-label="Increase quantity"
-                  disabled={quantity >= maxQuantity}
+                  disabled={
+                    quantity >= maxQuantity || cartItemCount == maxQuantity
+                  }
                   onClick={() => setQuantity(quantity + 1)}
                   className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-white text-base shadow-sm hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -260,7 +269,11 @@ function ProductDetail() {
               type="primary"
               size="large"
               block
-              disabled={outOfStock || cartItemCount >= 25}
+              disabled={
+                outOfStock ||
+                cartItemCount >= 25 ||
+                cartItemCount == maxQuantity
+              }
               onClick={handleAddToCart}
               className="mt-5 h-11! bg-indigo-700! text-xs! font-semibold! hover:bg-indigo-800! disabled:text-gray-500! disabled:bg-gray-100! disabled:opacity-100!"
             >

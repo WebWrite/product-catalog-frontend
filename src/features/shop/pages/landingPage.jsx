@@ -65,52 +65,40 @@ const featured = {
 
 const departments = [
   {
-    slug: "apparel-textiles",
-    title: "Apparel & Textiles",
-    subtitle: "Natural fibers",
-    itemCount: "420+",
+    title: "Clothing",
+    subtitle: "Everyday essentials",
     image:
       "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=85",
   },
   {
-    slug: "audio-electronics",
-    title: "Audio & Electronics",
-    subtitle: "Precision gear",
-    itemCount: "180+",
+    title: "Electronics",
+    subtitle: "Smart technology",
     image:
       "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
   },
   {
-    slug: "home-living",
-    title: "Home & Living",
-    subtitle: "Artisanal ceramics",
-    itemCount: "350+",
+    title: "Beauty",
+    subtitle: "Self-care essentials",
+    image:
+      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    title: "Furniture",
+    subtitle: "Thoughtful interiors",
     image:
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85",
   },
   {
-    slug: "accessories",
-    title: "Accessories",
-    subtitle: "Full-grain craft",
-    itemCount: "210+",
+    title: "Sports",
+    subtitle: "Move with purpose",
     image:
-      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=85",
   },
   {
-    slug: "clean-wellness",
-    title: "Clean Wellness",
-    subtitle: "Botanical formulas",
-    itemCount: "140+",
+    title: "Toys",
+    subtitle: "Play and discover",
     image:
-      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    slug: "studio-workspace",
-    title: "Studio & Workspace",
-    subtitle: "Desk companions",
-    itemCount: "95+",
-    image:
-      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1200&q=85",
   },
 ];
 
@@ -246,12 +234,11 @@ function LandingPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {departments.map((d) => (
             <CategoryCard
-              key={d.slug}
-              to={`/shop?category=${d.slug}`}
+              key={d.title}
+              to={`/shop?category=${encodeURIComponent(d.title)}`}
               image={d.image}
               title={d.title}
               subtitle={d.subtitle}
-              itemCount={d.itemCount}
             />
           ))}
         </div>

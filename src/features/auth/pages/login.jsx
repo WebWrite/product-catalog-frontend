@@ -35,21 +35,27 @@ function Login() {
     onSuccess: async (data) => {
       const user = data.data.user;
       setLoginMarker();
-      dispatch(setuser(user));
-      if (user.role === "admin") navigate("/admin/dashboard");
-      else if (user.role === "seller") navigate("/seller/dashboard");
-      else {
+
+      if (user.role === "admin" || user.role === "seller") {
+        dispatch(setuser(user));
+        navigate(
+          user.role === "admin" ? "/admin/dashboard" : "/seller/dashboard",
+        );
+      } else {
         if (cart?.items.length >= 1) {
-          const response = await mergeCart(cart.items);
-          if (response?.success !== false) {
-            dispatch(clearCart());
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-          }
+          try {
+            const response = await mergeCart(cart.items);
+            if (response?.success !== false) dispatch(clearCart());
+          } catch (e) {}
         }
-        await queryClient.refetchQueries({
-          queryKey: ["currentUser"],
-          type: "all",
-        });
+
+        dispatch(setuser(user));
+
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["cart"] }),
+          queryClient.invalidateQueries({ queryKey: ["currentUser"] }),
+        ]);
+
         navigate("/");
       }
 
@@ -62,6 +68,7 @@ function Login() {
       });
       form.resetFields();
     },
+
     onError: async (error, variables) => {
       const { email } = variables;
 

@@ -33,7 +33,8 @@ function normalizeProduct(product) {
     ...product,
     id: product._id,
     sku: product.sku ?? product._id,
-    seller: product.seller?.storeName ?? product.sellerId?.name ?? "Unknown seller",
+    seller:
+      product.seller?.storeName ?? product.sellerId?.name ?? "Unknown seller",
     image: product.image?.url ?? product.image ?? "",
     tier: product.tier ?? "Standard",
     velocity:
@@ -75,7 +76,7 @@ function ProductCatalog() {
         page,
         limit: PAGE_SIZE,
         search: debouncedKeyword,
-        ...(status === "active" ? { inStock: true } : {}),
+        ...(status !== "all" ? { status } : {}),
       }),
   });
   const inspectedQuery = useQuery({
@@ -87,7 +88,9 @@ function ProductCatalog() {
     mutationFn: deleteAdminProduct,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
-      queryClient.invalidateQueries({ queryKey: ["admin", "products", "summary"] });
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "products", "summary"],
+      });
       setInspectedId(null);
       notification.success({
         title: "Product deleted",
@@ -98,17 +101,14 @@ function ProductCatalog() {
     onError: (error) => {
       notification.error({
         title: "Could not delete product",
-        description: error?.response?.data?.message ?? "Failed to delete product.",
+        description:
+          error?.response?.data?.message ?? "Failed to delete product.",
         placement: "bottomRight",
       });
     },
   });
 
   const products = (productsQuery.data?.products ?? []).map(normalizeProduct);
-  const filteredProducts =
-    status === "inactive"
-      ? products.filter((product) => product.status === "inactive")
-      : products;
   const inspected = inspectedQuery.data
     ? normalizeProduct(inspectedQuery.data)
     : null;
@@ -220,19 +220,31 @@ function ProductCatalog() {
         <AnalyticalCard
           icon={<MdOutlineInventory2 className="size-4" />}
           title="Total Products"
-          amount={summaryQuery.isLoading ? "..." : (summary.totalProduct ?? 0).toLocaleString()}
+          amount={
+            summaryQuery.isLoading
+              ? "..."
+              : (summary.totalProduct ?? 0).toLocaleString()
+          }
           percent={100}
           barColor="#3730a3"
         />
         <AnalyticalCard
           icon={<MdCheckCircleOutline className="size-4" />}
           title="Active Listings"
-          amount={summaryQuery.isLoading ? "..." : (summary.activeProduct ?? 0).toLocaleString()}
+          amount={
+            summaryQuery.isLoading
+              ? "..."
+              : (summary.activeProduct ?? 0).toLocaleString()
+          }
         />
         <AnalyticalCard
           icon={<MdOutlineShoppingCart className="size-4" />}
           title="Out of Stock"
-          amount={summaryQuery.isLoading ? "..." : (summary.outOfStock ?? 0).toLocaleString()}
+          amount={
+            summaryQuery.isLoading
+              ? "..."
+              : (summary.outOfStock ?? 0).toLocaleString()
+          }
         />
       </div>
 
@@ -289,7 +301,7 @@ function ProductCatalog() {
           <Table
             rowKey="id"
             columns={columns}
-            dataSource={filteredProducts}
+            dataSource={products}
             loading={productsQuery.isLoading}
             pagination={false}
             scroll={{ x: 520 }}
