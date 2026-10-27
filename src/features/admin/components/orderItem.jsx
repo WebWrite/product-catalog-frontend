@@ -11,9 +11,19 @@ import {
   lineTotal,
   STATUS,
 } from "../constant/constant";
+import { getAdminOrderItemStatuses } from "../../orders/constant/constant";
 
 function ItemRow({ item, onStatus, isUpdating = false }) {
   const st = STATUS[item.status] ?? STATUS.pending;
+  const allowedStatuses = getAdminOrderItemStatuses(
+    item.paymentMethod,
+    item.status,
+    item.paymentStatus,
+  );
+  const statusOptions = DELIEVERY_STATUS_OPTIONS.filter(({ value }) =>
+    allowedStatuses.includes(value),
+  );
+  const canChangeStatus = allowedStatuses.length > 1;
 
   return (
     <div className="flex flex-col gap-4 border-b border-slate-100 p-4 last:border-0 lg:flex-row lg:items-center lg:justify-between">
@@ -97,9 +107,9 @@ function ItemRow({ item, onStatus, isUpdating = false }) {
             size="small"
             className="w-full"
             value={item.status}
-            options={DELIEVERY_STATUS_OPTIONS}
+            options={statusOptions}
             loading={isUpdating}
-            disabled={isUpdating}
+            disabled={isUpdating || !canChangeStatus}
             suffixIcon={isUpdating ? <MdLockOutline /> : undefined}
             onChange={(v) => onStatus(item.id, v)}
           />

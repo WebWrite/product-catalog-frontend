@@ -16,8 +16,6 @@ export const STATUS = {
 export const DELIEVERY_STATUS_OPTIONS = [
   { value: "pending", label: "Status: Pending" },
   { value: "confirmed", label: "Status: Confirmed" },
-  { value: "processing", label: "Status: Processing" },
-  { value: "shipped", label: "Status: Shipped" },
   { value: "delivered", label: "Status: Delivered" },
   { value: "cancelled", label: "Status: Cancelled" },
 ];

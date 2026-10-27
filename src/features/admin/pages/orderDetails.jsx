@@ -6,10 +6,7 @@ import { MdOutlineInventory2 } from "react-icons/md";
 import ItemRow from "../components/orderItem";
 import Ledger from "../components/ledger";
 import Recipient from "../components/orderRecipient";
-import {
-  getAdminOrderById,
-  updateAdminOrderItemStatus,
-} from "../api/api";
+import { getAdminOrderById, updateAdminOrderItemStatus } from "../api/api";
 
 function normalizeOrder(order) {
   if (!order) return null;
@@ -25,6 +22,8 @@ function normalizeOrder(order) {
     items: (order.items ?? []).map((item) => ({
       ...item,
       id: item._id,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
       seller: item.sellerId?.name ?? "Unknown seller",
       location: "",
       qty: item.quantity,
@@ -36,10 +35,7 @@ function normalizeOrder(order) {
       address: [
         order.shippingAddress?.fullName,
         order.shippingAddress?.address,
-        [
-          order.shippingAddress?.city,
-          order.shippingAddress?.postalCode,
-        ]
+        [order.shippingAddress?.city, order.shippingAddress?.postalCode]
           .filter(Boolean)
           .join(", "),
       ].filter(Boolean),
@@ -63,12 +59,17 @@ function OrderDetail() {
       queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
       message.success("Item status updated.");
     },
-    onError: () => {
-      message.error("Unable to update item status.");
+    onError: (error) => {
+      message.error(
+        error.response?.data?.message ?? "Unable to update item status.",
+      );
     },
   });
 
-  const order = useMemo(() => normalizeOrder(orderQuery.data), [orderQuery.data]);
+  const order = useMemo(
+    () => normalizeOrder(orderQuery.data),
+    [orderQuery.data],
+  );
 
   if (orderQuery.isLoading) {
     return <div className="p-6 text-sm text-slate-500">Loading order...</div>;
@@ -76,9 +77,7 @@ function OrderDetail() {
 
   if (orderQuery.isError || !order) {
     return (
-      <div className="p-6 text-sm text-red-600">
-        Unable to load this order.
-      </div>
+      <div className="p-6 text-sm text-red-600">Unable to load this order.</div>
     );
   }
 
@@ -97,7 +96,7 @@ function OrderDetail() {
           {order.customer.name}
         </span>
         <Tag color="#EAEDFF" className="m-0! text-[10px]! text-indigo-700!">
-          {order.paymentMethod} / {order.paymentStatus}
+          {order.paymentMethod}
         </Tag>
       </p>
 
