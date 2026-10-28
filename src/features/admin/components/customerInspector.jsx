@@ -12,14 +12,15 @@ import {
 import Stat from "./stats";
 import { money } from "../../../shared/utils/currency";
 import { initials, STATUS_TAG } from "../constant/constant";
+import { useStartChat } from "../../chat/hooks/useChat";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-function CustomerInspector({
-  customer,
-  onClose,
-  onStatusChange,
-  onMessage,
-  onNote,
-}) {
+function CustomerInspector({ customer, onClose, onStatusChange, onNote }) {
+  const startChat = useStartChat();
+  const user = useSelector((state) => state.user);
+  const navigate = useNavigate();
+
   if (!customer) {
     return (
       <aside className="rounded-2xl bg-white p-6 text-center text-xs text-slate-500 shadow-sm ring-1 ring-slate-100">
@@ -68,7 +69,7 @@ function CustomerInspector({
             {customer.email}
           </p>
           <p className="m-0 text-[10px] text-slate-500">
-            Member since {customer.joined} • ID: {customer.id}
+            Member since {customer.joined}
           </p>
         </div>
       </div>
@@ -144,10 +145,15 @@ function CustomerInspector({
         <Button
           type="primary"
           icon={<MdOutlineMessage />}
-          onClick={onMessage}
+          loading={startChat.isPending}
+          onClick={() =>
+            user
+              ? startChat.mutate({ admin: true, participantId: customer.id })
+              : navigate("/auth/login")
+          }
           className="bg-indigo-700!"
         >
-          Send Direct Message / Email
+          Send Direct Message
         </Button>
         <Button
           icon={<MdOutlineNoteAdd />}

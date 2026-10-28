@@ -7,6 +7,7 @@ function ChatInput({
   disabled = false,
   loading = false,
   placeholder = "Write message...",
+  onTyping,
 }) {
   const [text, setText] = useState("");
   const [files, setFiles] = useState([]);
@@ -37,7 +38,7 @@ function ChatInput({
     setFiles((prev) => prev.filter((_, i) => i !== index));
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+    <div className=" bg-white p-4 shadow-sm ring-1 ring-slate-100">
       <div className="rounded-xl bg-indigo-50/70 p-3 ring-1 ring-indigo-100">
         <Input.TextArea
           variant="borderless"
@@ -46,7 +47,10 @@ function ChatInput({
           placeholder={placeholder}
           value={text}
           disabled={disabled}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value);
+            onTyping?.();
+          }}
           onKeyDown={handleKeyDown}
           className="resize-none! bg-transparent! p-0! text-sm!"
         />
@@ -96,7 +100,7 @@ function ChatInput({
             disabled={!canSend}
             loading={loading}
             icon={<MdOutlineSend />}
-            iconPosition="end"
+            iconPlacement="end"
             onClick={handleSend}
             className="bg-indigo-800! text-white! px-5! text-sm! font-semibold! hover:bg-indigo-900! disabled:opacity-60!"
           >

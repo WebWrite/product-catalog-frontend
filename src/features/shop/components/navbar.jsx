@@ -13,6 +13,7 @@ import {
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
+import { RiAdminFill } from "react-icons/ri";
 import {
   FaMoon,
   FaSun,
@@ -23,7 +24,6 @@ import {
 } from "react-icons/fa";
 import {
   MdMenu,
-  MdOutlineFavoriteBorder,
   MdOutlineShoppingBag,
   MdSearch,
   MdViewInAr,
@@ -33,6 +33,8 @@ import { useTheme } from "../../../app/theme/useTheme";
 import { logout } from "../../../shared/utils/api";
 import { clearLoginMarker } from "../../../shared/utils/authStorage";
 import { useCartQuery } from "../../cart/hooks/useCart";
+import { useStartChat, useUnreadCount } from "../../chat/hooks/useChat";
+import { LuMessageSquareText } from "react-icons/lu";
 
 const NAV_LINKS = [
   { label: "Home", to: "/", end: true },
@@ -67,8 +69,10 @@ function NavBar() {
   const { isDarkMode, toggleTheme } = useTheme();
   const { data: cartData } = useCartQuery();
 
-  const favCount = 0;
   const isLoggedIn = !!user?.email;
+
+  const startChat = useStartChat();
+  const unreadCount = useUnreadCount();
 
   const guestCartCount = useSelector((state) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0),
@@ -136,6 +140,15 @@ function NavBar() {
       icon: <FaRegUserCircle className="size-3" />,
       onClick: () => navigate("/profile"),
     },
+    {
+      key: "chat-admin",
+      label: "Chat with Admin",
+      icon: <RiAdminFill />,
+      onClick: () =>
+        navigate(
+          user ? startChat.mutate({ admin: true }) : navigate("/auth/login"),
+        ),
+    },
     themeItem,
     {
       key: "logout",
@@ -171,7 +184,6 @@ function NavBar() {
     },
     themeItem,
   ];
-
   const iconButtonClass = "h-9! w-9! rounded-lg! border-slate-200!";
   const isSeller = user?.role;
   return (
@@ -225,14 +237,16 @@ function NavBar() {
       </div>
 
       <div className="hidden items-center gap-3 md:flex">
-        <Badge count={favCount} size="small" color="#4f46e5">
-          <Button
-            className={iconButtonClass}
-            onClick={() => navigate("/favourites")}
-            aria-label="Favourites"
-            icon={<MdOutlineFavoriteBorder className="text-lg" />}
-          />
-        </Badge>
+        {isLoggedIn && (
+          <Badge count={unreadCount.data} color={"#4f46e5"} size="small">
+            <Button
+              className={iconButtonClass}
+              onClick={() => navigate("/chat")}
+              aria-label="Chat"
+              icon={<LuMessageSquareText className="text-lg" />}
+            />
+          </Badge>
+        )}
 
         <Badge count={cartCount} size="small" color="#4f46e5">
           <Button
@@ -265,6 +279,16 @@ function NavBar() {
       </div>
 
       <div className="flex items-center gap-3 md:hidden">
+        {isLoggedIn && (
+          <Badge count={unreadCount.data} color={"#4f46e5"} size="small">
+            <Button
+              className={iconButtonClass}
+              onClick={() => navigate("/chat")}
+              aria-label="Chat"
+              icon={<LuMessageSquareText className="text-lg" />}
+            />
+          </Badge>
+        )}
         <Badge count={cartCount} size="small" color="#4f46e5">
           <Button
             className={iconButtonClass}
@@ -319,17 +343,6 @@ function NavBar() {
           />
         </div>
 
-        <Button
-          className="mt-3 w-full!"
-          onClick={() => {
-            setDrawerOpen(false);
-            navigate("/favourites");
-          }}
-          icon={<MdOutlineFavoriteBorder />}
-        >
-          Favourites
-        </Button>
-
         {isLoggedIn ? (
           <>
             <Button
@@ -341,6 +354,19 @@ function NavBar() {
               icon={<FaRegUserCircle className="size-3" />}
             >
               Profile
+            </Button>
+            <Button
+              className="mt-2 w-full!"
+              onClick={() => {
+                setDrawerOpen(false);
+                navigate(
+                  user
+                    ? startChat.mutate({ admin: true })
+                    : navigate("/auth/login"),
+                );
+              }}
+            >
+              Chat with Admin
             </Button>
             <Button
               danger

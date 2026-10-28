@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Button, message } from "antd";
 import {
@@ -20,6 +20,7 @@ import ProductNotFound from "../components/productNotFound";
 import { useDispatch, useSelector } from "react-redux";
 import { useAddToCart, useCartQuery } from "../../cart/hooks/useCart";
 import { addItem } from "../../../app/store/cart/cart";
+import { useStartChat } from "../../chat/hooks/useChat";
 
 function ProductDetail() {
   const { id } = useParams();
@@ -27,7 +28,10 @@ function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState(0);
   const isLoggedIn = useSelector((state) => !!state.user?.email);
   const cart = useSelector((state) => state.cart);
+  const startChat = useStartChat();
 
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
   let dispatch = useDispatch();
   let addItemMutation = useAddToCart();
   const { data: serverCart } = useCartQuery();
@@ -54,7 +58,6 @@ function ProductDetail() {
   }
   const seller = product.seller;
   const sellerName = seller?.storeName || seller?.name;
-  const sellerLink = "/chat";
   const sizes = product.sizes ?? [];
   const selectedSizeOption = sizes[selectedSize];
   const selectedSizeValue =
@@ -179,12 +182,18 @@ function ProductDetail() {
                 </span>
                 <MdVerified className="text-sm text-indigo-600" />
               </div>
-              <Link
-                to={sellerLink}
-                className="font-semibold text-indigo-600 hover:underline"
+              <Button
+                type="link"
+                className="font-semibold!"
+                loading={startChat.isPending}
+                onClick={() =>
+                  user
+                    ? startChat.mutate({ participantId: seller.userId })
+                    : navigate("/auth/login")
+                }
               >
-                Message Seller
-              </Link>
+                Chat with seller
+              </Button>
             </div>
 
             <p className="m-0 mt-3 flex items-center gap-1.5 text-xs text-slate-600">
@@ -344,18 +353,17 @@ function ProductDetail() {
           </div>
 
           <div className="flex gap-3">
-            <Link
-              to={sellerLink}
-              className="flex h-10 items-center rounded-lg bg-white! px-5 text-xs font-semibold text-slate-800! ring-1 ring-slate-200 hover:bg-indigo-50"
+            <Button
+              loading={startChat.isPending}
+              onClick={() =>
+                user
+                  ? startChat.mutate({ participantId: seller.userId })
+                  : navigate("/auth/login")
+              }
+              className=" h-10! rounded-lg! bg-white! px-5! text-x! font-semibold! text-slate-800! ring-1 ring-slate-200! hover:bg-indigo-50!"
             >
-              Contact Studio
-            </Link>
-            <Link
-              to={sellerLink}
-              className="flex h-10 items-center rounded-lg bg-indigo-700! px-5 text-xs font-semibold text-white! hover:bg-indigo-800!"
-            >
-              Visit Studio Store
-            </Link>
+              Contact Seller
+            </Button>
           </div>
         </section>
 

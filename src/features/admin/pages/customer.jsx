@@ -276,7 +276,6 @@ function CustomerManagement() {
             customer={customer}
             onClose={() => setInspectedId(null)}
             onStatusChange={updateCustomer}
-            onMessage={() => window.open(`mailto:${customer?.email}`)}
             onNote={() => setPasswordOpen(true)}
           />
         </div>

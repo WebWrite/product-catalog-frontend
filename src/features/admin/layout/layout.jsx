@@ -32,46 +32,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { clearLoginMarker } from "../../../shared/utils/authStorage";
 import { useTheme } from "../../../app/theme/useTheme";
 import ThemeToggle from "../../../shared/components/themeToggle";
+import { useUnreadCount } from "../../chat/hooks/useChat";
 
 const { Sider, Content } = Layout;
-
-const MENU_ITEMS = [
-  {
-    key: "/admin/dashboard",
-    icon: <MdDashboard size={18} />,
-    label: <Link to="/admin/dashboard">Overview</Link>,
-  },
-  {
-    key: "/admin/products",
-    icon: <MdInventory size={18} />,
-    label: <Link to="/admin/products">Products</Link>,
-  },
-  {
-    key: "/admin/orders",
-    icon: <MdShoppingCart size={18} />,
-    label: <Link to="/admin/orders">Orders</Link>,
-  },
-  {
-    key: "/admin/sellers",
-    icon: <MdSupervisedUserCircle size={18} />,
-    label: <Link to="/admin/sellers">Sellers</Link>,
-  },
-  {
-    key: "/admin/customers",
-    icon: <MdSupervisedUserCircle size={18} />,
-    label: <Link to="/admin/customers">Users / Customer</Link>,
-  },
-  {
-    key: "/admin/chat",
-    icon: <MdMessage size={18} />,
-    label: <Link to="/admin/chat">Messages</Link>,
-  },
-  {
-    key: "/admin/settings",
-    icon: <MdSettings size={18} />,
-    label: <Link to="/admin/settings">Settings</Link>,
-  },
-];
 
 function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -80,6 +43,8 @@ function AdminLayout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const unreadCount = useUnreadCount();
+
   const { isDarkMode } = useTheme();
   const handleLogout = async () => {
     const res = await logout();
@@ -101,6 +66,53 @@ function AdminLayout() {
     name: "Admin",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mohsin",
   };
+
+  const MENU_ITEMS = [
+    {
+      key: "/admin/dashboard",
+      icon: <MdDashboard size={18} />,
+      label: <Link to="/admin/dashboard">Overview</Link>,
+    },
+    {
+      key: "/admin/products",
+      icon: <MdInventory size={18} />,
+      label: <Link to="/admin/products">Products</Link>,
+    },
+    {
+      key: "/admin/orders",
+      icon: <MdShoppingCart size={18} />,
+      label: <Link to="/admin/orders">Orders</Link>,
+    },
+    {
+      key: "/admin/sellers",
+      icon: <MdSupervisedUserCircle size={18} />,
+      label: <Link to="/admin/sellers">Sellers</Link>,
+    },
+    {
+      key: "/admin/customers",
+      icon: <MdSupervisedUserCircle size={18} />,
+      label: <Link to="/admin/customers">Users / Customer</Link>,
+    },
+    {
+      key: "/admin/chat",
+      icon: <MdMessage size={18} />,
+      label: (
+        <Link to="/admin/chat">
+          Messages
+          <Badge
+            count={unreadCount.data}
+            className="ml-4!"
+            color="#4f46e5"
+          ></Badge>
+        </Link>
+      ),
+    },
+    {
+      key: "/admin/settings",
+      icon: <MdSettings size={18} />,
+      label: <Link to="/admin/settings">Settings</Link>,
+    },
+  ];
 
   const userMenuItems = [
     {
@@ -297,7 +309,12 @@ function AdminLayout() {
 
               <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
                 <ThemeToggle />
-                <Badge dot color="red" offset={[-2, 2]}>
+                <Badge
+                  count={unreadCount.data}
+                  color="blue"
+                  size="small"
+                  offset={[-2, 2]}
+                >
                   <MdNotificationsNone
                     size={22}
                     className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"

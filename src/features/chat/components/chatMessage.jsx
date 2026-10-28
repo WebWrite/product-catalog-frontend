@@ -1,3 +1,4 @@
+import { MdDone, MdDoneAll } from "react-icons/md";
 import { initials } from "../../../shared/utils/initialsName";
 
 function ChatMessage({ message, mine = false }) {
@@ -49,6 +50,14 @@ function ChatMessage({ message, mine = false }) {
           }`}
         >
           {text}
+          <div className="flex justify-end items-end">
+            {mine &&
+              (message.seen ? (
+                <MdDoneAll color="#34B7F1" size={16} />
+              ) : (
+                <MdDone color="#8696A0" size={16} />
+              ))}
+          </div>
         </div>
       </div>
     </div>

@@ -13,6 +13,9 @@ import AnalyticalCard from "../components/analyticalCard";
 import { money } from "../../../shared/utils/currency";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { getAdminSellerSummary, getAdminSellers } from "../api/api";
+import { LuMessageSquareText } from "react-icons/lu";
+import { useStartChat } from "../../chat/hooks/useChat";
+import { useSelector } from "react-redux";
 
 const PAGE_SIZE = 10;
 const CATEGORY_OPTIONS = [
@@ -30,64 +33,10 @@ const STATUS_OPTIONS = [
   { value: "inactive", label: "Inactive" },
 ];
 
-const columns = [
-  {
-    title: "STORE & BRAND",
-    render: (_, seller) => (
-      <div className="flex items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-sm font-bold text-indigo-700">
-          {seller.storeName?.[0] ?? "S"}
-        </span>
-        <div>
-          <p className="m-0 flex items-center gap-1 text-xs font-bold text-slate-900">
-            {seller.storeName}
-            <MdVerified className="text-indigo-600" />
-          </p>
-          <p className="m-0 font-mono text-[10px] text-slate-500">
-            {seller.storeType}
-          </p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "OWNER / CONTACT",
-    render: (_, seller) => (
-      <>
-        <p className="m-0 text-xs font-semibold text-slate-900">
-          {seller.name}
-        </p>
-        <p className="m-0 text-[10px] text-slate-500">{seller.email}</p>
-      </>
-    ),
-  },
-  {
-    title: "STATUS",
-    dataIndex: "status",
-    render: (status) => (
-      <Tag color={status === "active" ? "green" : "default"}>{status}</Tag>
-    ),
-  },
-  {
-    title: "PRODUCTS",
-    dataIndex: "productCount",
-    render: (count) => `${count ?? 0} items`,
-  },
-  {
-    title: "MONTHLY GMV",
-    dataIndex: "monthlySales",
-    render: (sales, seller) => (
-      <>
-        <b className="text-xs">{money(sales ?? 0)}</b>
-        <p className="m-0 text-[10px] text-slate-500">
-          {seller.monthlyOrders ?? 0} orders
-        </p>
-      </>
-    ),
-  },
-];
-
 function SellerManagement() {
+  const startChat = useStartChat();
+  const user = useSelector((state) => state.user);
+
   const navigate = useNavigate();
   const [filters, setFilters] = useState({
     search: "",
@@ -134,6 +83,81 @@ function SellerManagement() {
       icon: MdOutlinePayments,
       title: "Seller GMV",
       amount: money(summary.gmv ?? 0),
+    },
+  ];
+  const columns = [
+    {
+      title: "STORE & BRAND",
+      render: (_, seller) => (
+        <div className="flex items-center gap-3">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-sm font-bold text-indigo-700">
+            {seller.storeName?.[0] ?? "S"}
+          </span>
+          <div>
+            <p className="m-0 flex items-center gap-1 text-xs font-bold text-slate-900">
+              {seller.storeName}
+              <MdVerified className="text-indigo-600" />
+            </p>
+            <p className="m-0 font-mono text-[10px] text-slate-500">
+              {seller.storeType}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "OWNER / CONTACT",
+      render: (_, seller) => (
+        <>
+          <p className="m-0 text-xs font-semibold text-slate-900">
+            {seller.name}
+          </p>
+          <p className="m-0 text-[10px] text-slate-500">{seller.email}</p>
+        </>
+      ),
+    },
+    {
+      title: "STATUS",
+      dataIndex: "status",
+      render: (status) => (
+        <Tag color={status === "active" ? "green" : "default"}>{status}</Tag>
+      ),
+    },
+    {
+      title: "PRODUCTS",
+      dataIndex: "productCount",
+      render: (count) => `${count ?? 0} items`,
+    },
+    {
+      title: "MONTHLY GMV",
+      dataIndex: "monthlySales",
+      render: (sales, seller) => (
+        <>
+          <b className="text-xs">{money(sales ?? 0)}</b>
+          <p className="m-0 text-[10px] text-slate-500">
+            {seller.monthlyOrders ?? 0} orders
+          </p>
+        </>
+      ),
+    },
+    {
+      title: "Action",
+      key: "operation",
+      fixed: "end",
+      width: 100,
+      render: (_, record) => (
+        <Button
+          type="text"
+          loading={startChat.isPending}
+          onClick={() =>
+            user
+              ? startChat.mutate({ admin: true, participantId: record.userId })
+              : navigate("/auth/login")
+          }
+        >
+          <LuMessageSquareText />
+        </Button>
+      ),
     },
   ];
 
