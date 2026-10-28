@@ -32,16 +32,12 @@ export const CATEGORIES = [
 
 export const STATUS_OPTIONS = [
   { value: "active", label: "Active" },
-  { value: "pending", label: "Pending Review" },
-  { value: "flagged", label: "Flagged" },
-  { value: "suspended", label: "Suspended" },
+  { value: "inactive", label: "Inactive" },
 ];
 
 export const STATUS_TAG = {
   active: { label: "Active", color: "green" },
-  pending: { label: "Pending Review", color: "orange" },
-  flagged: { label: "Flagged", color: "red" },
-  suspended: { label: "Suspended", color: "default" },
+  inactive: { label: "Inactive", color: "red" },
 };
 
 export const initials = (name) =>

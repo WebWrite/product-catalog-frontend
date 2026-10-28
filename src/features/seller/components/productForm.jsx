@@ -174,7 +174,7 @@ function ProductForm({ mode, product, onSubmit, isPending = false }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6 w-full min-w-0 max-w-3xl mx-auto">
+    <div className="flex flex-col gap-4 md:gap-6 w-full min-w-0 max-w-3xl mx-auto py-4">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -253,7 +253,9 @@ function ProductForm({ mode, product, onSubmit, isPending = false }) {
               {!imageFile && (
                 <div className="flex flex-col items-center gap-1 text-slate-400">
                   <MdCloudUpload size={22} />
-                  <span className="text-[11px] font-medium">Upload</span>
+                  <span className="text-[11px] font-medium">
+                    {isEdit ? "Edit" : "Upload"}
+                  </span>
                 </div>
               )}
             </Upload>
@@ -305,7 +307,7 @@ function ProductForm({ mode, product, onSubmit, isPending = false }) {
 
           <div className="flex flex-col md:flex-row gap-4">
             <Form.Item
-              label="Price ($)"
+              label="Price (PKR)"
               name="price"
               className="flex-1"
               rules={[productFieldRule("price")]}

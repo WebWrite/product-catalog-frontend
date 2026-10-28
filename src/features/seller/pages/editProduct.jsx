@@ -49,7 +49,7 @@ function EditProduct() {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto w-full p-4">
+      <div className="max-w-3xl mx-auto w-full p-4 sm:p-8 ">
         <Skeleton active paragraph={{ rows: 8 }} />
       </div>
     );

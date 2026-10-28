@@ -54,8 +54,7 @@ function ProductDetail() {
   }
   const seller = product.seller;
   const sellerName = seller?.storeName || seller?.name;
-  //   const sellerLink = `/sellers/${seller?._id ?? ""}`;
-  const sellerLink = "/";
+  const sellerLink = "/chat";
   const sizes = product.sizes ?? [];
   const selectedSizeOption = sizes[selectedSize];
   const selectedSizeValue =

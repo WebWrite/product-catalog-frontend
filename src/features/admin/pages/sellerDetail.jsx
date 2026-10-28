@@ -15,8 +15,7 @@ const STORE_TYPES = [
 ];
 const SELLER_STATUSES = [
   { value: "active", label: "Active" },
-  { value: "blocked", label: "Blocked" },
-  { value: "suspended", label: "Suspended" },
+  { value: "inactive", label: "Inactive" },
 ];
 
 function SellerDetail() {
@@ -78,7 +77,7 @@ function SellerDetail() {
   const status = owner.status ?? "active";
 
   return (
-    <div className="mx-auto w-full max-w-6xl p-4">
+    <div className="mx-auto w-full max-w-6xl p-4 sm:p-8 ">
       <Link
         to="/admin/sellers"
         className="mb-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600"

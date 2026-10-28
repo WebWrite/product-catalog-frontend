@@ -12,6 +12,7 @@ import PaymentSuccess from "../../features/orders/pages/paymentSuccess";
 import PaymentCancelled from "../../features/orders/pages/paymentCancelled";
 
 import AdminLayout from "../../features/admin/layout/layout";
+const Chat = lazy(() => import("../../features/chat/pages/chat"));
 const CustomerManagement = lazy(
   () => import("../../features/admin/pages/customer"),
 );
@@ -64,6 +65,10 @@ const renderPage = (Component) => (
     <Component />
   </Suspense>
 );
+const chatRoutes = [
+  { path: "chat", element: renderPage(Chat) },
+  { path: "chat/:id", element: renderPage(Chat) },
+];
 
 export const router = createBrowserRouter([
   {
@@ -122,6 +127,7 @@ export const router = createBrowserRouter([
         path: "orders",
         element: renderPage(SellerOrders),
       },
+      ...chatRoutes,
     ],
   },
   {
@@ -200,8 +206,14 @@ export const router = createBrowserRouter([
         path: "customers",
         element: renderPage(CustomerManagement),
       },
+      ...chatRoutes,
     ],
   },
+  {
+    path: "chat",
+    element: renderPage(Chat),
+  },
+  { path: "/chat/:id", element: renderPage(Chat) },
   {
     path: "*",
     element: <NotFound />,
