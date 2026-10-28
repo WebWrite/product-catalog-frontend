@@ -313,3 +313,14 @@ body {
   font-style: normal;
   font-variation-settings: "GRAD" 0;
 }
+
+.filter-control .ant-select-selector {
+  border-color: var(--filter-border, #b8c0cc) !important;
+}
+
+.filter-control .ant-select-selection-item,
+.filter-control .ant-select-selection-placeholder,
+.filter-control .ant-select-arrow,
+.filter-control input {
+  color: var(--filter-text, #334155);
+}
