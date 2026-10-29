@@ -27,9 +27,9 @@ function OrderCard({ order, active, onSelect }) {
         <div>
           <p className="m-0 flex items-center gap-2 text-sm font-bold text-slate-900">
             {shortId(order)}
-            <Tag color={status.color} className="m-0! text-[10px]!">
+            {/* <Tag color={status.color} className="m-0! text-[10px]!">
               {status.label}
-            </Tag>
+            </Tag> */}
           </p>
           <p className="m-0 mt-1 text-[11px] text-slate-500">
             {order.shippingAddress?.fullName} • {order.shippingAddress?.city}

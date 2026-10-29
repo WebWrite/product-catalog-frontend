@@ -4,24 +4,24 @@ export const formatPrice = (price) =>
   }).format(Number(price) || 0);
 
 export const getStockStatus = (stock) => {
-  const quantity = Number(stock) || 0;
-
-  if (quantity <= 0) {
+  if (stock <= 0) {
     return {
-      label: "Dead Stock",
-      className: "bg-red-900/30 text-red-400",
+      label: "Out of Stock",
+      className: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
     };
   }
 
-  if (quantity <= 10) {
+  if (stock <= 10) {
     return {
       label: "Low Stock",
-      className: "bg-yellow-900/30 text-yellow-400",
+      className:
+        "bg-yellow-100 text-yellow-900 dark:bg-yellow-950 dark:text-yellow-300",
     };
   }
 
   return {
     label: "In Stock",
-    className: "bg-green-900/30 text-green-400",
+    className:
+      "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
   };
 };

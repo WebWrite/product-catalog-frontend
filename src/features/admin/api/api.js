@@ -101,3 +101,12 @@ export async function updateAdminCustomer(id, payload) {
   const response = await api.patch(`/admin/customers/${id}`, payload);
   return response.data.customer;
 }
+
+export async function getAdminActivityLogs(params = {}) {
+  const response = await api.get("/admin/activity-logs", { params });
+
+  return {
+    logs: response.data.logs,
+    pagination: response.data.pagination,
+  };
+}
