@@ -102,6 +102,7 @@ function NavBar() {
       clearLoginMarker();
       dispatch(removeUser());
       queryClient.removeQueries({ queryKey: ["currentUser"] });
+      queryClient.clear();
       navigate("/");
       notification.success({
         title: "Logout successfully",

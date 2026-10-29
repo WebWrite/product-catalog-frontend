@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App } from "antd";
 import { emit, socket } from "../../../shared/utils/socket";
 import { CHAT_BASE } from "../../../shared/utils/chatPath";
+import { hasLoginMarker } from "../../../shared/utils/authStorage";
 import { getConversations, getUnreadCount } from "../api/api";
 
 export const useChatSocket = () => {
@@ -29,11 +30,25 @@ export const useChatSocket = () => {
   }, [user?.id, qc]);
 };
 
-export const useConversations = () =>
-  useQuery({ queryKey: ["conversations"], queryFn: getConversations });
+export const useConversations = () => {
+  const user = useSelector((state) => state.user);
 
-export const useUnreadCount = () =>
-  useQuery({ queryKey: ["chat-unread"], queryFn: getUnreadCount });
+  return useQuery({
+    queryKey: ["conversations"],
+    queryFn: getConversations,
+    enabled: hasLoginMarker() && !!user?.email,
+  });
+};
+
+export const useUnreadCount = () => {
+  const user = useSelector((state) => state.user);
+
+  return useQuery({
+    queryKey: ["chat-unread"],
+    queryFn: getUnreadCount,
+    enabled: hasLoginMarker() && !!user?.email,
+  });
+};
 
 export const useStartChat = () => {
   const navigate = useNavigate();

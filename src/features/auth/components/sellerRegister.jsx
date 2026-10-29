@@ -186,7 +186,7 @@ function SellerRegister() {
         >
           <Select
             size="large"
-            className="font-normal"
+            className="theme-select font-normal"
             placeholder="Select an option"
             prefix={<MdOutlineCategory className="text-sm text-slate-500" />}
             showSearch={{ optionFilterProp: "label" }}

@@ -11,7 +11,7 @@ function FilterTag({ text, onClose }) {
       color="#EAEDFF"
       closable
       onClose={handleClose}
-      className="rounded-2xl! text-black!"
+      className="theme-tag rounded-2xl!"
     >
       {text}
     </Tag>

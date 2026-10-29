@@ -148,7 +148,7 @@ function ExplorePage() {
               type="link"
               text="Clear All"
               onClick={clearAll}
-              className="text-xs! font-semibold!"
+              className="theme-action-button text-xs! font-semibold!"
             />
           )}
         </div>
@@ -158,14 +158,14 @@ function ExplorePage() {
             <button
               type="button"
               onClick={() => setFiltersOpen(true)}
-              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-violet-100 px-3 text-xs font-semibold text-slate-700 lg:hidden"
+              className="theme-dark-control flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-violet-100 px-3 text-xs font-semibold text-slate-700 lg:hidden"
             >
               <MdFilterList className="text-base" />
               Filters
             </button>
           </Badge>
 
-          <div className="flex items-center rounded-lg bg-violet-100 p-1 font-semibold">
+          <div className="theme-sort-control flex items-center rounded-lg p-1 font-semibold">
             <div className="theme-muted flex items-center gap-1 pl-1 text-xs">
               <MdOutlineSort />
               <span>Sort:</span>
@@ -173,7 +173,7 @@ function ExplorePage() {
             <Select
               value={filters.sortBy}
               variant="borderless"
-              className="w-32! bg-violet-100! sm:w-40!"
+              className="theme-sort-select w-32! sm:w-40!"
               onChange={(value) => updateFilters({ sortBy: value })}
               options={[
                 { value: "high-to-low", label: "High to Low" },

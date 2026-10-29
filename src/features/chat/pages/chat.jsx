@@ -13,6 +13,7 @@ import { formatDate } from "../../../shared/utils/formatDate";
 import { emit, socket } from "../../../shared/utils/socket";
 import { useConversations } from "../hooks/useChat";
 import { IoCloseCircle } from "react-icons/io5";
+import { uplaodAttachment } from "../api/api";
 
 function Chat() {
   const TABS = [
@@ -147,15 +148,29 @@ function Chat() {
       top: messageContainer.scrollHeight,
       behavior: "smooth",
     });
-  }, [id, messages.length, otherTyping]);
+  }, [id, messages, otherTyping]);
 
-  const handleSend = ({ text }) => {
-    if (!text) return;
-    clearTimeout(typingTimer.current);
-    socket.emit("typing", { roomId: id, isTyping: false });
-    emit("send_message", { roomId: id, text }).catch((err) =>
-      notifyError("Message not sent", err),
-    );
+  const handleSend = async ({ text, files = [] }) => {
+    if (!text && files.length === 0) return;
+    let attachment = null;
+    try {
+      if (files.length > 0) {
+        attachment = await uplaodAttachment(files[0]);
+      }
+      clearTimeout(typingTimer.current);
+      socket.emit("typing", { roomId: id, isTyping: false });
+      const result = await emit("send_message", {
+        roomId: id,
+        text,
+        attachment,
+      });
+      if (result?.success === false) {
+        throw new Error(result.message || "Message not sent");
+      }
+    } catch (err) {
+      notifyError("Message not sent", err);
+      throw err;
+    }
   };
 
   const handleTyping = () => {
@@ -171,7 +186,7 @@ function Chat() {
 
   return (
     <div
-      className={`mx-auto flex w-full max-h-[100dvh] overflow-hidden overscroll-none bg-white font-sans ${"h-[calc(100dvh-4rem)]"}`}
+      className={`theme-page mx-auto flex w-full max-h-[100dvh] overflow-hidden overscroll-none bg-white font-sans ${"h-[calc(100dvh-4rem)]"}`}
     >
       <aside
         className={`min-h-0 w-full shrink-0 flex-col lg:flex lg:w-88 ${
@@ -187,7 +202,7 @@ function Chat() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             prefix={<MdSearch className="text-lg text-slate-500" />}
-            className="bg-indigo-50!"
+            className="theme-input bg-indigo-50!"
           />
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -255,7 +270,7 @@ function Chat() {
       >
         {id ? (
           <>
-            <header className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white p-3">
+            <header className="theme-surface flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white p-3">
               <Link
                 to={base}
                 aria-label="Back to inbox"
@@ -289,7 +304,7 @@ function Chat() {
 
             <div
               ref={messageScrollRef}
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-purple-50"
+              className="theme-chat-background min-h-0 flex-1 overflow-y-auto overscroll-contain bg-purple-50"
             >
               <div className="flex flex-col gap-5 p-4 sm:p-6">
                 {loadingRoom && <Skeleton active />}
@@ -303,6 +318,7 @@ function Chat() {
                         name: mine ? user.name : other?.name,
                         role: mine ? undefined : other?.role,
                         time: formatDate(m.createdAt),
+                        attachment: m.attachment,
                         text: m.text,
                         seen: m.seen,
                       }}
@@ -317,12 +333,12 @@ function Chat() {
               </div>
             </div>
 
-            <div className="sticky bottom-0 z-10 shrink-0 border-t border-slate-200 bg-white">
+            <div className="theme-surface sticky bottom-0 z-10 shrink-0 border-t border-slate-200 bg-white">
               <ChatInput onSend={handleSend} onTyping={handleTyping} />
             </div>
           </>
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 bg-purple-50 text-slate-500">
+          <div className="theme-chat-background flex flex-1 flex-col items-center justify-center gap-2 bg-purple-50 text-slate-500">
             <MdOutlineChat className="text-4xl" />
             <p className="m-0 text-sm">
               Select a conversation to start chatting

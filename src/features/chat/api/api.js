@@ -11,3 +11,10 @@ export const getConversations = () =>
 
 export const getUnreadCount = async () =>
   api.get("/chat/unread-count").then((r) => r.data.data.unreadCount);
+
+export const uplaodAttachment = async (file) => {
+  const formData = new FormData();
+  formData.append("image", file);
+  const res = await api.post("/chat/upload", formData);
+  return res.data.data.attachment;
+};
