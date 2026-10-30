@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
-import { App, Input, Skeleton } from "antd";
+import { App, Button, Input, Skeleton } from "antd";
 import { MdArrowBack, MdOutlineChat, MdSearch } from "react-icons/md";
 import CustomTag from "../../../shared/components/customTag";
 import InboxItem from "../components/inboxItem";
@@ -209,19 +209,19 @@ function Chat() {
             {TABS.map((t) => {
               const count = inbox.filter(TAB_TEST[t.value]).length;
               return (
-                <button
+                <Button
                   key={t.value}
-                  type="button"
+                  type="text"
                   onClick={() => setTab(t.value)}
                   className={`cursor-pointer rounded-xl px-3 py-0.5 text-xs font-medium transition-colors ${
                     tab === t.value
-                      ? "bg-indigo-700 text-white"
-                      : "bg-indigo-100 text-slate-700 hover:bg-indigo-200"
+                      ? "bg-indigo-700! text-white!"
+                      : "bg-indigo-100! text-slate-700! hover:bg-indigo-200!"
                   }`}
                 >
                   {t.label}
                   {t.value !== "all" && ` (${count})`}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -288,8 +288,9 @@ function Chat() {
                   </h4>
                   {other?.role && (
                     <CustomTag
+                      color={"#E0E7FF"}
                       text={other.role}
-                      className="bg-indigo-100! rounded-xl! px-2! text-[11px]! capitalize"
+                      className=" rounded-xl! px-2! text-[11px]! capitalize"
                     />
                   )}
                 </div>

@@ -82,9 +82,6 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
         <div>
           <h1 className="m-0 flex flex-wrap items-center gap-3 text-xl font-bold text-slate-900 sm:text-2xl">
             Order {shortId(order)}
-            <Tag color={status.color} className="m-0!">
-              {status.label}
-            </Tag>
           </h1>
           <p className="m-0 mt-2 text-xs text-slate-600">
             Placed {formatDate(order.createdAt)} • {order.paymentMethod}

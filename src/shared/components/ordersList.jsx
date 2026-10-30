@@ -46,9 +46,6 @@ function Row({ label, value, valueClass = "text-slate-900" }) {
 }
 
 function OrderDetail({ order, onCancel, onRetry, isCancelling, isRetrying }) {
-  const status = GetOrderStatus(order);
-  console.log(order);
-
   const stage = getOrderStage(order);
   const payment = PAYMENT_STATUS[order.paymentStatus];
   const address = order.shippingAddress;
@@ -65,9 +62,6 @@ function OrderDetail({ order, onCancel, onRetry, isCancelling, isRetrying }) {
         <div>
           <h1 className="m-0 flex flex-wrap items-center gap-3 text-xl font-bold text-slate-900 sm:text-2xl">
             Order {shortId(order)}
-            <Tag color={status.color} className="m-0!">
-              {status.label}
-            </Tag>
           </h1>
           <p className="m-0 mt-2 text-xs text-slate-600">
             Placed {formatDate(order.createdAt)} • Paid via{" "}

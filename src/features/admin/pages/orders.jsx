@@ -131,7 +131,7 @@ function OrdersFulfillment() {
     },
     {
       icon: MdOutlineLocalShipping,
-      title: "In Transit",
+      title: "Pending",
       amount: summaryQuery.isLoading ? "..." : (summary.inTransit ?? 0),
     },
     {

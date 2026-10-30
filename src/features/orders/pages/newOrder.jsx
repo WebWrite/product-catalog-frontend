@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import ShippingAddressForm from "../components/shippingAddressForm";
 import { useCreateCODOrder } from "../hooks/useCreateOrder";
 import { useCreateStripeCheckout } from "../hooks/useCreateStripeCheckout";
+import { useQueryClient } from "@tanstack/react-query";
 
 const { Title, Text } = Typography;
 
 const NewOrder = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { mutate: createCOD, isPending: isCODPending } = useCreateCODOrder();
 
@@ -29,7 +31,7 @@ const NewOrder = () => {
             showProgress: true,
             placement: "bottomRight",
           });
-
+          queryClient.invalidateQueries({ queryKey: ["cart"] });
           navigate("/orders/myorders");
         },
         onError: (error) => {

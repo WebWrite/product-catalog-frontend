@@ -1,6 +1,7 @@
 import { Flex, Table, Tag } from "antd";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { money } from "../../../shared/utils/currency";
+import { Link } from "react-router-dom";
 
 function RecentOrder({ orders = [], isLoading = false }) {
   const columns = [
@@ -57,10 +58,12 @@ function RecentOrder({ orders = [], isLoading = false }) {
     {
       title: "Actions",
       key: "action",
-      render: () => (
-        <Tag>
-          View <MdKeyboardArrowRight />
-        </Tag>
+      render: (_, record) => (
+        <Link to={`/admin/orders/${record._id}`}>
+          <Tag>
+            View <MdKeyboardArrowRight />
+          </Tag>
+        </Link>
       ),
     },
   ];

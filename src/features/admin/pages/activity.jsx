@@ -223,9 +223,6 @@ const Activity = () => {
               ? "rgba(255,255,255,0.04)"
               : "rgba(15,23,42,0.04)",
           },
-          Pagination: {
-            itemActiveBg: isDark ? "#6366f1" : "#5b5bd6",
-          },
         },
       }}
     >

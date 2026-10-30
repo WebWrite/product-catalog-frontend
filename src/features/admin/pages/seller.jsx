@@ -155,7 +155,7 @@ function SellerManagement() {
               : navigate("/auth/login")
           }
         >
-          <LuMessageSquareText />
+          <LuMessageSquareText size={18} />
         </Button>
       ),
     },

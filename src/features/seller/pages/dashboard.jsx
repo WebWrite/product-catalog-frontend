@@ -62,7 +62,7 @@ function SellerDashboard() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 md:gap-4 w-full min-w-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full min-w-0">
         <StatCard
           title="Total Cataloged"
           value={

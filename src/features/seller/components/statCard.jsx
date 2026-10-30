@@ -22,7 +22,7 @@ function StatCard({
             className={`shrink-0 rounded-lg p-1 sm:p-1.5 ${
               iconClassName ||
               (isAlert
-                ? "bg-red-900/30 text-red-400"
+                ? "bg-red-800/30 text-red-400"
                 : "bg-slate-800 text-slate-400")
             }`}
           >

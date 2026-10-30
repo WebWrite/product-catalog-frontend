@@ -20,7 +20,8 @@ function InboxItem({ active, unread, name, role }) {
         <div className="text-sm   ">
           <h2 className="font-semibold">{name}</h2>
           <CustomTag
-            className={"bg-indigo-100! rounded-xl! px-2! text-[11px]! "}
+            color={"#E0E7FF"}
+            className={" rounded-xl! px-2! text-[11px]! "}
             text={role}
           />
         </div>

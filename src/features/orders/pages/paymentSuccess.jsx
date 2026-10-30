@@ -1,4 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { Button, Result } from "antd";
+import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 const PaymentSuccess = () => {
@@ -6,6 +8,11 @@ const PaymentSuccess = () => {
   const navigate = useNavigate();
 
   const sessionId = searchParams.get("session_id");
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["cart"] });
+  });
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center p-4 sm:p-6">

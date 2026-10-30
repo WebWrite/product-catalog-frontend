@@ -10,11 +10,11 @@ const ROLES = [
 ];
 
 const TARGETS = [
-  { value: "product", label: "Product" },
-  { value: "cart", label: "Cart" },
-  { value: "order", label: "Order" },
-  { value: "auth", label: "Auth" },
-  { value: "chat", label: "Chat" },
+  { value: "Product", label: "Product" },
+  { value: "Cart", label: "Cart" },
+  { value: "Order", label: "Order" },
+  { value: "Auth", label: "Auth" },
+  { value: "User", label: "User" },
 ];
 
 const ActivityFilters = ({ filters, onChange, onReset }) => {

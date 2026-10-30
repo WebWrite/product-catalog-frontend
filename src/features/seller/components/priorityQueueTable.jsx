@@ -1,142 +1,183 @@
-import { Button, Tag, Checkbox, Skeleton } from "antd";
-import { useNavigate } from "react-router-dom";
-import { MdInventory2 } from "react-icons/md";
-import { useSellerProducts } from "../hooks/useSellerProducts";
 import { useState } from "react";
-import SellerProductPagination from "./sellerPagination";
+import { useNavigate } from "react-router-dom";
+import { Button, Table, Tooltip } from "antd";
+import { MdEdit, MdOpenInNew } from "react-icons/md";
+import { useSellerProducts } from "../hooks/useSellerProducts";
 import { money } from "../../../shared/utils/currency";
+
+const LOW_STOCK = 5;
+
+function StockBar({ stock }) {
+  const out = stock === 0;
+  const low = stock <= LOW_STOCK;
+  const text = out ? "text-red-400" : low ? "text-amber-400" : "text-slate-300";
+
+  return (
+    <div className="w-28">
+      <p className={`m-0 text-xs font-semibold ${text}`}>
+        {out ? "Out of stock" : `${stock} in stock`}
+      </p>
+    </div>
+  );
+}
+
+function StatusPill({ status }) {
+  const active = status === "active";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize ${
+        active
+          ? "bg-emerald-500/10 text-emerald-400"
+          : "bg-slate-500/10 text-slate-400"
+      }`}
+    >
+      <span
+        className={`size-1.5 rounded-full ${active ? "bg-emerald-400" : "bg-slate-500"}`}
+      />
+      {status}
+    </span>
+  );
+}
 
 function PriorityQueueTable() {
   const navigate = useNavigate();
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5);
+  const [selectedKeys, setSelectedKeys] = useState([]);
 
-  const { data, isLoading, isError } = useSellerProducts({
-    page,
-    limit,
-  });
+  const { data, isLoading, isError } = useSellerProducts();
 
   const products = data?.products ?? [];
   const total = data?.pagination?.total ?? 0;
-  const handleCardClick = () => {
-    navigate("/seller/products");
-  };
+
+  const columns = [
+    {
+      title: "PRODUCT",
+      dataIndex: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (_, p) => (
+        <div className="flex min-w-0 items-center gap-3.5">
+          <div className="size-14 shrink-0 overflow-hidden rounded-xl bg-slate-800 ring-1 ring-slate-700">
+            {p.image?.url && (
+              <img
+                src={p.image.url}
+                alt={p.name}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+              />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="m-0 line-clamp-1 text-sm font-semibold capitalize text-slate-100">
+              {p.name}
+            </p>
+            <p className="m-0 mt-0.5 line-clamp-1 text-xs capitalize text-slate-500">
+              {p.category}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "STOCK",
+      dataIndex: "stock",
+      sorter: (a, b) => a.stock - b.stock,
+      render: (stock) => <StockBar stock={stock} />,
+    },
+    {
+      title: "PRICE",
+      dataIndex: "price",
+      sorter: (a, b) => a.price - b.price,
+      render: (price) => (
+        <span className="text-sm font-bold text-slate-100">{money(price)}</span>
+      ),
+    },
+    {
+      title: "STATUS",
+      dataIndex: "status",
+      render: (s) => <StatusPill status={s} />,
+    },
+    {
+      title: "",
+      key: "actions",
+      align: "right",
+      width: 100,
+      render: (_, p) => (
+        <div
+          className="flex justify-end gap-1 transition-opacity lg:opacity-0 lg:group-hover:opacity-100"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Tooltip title="Edit product">
+            <Button
+              type="text"
+              shape="circle"
+              aria-label="Edit product"
+              icon={<MdEdit />}
+              onClick={() => navigate("/seller/products")}
+            />
+          </Tooltip>
+          <Tooltip title="View in shop">
+            <Button
+              type="text"
+              shape="circle"
+              aria-label="View in shop"
+              icon={<MdOpenInNew />}
+              onClick={() => window.open(`/shop/${p._id}`, "_blank")}
+            />
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div
-      className="rounded-2xl border border-slate-800 shadow-sm overflow-hidden mt-2 w-full min-w-0"
+      className="mt-2 w-full min-w-0 overflow-hidden rounded-2xl border border-slate-800 shadow-lg shadow-black/20"
       style={{ background: "var(--workspace-surface)" }}
     >
-      <div className="p-4 md:p-6 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3">
-        <div className="flex items-center gap-2 md:gap-3 flex-wrap min-w-0">
-          <h3 className="m-0 font-bold text-sm md:text-base lg:text-lg text-slate-100">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-4 pt-5">
+        <div>
+          <h3 className="m-0 text-base font-bold text-slate-100 lg:text-lg">
             Cataloged Products
           </h3>
-          <Tag className="m-0 border-0 text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-900/30 text-indigo-400 uppercase tracking-wider">
-            {total} Items
-          </Tag>
+          <p className="m-0 mt-0.5 text-xs text-slate-500">
+            {total} {total === 1 ? "item" : "items"} in your catalog
+          </p>
         </div>
         <Button
+          type="primary"
           size="small"
-          type="text"
-          className="text-[11px] md:text-[12px] font-semibold text-indigo-400 hover:text-indigo-300 hover:bg-slate-800 px-3"
           onClick={() => navigate("/seller/products")}
+          className="px-4 font-semibold"
         >
-          View All →
+          View All
         </Button>
       </div>
 
-      {isLoading && (
-        <div className="flex flex-col gap-3 p-4">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} active paragraph={{ rows: 1 }} />
-          ))}
-        </div>
-      )}
-
-      {isError && (
-        <div className="p-6 text-center text-slate-500 text-sm">
+      {isError ? (
+        <div className="p-8 text-center text-sm text-slate-500">
           Failed to load products.
         </div>
-      )}
-
-      {!isLoading && !isError && (!products || products.length === 0) && (
-        <div className="p-6 text-center text-slate-500 text-sm">
-          No products yet.
-        </div>
-      )}
-
-      {!isLoading && !isError && products && products.length > 0 && (
-        <div
-          className="flex flex-col overflow-y-auto"
-          style={{ maxHeight: 320 }}
-        >
-          {products.map((product) => (
-            <div
-              key={product._id}
-              className="p-3 md:p-4 border-b border-slate-800 last:border-b-0 hover:bg-slate-800/40 transition-colors cursor-pointer"
-              onClick={handleCardClick}
-            >
-              <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-                  <Checkbox
-                    className="product-checkbox"
-                    onChange={() => handleCardClick()}
-                  />
-                </div>
-
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-slate-700 overflow-hidden flex-shrink-0 border border-slate-600">
-                  <img
-                    src={product.image?.url}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-
-                <div className="flex flex-col min-w-0 flex-1 gap-1">
-                  <span className="text-[13px] md:text-sm font-bold text-slate-100 line-clamp-1 capitalize">
-                    {product.name}
-                  </span>
-                  <span className="text-[10px] md:text-[11px] text-slate-500 line-clamp-1">
-                    {product.category}
-                  </span>
-                  <span className="text-[10px] md:text-[11px] text-slate-400 font-medium flex items-center gap-1">
-                    <MdInventory2 size={12} />
-                    Stock: {product.stock}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <span className="text-[14px] md:text-[16px] font-bold text-slate-100">
-                    {money(product.price)}
-                  </span>
-                  <Tag
-                    className={`m-0 border-0 text-[9px] md:text-[10px] font-bold px-1.5 py-0 rounded-md ${
-                      product.status === "active"
-                        ? "bg-green-900/30 text-green-400"
-                        : "bg-slate-800 text-slate-400"
-                    }`}
-                  >
-                    {product.status}
-                  </Tag>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="border-t border-slate-800 px-2 py-3 md:px-4">
-        <SellerProductPagination
-          page={page}
-          limit={limit}
-          total={total}
-          onChange={(nextPage, nextLimit) => {
-            setPage(nextLimit !== limit ? 1 : nextPage);
-            setLimit(nextLimit);
+      ) : (
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={products}
+          loading={isLoading}
+          scroll={{ x: 680 }}
+          rowClassName="group cursor-pointer"
+          rowSelection={{
+            selectedRowKeys: selectedKeys,
+            onChange: setSelectedKeys,
           }}
+          onClick={() => navigate("/seller/products")}
+          locale={{
+            emptyText:
+              products.length === 0
+                ? "No products yet."
+                : "No products match your filters",
+          }}
+          className="[&_.ant-table-thead>tr>th]:text-[11px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-thead>tr>th]:before:hidden! [&_.ant-table-tbody>tr:last-child>td]:border-b-0!"
         />
-      </div>
+      )}
     </div>
   );
 }
