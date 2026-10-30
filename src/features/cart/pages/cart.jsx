@@ -27,7 +27,7 @@ import {
   removeItem,
   updateItem,
 } from "../../../app/store/cart/cart";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 function CartPage() {
   const assurance = [
@@ -48,6 +48,7 @@ function CartPage() {
     },
   ];
   let dispatch = useDispatch();
+  const role = useSelector((state) => state.user?.role);
 
   const isLoggedIn = useSelector((state) => !!state.user?.email);
   const guestItems = useSelector((state) => state.cart.items);
@@ -84,6 +85,8 @@ function CartPage() {
       });
     }
   }, [areGuestProductsError, isLoggedIn]);
+  const isBlockedRole = role === "admin" || role === "seller";
+  if (isBlockedRole) return <Navigate to="/auth/login" replace />;
 
   if (isLoggedIn && isLoading) return <Loader />;
   if (!isLoggedIn && areGuestProductsLoading) return <Loader />;

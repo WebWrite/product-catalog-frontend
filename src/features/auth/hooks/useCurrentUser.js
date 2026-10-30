@@ -1,15 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { getMe, refreshToken } from "../../../shared/utils/api";
+import { getMe } from "../../../shared/utils/api";
 import { hasLoginMarker } from "../../../shared/utils/authStorage";
 
 export const fetchCurrentUser = async () => {
-  const refreshed = await refreshToken();
-
-  if (!refreshed) {
-    throw new Error("Unable to refresh authentication");
-  }
-
   return getMe();
 };
 

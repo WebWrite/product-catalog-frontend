@@ -141,15 +141,21 @@ function NavBar() {
       icon: <FaRegUserCircle className="size-3" />,
       onClick: () => navigate("/profile"),
     },
-    {
-      key: "chat-admin",
-      label: "Chat with Admin",
-      icon: <RiAdminFill />,
-      onClick: () =>
-        navigate(
-          user ? startChat.mutate({ admin: true }) : navigate("/auth/login"),
-        ),
-    },
+    ...(user?.role != "admin"
+      ? [
+          {
+            key: "chat-admin",
+            label: "Chat with Admin",
+            icon: <RiAdminFill />,
+            onClick: () =>
+              navigate(
+                user
+                  ? startChat.mutate({ admin: true })
+                  : navigate("/auth/login"),
+              ),
+          },
+        ]
+      : []),
     themeItem,
     {
       key: "logout",
@@ -248,16 +254,16 @@ function NavBar() {
             />
           </Badge>
         )}
-
-        <Badge count={cartCount} size="small" color="#4f46e5">
-          <Button
-            className={iconButtonClass}
-            onClick={() => navigate("/cart")}
-            aria-label="Cart"
-            icon={<MdOutlineShoppingBag className="text-lg" />}
-          />
-        </Badge>
-
+        {user?.role != "admin" && user?.role !== "seller" && (
+          <Badge count={cartCount} size="small" color="#4f46e5">
+            <Button
+              className={iconButtonClass}
+              onClick={() => navigate("/cart")}
+              aria-label="Cart"
+              icon={<MdOutlineShoppingBag className="text-lg" />}
+            />
+          </Badge>
+        )}
         <Dropdown
           menu={{ items: isLoggedIn ? loggedInItems : guestItems }}
           placement="bottomRight"
@@ -290,13 +296,15 @@ function NavBar() {
             />
           </Badge>
         )}
-        <Badge count={cartCount} size="small" color="#4f46e5">
-          <Button
-            className={iconButtonClass}
-            onClick={() => navigate("/cart")}
-            icon={<MdOutlineShoppingBag className="text-lg" />}
-          />
-        </Badge>
+        {user?.role != "admin" && user?.role !== "seller" && (
+          <Badge count={cartCount} size="small" color="#4f46e5">
+            <Button
+              className={iconButtonClass}
+              onClick={() => navigate("/cart")}
+              icon={<MdOutlineShoppingBag className="text-lg" />}
+            />
+          </Badge>
+        )}
         <Button
           className={iconButtonClass}
           onClick={() => setDrawerOpen(true)}
@@ -356,19 +364,21 @@ function NavBar() {
             >
               Profile
             </Button>
-            <Button
-              className="mt-2 w-full!"
-              onClick={() => {
-                setDrawerOpen(false);
-                navigate(
-                  user
-                    ? startChat.mutate({ admin: true })
-                    : navigate("/auth/login"),
-                );
-              }}
-            >
-              Chat with Admin
-            </Button>
+            {user?.role != "admin" && (
+              <Button
+                className="mt-2 w-full!"
+                onClick={() => {
+                  setDrawerOpen(false);
+                  navigate(
+                    user
+                      ? startChat.mutate({ admin: true })
+                      : navigate("/auth/login"),
+                  );
+                }}
+              >
+                Chat with Admin
+              </Button>
+            )}
             <Button
               danger
               className="mt-2 w-full!"

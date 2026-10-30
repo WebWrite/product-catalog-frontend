@@ -34,6 +34,10 @@ function ProductDetail() {
   const user = useSelector((state) => state.user);
   let dispatch = useDispatch();
   let addItemMutation = useAddToCart();
+  const role = user?.role;
+  const isAdmin = role === "admin";
+  const isSeller = role === "seller";
+  const cartDisabled = isAdmin || isSeller;
   const { data: serverCart } = useCartQuery();
 
   const { data, isLoading, isError } = useQuery({
@@ -140,6 +144,17 @@ function ProductDetail() {
     }
   };
 
+  const handleChatWithSeller = () => {
+    if (!isLoggedIn) {
+      navigate("/auth/login");
+      return;
+    }
+
+    startChat.mutate({
+      participantId: seller.userId,
+      ...(isAdmin && { admin: true }),
+    });
+  };
   return (
     <div className="min-h-screen bg-purple-50  font-sans">
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
@@ -186,11 +201,8 @@ function ProductDetail() {
                 type="link"
                 className="font-semibold!"
                 loading={startChat.isPending}
-                onClick={() =>
-                  user
-                    ? startChat.mutate({ participantId: seller.userId })
-                    : navigate("/auth/login")
-                }
+                disabled={isSeller}
+                onClick={handleChatWithSeller}
               >
                 Chat with seller
               </Button>
@@ -256,7 +268,9 @@ function ProductDetail() {
                   type="button"
                   aria-label="Increase quantity"
                   disabled={
-                    quantity >= maxQuantity || cartItemCount == maxQuantity
+                    quantity >= maxQuantity ||
+                    cartItemCount == maxQuantity ||
+                    cartDisabled
                   }
                   onClick={() => setQuantity(quantity + 1)}
                   className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-white text-base shadow-sm hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
@@ -278,6 +292,7 @@ function ProductDetail() {
               size="large"
               block
               disabled={
+                cartDisabled ||
                 outOfStock ||
                 cartItemCount >= 25 ||
                 cartItemCount == maxQuantity
@@ -287,16 +302,20 @@ function ProductDetail() {
             >
               {outOfStock
                 ? "Out of Stock"
-                : cartItemCount >= 25
-                  ? "Your item cart is full"
-                  : `Add to Cart — ${money(total)}`}
+                : cartDisabled
+                  ? "Not available for your account"
+                  : cartItemCount >= 25
+                    ? "Your item cart is full"
+                    : `Add to Cart — ${money(total)}`}
             </Button>
 
             <div className="mt-3 flex gap-3">
               <Link
                 to="/cart"
                 className={`flex h-11 flex-1 items-center justify-center rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-700! transition-colors hover:bg-indigo-100 ${
-                  outOfStock ? "pointer-events-none opacity-60" : ""
+                  outOfStock || cartDisabled
+                    ? "pointer-events-none opacity-60"
+                    : ""
                 }`}
               >
                 Buy Now • Start Checkout
@@ -355,11 +374,8 @@ function ProductDetail() {
           <div className="flex gap-3">
             <Button
               loading={startChat.isPending}
-              onClick={() =>
-                user
-                  ? startChat.mutate({ participantId: seller.userId })
-                  : navigate("/auth/login")
-              }
+              disabled={isSeller}
+              onClick={handleChatWithSeller}
               className=" h-10! rounded-lg! bg-white! px-5! text-x! font-semibold! text-slate-800! ring-1 ring-slate-200! hover:bg-indigo-50!"
             >
               Contact Seller

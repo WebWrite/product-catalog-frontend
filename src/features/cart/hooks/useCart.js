@@ -11,12 +11,13 @@ import { notification } from "antd";
 import { getProductsById } from "../../shop/api/api";
 
 export const useCartQuery = () => {
-  const isLoggedIn = useSelector((state) => !!state.user?.email);
+  const user = useSelector((state) => state.user);
+  const isCustomer = !!user?.email && user?.role === "customer";
 
   return useQuery({
     queryKey: ["cart"],
     queryFn: getCart,
-    enabled: isLoggedIn,
+    enabled: isCustomer,
   });
 };
 
