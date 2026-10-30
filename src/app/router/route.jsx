@@ -13,6 +13,8 @@ import PaymentCancelled from "../../features/orders/pages/paymentCancelled";
 
 import AdminLayout from "../../features/admin/layout/layout";
 const Chat = lazy(() => import("../../features/chat/pages/chat"));
+const Activity = lazy(() => import("../../features/admin/pages/activity"));
+
 const CustomerManagement = lazy(
   () => import("../../features/admin/pages/customer"),
 );
@@ -205,6 +207,10 @@ export const router = createBrowserRouter([
       {
         path: "customers",
         element: renderPage(CustomerManagement),
+      },
+      {
+        path: "activity",
+        element: renderPage(Activity),
       },
       ...chatRoutes,
     ],

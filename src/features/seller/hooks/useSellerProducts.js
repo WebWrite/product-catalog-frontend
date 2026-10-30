@@ -115,6 +115,7 @@ export function useUpdateOrderStatus() {
     mutationFn: updateSellerOrderStatus,
     onSuccess: async () => {
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ORDERS_QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: STATS_QUERY_KEY }),
       ]);

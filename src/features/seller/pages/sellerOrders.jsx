@@ -14,11 +14,11 @@ import {
 } from "../hooks/useSellerProducts";
 import AnalyticalCard from "../../admin/components/analyticalCard";
 import confirmCancelItem from "../../../shared/components/confirmCancelItem";
-import SellerOrderCard from "../components/sellerOrderCard";
 import SellerOrderDetail from "../components/sellerOrderDetail";
 import { FLOW, getOrderStage } from "../../orders/constant/constant";
 import { liveTotal } from "../constants/productConstants";
 import { money } from "../../../shared/utils/currency";
+import OrderCard from "../../../shared/components/orderCard";
 
 const FILTERS = [
   { value: "all", label: "All" },
@@ -182,7 +182,7 @@ const SellerOrders = () => {
             )}
 
             {visible.map((order) => (
-              <SellerOrderCard
+              <OrderCard
                 key={order._id}
                 order={order}
                 active={order._id === selected?._id}

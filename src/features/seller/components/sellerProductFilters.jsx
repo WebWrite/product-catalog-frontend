@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Input, Select } from "antd";
+import { Input, Select, theme } from "antd";
 import { MdSearch } from "react-icons/md";
 import {
   PRODUCT_CATEGORIES,
@@ -7,10 +7,17 @@ import {
 } from "../constants/productConstants";
 
 const CATEGORIES = PRODUCT_CATEGORIES;
-
 const SORT_OPTIONS = PRODUCT_SORT_OPTIONS;
 
+const STOCK_OPTIONS = [
+  { label: "All stock", value: "" },
+  { label: "In Stock", value: "inStock" },
+  { label: "Low Stock", value: "lowStock" },
+  { label: "Dead Stock", value: "deadStock" },
+];
+
 function SellerProductFilters({ filters, onChange }) {
+  const { token } = theme.useToken();
   const [searchInput, setSearchInput] = useState(filters.search);
 
   useEffect(() => {
@@ -29,15 +36,22 @@ function SellerProductFilters({ filters, onChange }) {
     return () => clearTimeout(timeoutId);
   }, [searchInput, filters.search, onChange]);
 
+  const controlStyle = {
+    height: 40,
+    borderColor: token.colorBorder,
+    color: token.colorText,
+  };
+
   return (
-    <div className="mb-1 flex flex-col gap-3 sm:flex-row">
+    <div className="mb-1 grid grid-cols-2 gap-3 lg:grid-cols-4">
       <Input
         allowClear
         value={searchInput}
         onChange={(event) => setSearchInput(event.target.value)}
         placeholder="Search products..."
-        prefix={<MdSearch className="text-lg text-slate-400" />}
-        className="md:h-10 sm:max-w-xs"
+        prefix={<MdSearch className="text-lg" />}
+        className="filter-control h-10 w-full min-w-0"
+        style={controlStyle}
       />
 
       <Select
@@ -49,14 +63,26 @@ function SellerProductFilters({ filters, onChange }) {
           label: category,
           value: category,
         }))}
-        className="w-full  sm:min-w-44 sm:flex-1"
+        className="filter-control h-10 w-full min-w-0"
+        style={controlStyle}
       />
 
       <Select
         value={filters.sortBy}
         onChange={(sortBy) => onChange({ sortBy })}
         options={SORT_OPTIONS}
-        className="w-full sm:min-w-48 sm:flex-1"
+        className="filter-control h-10 w-full min-w-0"
+        style={controlStyle}
+      />
+
+      <Select
+        value={filters.stockStatus || undefined}
+        onChange={(stockStatus) => onChange({ stockStatus: stockStatus || "" })}
+        placeholder="All stock"
+        allowClear
+        options={STOCK_OPTIONS}
+        className="filter-control h-10 w-full min-w-0"
+        style={controlStyle}
       />
     </div>
   );

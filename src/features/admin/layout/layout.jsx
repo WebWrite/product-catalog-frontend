@@ -24,6 +24,7 @@ import {
   MdSearch,
   MdViewInAr,
   MdSupervisedUserCircle,
+  MdHistory,
 } from "react-icons/md";
 import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
@@ -107,6 +108,11 @@ function AdminLayout() {
           ></Badge>
         </Link>
       ),
+    },
+    {
+      key: "/admin/activity",
+      icon: <MdHistory size={18} />,
+      label: <Link to="/admin/activity">Activity</Link>,
     },
     {
       key: "/admin/settings",
@@ -243,29 +249,6 @@ function AdminLayout() {
             theme={isDarkMode ? "dark" : "light"}
             onClick={handleMenuClick}
           />
-
-          {!collapsed && (
-            <div className="absolute bottom-0 w-full p-5 border-t border-slate-800">
-              <div className="flex justify-between text-[11px] text-slate-400 mb-2 font-medium">
-                <span>Storage & Quota</span>
-                <span className="font-bold text-slate-200">84%</span>
-              </div>
-              <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden mb-5">
-                <div className="bg-indigo-500 h-full w-[84%]"></div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold m-0 text-slate-100">
-                    Studio Kanso
-                  </p>
-                  <p className="text-[10px] text-slate-500 m-0 font-medium">
-                    Kyoto, JP
-                  </p>
-                </div>
-                <MdSettings className="text-slate-500 cursor-pointer hover:text-indigo-400" />
-              </div>
-            </div>
-          )}
         </Sider>
 
         <div
