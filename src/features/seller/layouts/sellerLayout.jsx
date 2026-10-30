@@ -46,11 +46,7 @@ const MENU_ITEMS = [
     icon: <MdInventory size={18} />,
     label: <Link to="/seller/products">Products</Link>,
   },
-  {
-    key: "/seller/inventory",
-    icon: <MdInventory size={18} />,
-    label: <Link to="/seller/inventory">Inventory</Link>,
-  },
+
   {
     key: "/seller/orders",
     icon: <MdShoppingCart size={18} />,
