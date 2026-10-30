@@ -114,11 +114,6 @@ function AdminLayout() {
       icon: <MdHistory size={18} />,
       label: <Link to="/admin/activity">Activity</Link>,
     },
-    {
-      key: "/admin/settings",
-      icon: <MdSettings size={18} />,
-      label: <Link to="/admin/settings">Settings</Link>,
-    },
   ];
 
   const userMenuItems = [

@@ -99,11 +99,6 @@ function SellerLayout() {
         </Link>
       ),
     },
-    {
-      key: "/seller/settings",
-      icon: <MdSettings size={18} />,
-      label: <Link to="/seller/settings">Store Settings</Link>,
-    },
   ];
   const userMenuItems = [
     {
