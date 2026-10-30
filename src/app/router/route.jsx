@@ -217,11 +217,32 @@ export const router = createBrowserRouter([
   },
   {
     path: "chat",
-    element: renderPage(Chat),
+    element: (
+      <ProtectedRoutes allowedRoles={["admin", "seller", "customer"]}>
+        <ShopLayout />
+      </ProtectedRoutes>
+    ),
+    children: [
+      {
+        path: "",
+        element: renderPage(Chat),
+      },
+      {
+        path: ":id",
+        element: renderPage(Chat),
+      },
+    ],
   },
-  { path: "/chat/:id", element: renderPage(Chat) },
   {
     path: "*",
     element: <NotFound />,
   },
 ]);
+
+router.subscribe(() => {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "smooth",
+  });
+});

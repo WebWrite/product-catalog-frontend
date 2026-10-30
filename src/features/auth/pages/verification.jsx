@@ -59,27 +59,49 @@ function Verification() {
       setOtp("");
 
       if (comeFrom === "login") {
-        const user = res.data.user;
+        const loginUser = res.data.user;
         setLoginMarker();
 
-        if (user.role === "admin" || user.role === "seller") {
-          dispatch(setuser(user));
+        await queryClient.cancelQueries({ queryKey: ["currentUser"] });
+        await queryClient.cancelQueries({ queryKey: ["cart"] });
+
+        if (loginUser.role === "admin" || loginUser.role === "seller") {
+          dispatch(setuser(loginUser));
+          queryClient.setQueryData(["currentUser"], loginUser);
           navigate(
-            user.role === "admin" ? "/admin/dashboard" : "/seller/dashboard",
+            loginUser.role === "admin"
+              ? "/admin/dashboard"
+              : "/seller/dashboard",
           );
         } else {
-          if (cart?.items.length >= 1) {
+          if (cart?.items?.length >= 1) {
             try {
               const response = await mergeCart(cart.items);
               if (response?.success !== false) dispatch(clearCart());
-            } catch (e) {}
+            } catch (e) {
+              console.error("Cart merge failed", e);
+            }
           }
 
-          dispatch(setuser(user));
+          let latestUser = loginUser;
+          try {
+            const me = await api.get("/user/me");
+            latestUser = me.data?.user ?? loginUser;
+          } catch (e) {
+            console.error("Failed to refresh user", e);
+          }
+
+          dispatch(setuser(latestUser));
 
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ["cart"] }),
-            queryClient.invalidateQueries({ queryKey: ["currentUser"] }),
+            queryClient.invalidateQueries({
+              queryKey: ["currentUser"],
+              refetchType: "all",
+            }),
+            queryClient.invalidateQueries({
+              queryKey: ["cart"],
+              refetchType: "all",
+            }),
           ]);
 
           navigate("/");

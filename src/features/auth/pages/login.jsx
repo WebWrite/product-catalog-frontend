@@ -19,6 +19,7 @@ import { clearCart } from "../../../app/store/cart/cart";
 import { mergeCart } from "../../cart/api/cartApi";
 import { setLoginMarker } from "../../../shared/utils/authStorage";
 import { IoHome } from "react-icons/io5";
+import ThemeToggle from "../../../shared/components/themeToggle";
 
 function Login() {
   const dispatch = useDispatch();
@@ -33,27 +34,47 @@ function Login() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: async (data) => {
-      const user = data.data.user;
+      const loginUser = data.data.user;
       setLoginMarker();
 
-      if (user.role === "admin" || user.role === "seller") {
-        dispatch(setuser(user));
+      await queryClient.cancelQueries({ queryKey: ["currentUser"] });
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+
+      if (loginUser.role === "admin" || loginUser.role === "seller") {
+        dispatch(setuser(loginUser));
+        queryClient.setQueryData(["currentUser"], loginUser);
         navigate(
-          user.role === "admin" ? "/admin/dashboard" : "/seller/dashboard",
+          loginUser.role === "admin" ? "/admin/dashboard" : "/seller/dashboard",
         );
       } else {
-        if (cart?.items.length >= 1) {
+        if (cart?.items?.length >= 1) {
           try {
             const response = await mergeCart(cart.items);
             if (response?.success !== false) dispatch(clearCart());
-          } catch (e) {}
+          } catch (e) {
+            console.error("Cart merge failed", e);
+          }
         }
 
-        dispatch(setuser(user));
+        let latestUser = loginUser;
+        try {
+          const me = await api.get("/user/me");
+          latestUser = me.data?.user ?? loginUser;
+        } catch (e) {
+          console.error("Failed to refresh user", e);
+        }
+
+        dispatch(setuser(latestUser));
 
         await Promise.all([
-          queryClient.invalidateQueries({ queryKey: ["cart"] }),
-          queryClient.invalidateQueries({ queryKey: ["currentUser"] }),
+          queryClient.invalidateQueries({
+            queryKey: ["currentUser"],
+            refetchType: "all",
+          }),
+          queryClient.invalidateQueries({
+            queryKey: ["cart"],
+            refetchType: "all",
+          }),
         ]);
 
         navigate("/");
@@ -148,7 +169,10 @@ function Login() {
   const busy = mutation.isPending || otpMutation.isPending;
 
   return (
-    <div className="min-h-screen bg-purple-50 relative ">
+    <div className="theme-page relative min-h-screen bg-purple-50">
+      <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
+        <ThemeToggle />
+      </div>
       <Link
         to={"/"}
         className="fixed top-4 left-0 z-50 flex items-center gap-2 rounded-r-lg! bg-blue-600! p-2 text-white! shadow-lg! transition-colors! hover:bg-blue-700! sm:top-20 sm:-translate-y-1/2 sm:p-3"

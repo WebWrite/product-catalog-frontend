@@ -1,11 +1,16 @@
+import { MdDone, MdDoneAll, MdDownload } from "react-icons/md";
 import { initials } from "../../../shared/utils/initialsName";
 
 function ChatMessage({ message, mine = false }) {
   const { name, role, time, text, avatar } = message;
+  const imageUrl = message.attachment?.url;
+  const downloadUrl = imageUrl?.replace("/upload/", "/upload/fl_attachment/");
 
   return (
     <div
-      className={`flex w-full gap-2.5 ${mine ? "justify-end" : "justify-start"}`}
+      className={`flex w-full gap-2.5 ${
+        mine ? "justify-end" : "justify-start"
+      }`}
     >
       {!mine && (
         <span className="mt-1 flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700">
@@ -18,7 +23,9 @@ function ChatMessage({ message, mine = false }) {
       )}
 
       <div
-        className={`flex max-w-[85%] flex-col sm:max-w-[70%] ${mine ? "items-end" : "items-start"}`}
+        className={`flex max-w-[85%] flex-col sm:max-w-[70%] ${
+          mine ? "items-end" : "items-start"
+        }`}
       >
         <p className="m-0 mb-1.5 flex flex-wrap items-center gap-2 text-[11px]">
           {mine ? (
@@ -42,13 +49,47 @@ function ChatMessage({ message, mine = false }) {
         </p>
 
         <div
-          className={`whitespace-pre-line px-4 py-3 text-sm leading-relaxed shadow-sm ${
+          className={`whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
             mine
-              ? "rounded-2xl rounded-br-sm bg-indigo-800 text-white"
-              : "rounded-2xl rounded-tl-sm bg-white text-slate-800 ring-1 ring-slate-100"
+              ? "rounded-br-sm bg-indigo-700 text-white"
+              : "theme-surface rounded-tl-sm bg-white text-slate-800 ring-1 ring-slate-100"
           }`}
         >
-          {text}
+          {message.attachment?.type === "image" && (
+            <div className="relative mb-2 w-fit">
+              <img
+                src={message.attachment.url}
+                alt="Chat attachment"
+                className={`max-h-64 max-w-full rounded-lg border bg-white object-contain ${
+                  mine ? "border-indigo-800" : "border-gray-200"
+                }`}
+                loading="lazy"
+              />
+
+              <a
+                href={downloadUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Download image"
+                title="Download image"
+                className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
+              >
+                <MdDownload size={18} />
+              </a>
+            </div>
+          )}
+
+          {text && <p className="m-0 break-words">{text}</p>}
+
+          <div className="flex items-end justify-end">
+            {mine &&
+              (message.seen ? (
+                <MdDoneAll color="#34B7F1" size={16} />
+              ) : (
+                <MdDone color="#8696A0" size={16} />
+              ))}
+          </div>
         </div>
       </div>
     </div>

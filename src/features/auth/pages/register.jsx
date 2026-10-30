@@ -24,7 +24,7 @@ function Register() {
   const [userType, setUserType] = useState("Buyer");
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden scrollbar-none bg-purple-50">
+    <div className="theme-page relative min-h-screen overflow-x-hidden scrollbar-none bg-purple-50">
       <Link
         to={"/"}
         className="fixed top-4 left-0 z-50 flex items-center gap-2 rounded-r-lg! bg-blue-600! p-2 text-white! shadow-lg! transition-colors! hover:bg-blue-700! sm:top-20 sm:-translate-y-1/2 sm:p-3"
@@ -52,14 +52,14 @@ function Register() {
           <div className="absolute -bottom-10 -right-20 z-0 h-40 w-40 rounded-full bg-indigo-500/60 blur-2xl" />
 
           <div className="theme-panel relative z-10 w-full min-w-0 overflow-hidden rounded-2xl p-3 sm:p-4">
-            <p className="mb-2 text-[11px] font-medium tracking-wider text-slate-600">
+            <p className="theme-muted mb-2 text-[11px] font-medium tracking-wider">
               SELECT ACCOUNT TYPE
             </p>
             <Segmented
               block
               value={userType}
               onChange={setUserType}
-              className="mb-4! w-full! min-w-0! rounded-2xl! bg-[#e9ebff]! p-1.5!
+              className="theme-segmented mb-4! w-full! min-w-0! rounded-2xl! bg-[#e9ebff]! p-1.5!
               font-sans
                 [&_.ant-segmented-item]:rounded-xl!
                 [&_.ant-segmented-thumb]:rounded-xl!   
@@ -74,18 +74,18 @@ function Register() {
                     <div className="px-2 py-2 text-left sm:px-3.5">
                       <div
                         className={`flex items-center gap-2 ${
-                          active ? "text-indigo-600" : "text-slate-800"
+                          active ? "text-indigo-600" : "theme-heading"
                         }`}
                       >
                         <span className="text-sm">{t.icon}</span>
-                        <span className=" text-sm font-semibold">
+                        <span className="text-sm font-semibold">
                           {t.value}
                         </span>
                         {active && (
                           <span className="ml-auto h-2 w-2 rounded-full bg-indigo-50" />
                         )}
                       </div>
-                      <p className="mt-0.5 text-[10px] leading-snug whitespace-normal text-slate-600">
+                      <p className="theme-muted mt-0.5 text-[10px] leading-snug whitespace-normal">
                         {t.desc}
                       </p>
                     </div>

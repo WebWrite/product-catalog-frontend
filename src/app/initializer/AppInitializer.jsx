@@ -11,12 +11,14 @@ import {
   hasLoginMarker,
 } from "../../shared/utils/authStorage";
 import PageLoader from "../../shared/components/pageLoader";
+import { useChatSocket } from "../../features/chat/hooks/useChat";
 
 function AppInitializer() {
   const dispatch = useDispatch();
 
   const { data, isLoading, isError } = useCurrentUser();
   const isLoggedIn = hasLoginMarker();
+  useChatSocket();
 
   useEffect(() => {
     if (!isLoggedIn) {

@@ -4,6 +4,7 @@ import {
   MdOutlineCreditCard,
   MdOutlineInventory2,
   MdOutlineLocalShipping,
+  MdOutlineMessage,
   MdOutlinePersonOutline,
   MdOutlinePlace,
   MdOutlineReceiptLong,
@@ -21,6 +22,9 @@ import {
 import { formatDate } from "../../../shared/utils/formatDate";
 import { liveTotal } from "../constants/productConstants";
 import { money } from "../../../shared/utils/currency";
+import { useSelector } from "react-redux";
+import { useStartChat } from "../../chat/hooks/useChat";
+import { useNavigate } from "react-router-dom";
 
 function Card({ title, icon, children }) {
   return (
@@ -56,11 +60,7 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
   const blockedReason = "Waiting for the customer's Stripe payment";
 
   const bulkItems = order.items.filter((item) =>
-    getSellerNextStatus(
-      order.paymentMethod,
-      item.status,
-      order.paymentStatus,
-    ),
+    getSellerNextStatus(order.paymentMethod, item.status, order.paymentStatus),
   );
   const bulk = bulkItems.length
     ? getSellerNextStatus(
@@ -72,6 +72,9 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
 
   const advanceAll = () =>
     bulkItems.forEach((item) => onUpdate(order._id, item._id, bulk.to));
+  const user = useSelector((state) => state.user);
+  const startChat = useStartChat();
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col gap-4">
@@ -156,6 +159,21 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
               )}
             </div>
           </div>
+          <Button
+            type="primary"
+            icon={<MdOutlineMessage />}
+            loading={startChat.isPending}
+            onClick={() =>
+              user
+                ? startChat.mutate({
+                    participantId: customer._id,
+                  })
+                : navigate("/auth/login")
+            }
+            className="bg-indigo-700! mt-3 w-full"
+          >
+            Send Direct Message
+          </Button>{" "}
         </Card>
 
         <Card title="Ship To" icon={<MdOutlinePlace />}>

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Button, Input } from "antd";
+import imageCompression from "browser-image-compression";
 import { MdAttachFile, MdOutlineSend, MdClose } from "react-icons/md";
 
 function ChatInput({
@@ -7,18 +8,84 @@ function ChatInput({
   disabled = false,
   loading = false,
   placeholder = "Write message...",
+  onTyping,
 }) {
   const [text, setText] = useState("");
   const [files, setFiles] = useState([]);
+  const [imageError, setImageError] = useState("");
+  const [isCompressing, setIsCompressing] = useState(false);
   const fileRef = useRef(null);
 
-  const canSend = (text.trim() || files.length > 0) && !disabled && !loading;
+  const canSend =
+    Boolean(text.trim() || files.length > 0) &&
+    !disabled &&
+    !loading &&
+    !isCompressing;
 
-  const handleSend = () => {
+  const handleFiles = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const maxSize = 5 * 1024 * 1024;
+
+    setImageError("");
+
+    if (!allowedTypes.includes(file.type)) {
+      setImageError("Only JPG, PNG, and WEBP images are allowed.");
+      return;
+    }
+
+    if (file.size > maxSize) {
+      setImageError("Image must be 5 MB or smaller.");
+      return;
+    }
+
+    setIsCompressing(true);
+
+    try {
+      const blob = await imageCompression(file, {
+        maxSizeMB: 5,
+        maxWidthOrHeight: 1280,
+        initialQuality: 0.78,
+        fileType: "image/webp",
+        useWebWorker: true,
+      });
+
+      if (blob.type !== "image/webp" || blob.size > maxSize) {
+        setImageError("Could not prepare the image. Please try another image.");
+        return;
+      }
+
+      const compressedFile = new File(
+        [blob],
+        `${file.name.replace(/\.[^/.]+$/, "")}.webp`,
+        {
+          type: "image/webp",
+          lastModified: file.lastModified,
+        },
+      );
+
+      setFiles([compressedFile]);
+    } catch (error) {
+      console.error("Image compression failed:", error);
+      setImageError("Image compression failed. Please try another image.");
+    } finally {
+      setIsCompressing(false);
+    }
+  };
+
+  const handleSend = async () => {
     if (!canSend) return;
-    onSend?.({ text: text.trim(), files });
-    setText("");
-    setFiles([]);
+
+    try {
+      await onSend?.({ text: text.trim(), files });
+      setText("");
+      setFiles([]);
+      setImageError("");
+    } catch {}
   };
 
   const handleKeyDown = (e) => {
@@ -28,17 +95,14 @@ function ChatInput({
     }
   };
 
-  const handleFiles = (e) => {
-    setFiles((prev) => [...prev, ...Array.from(e.target.files)]);
-    e.target.value = "";
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setImageError("");
   };
 
-  const removeFile = (index) =>
-    setFiles((prev) => prev.filter((_, i) => i !== index));
-
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-      <div className="rounded-xl bg-indigo-50/70 p-3 ring-1 ring-indigo-100">
+    <div className="theme-surface bg-white p-4 shadow-sm ring-1 ring-slate-100">
+      <div className="theme-input rounded-xl bg-indigo-50/70 p-3 ring-1 ring-indigo-100">
         <Input.TextArea
           variant="borderless"
           style={{ boxShadow: "none", outline: "none" }}
@@ -46,7 +110,10 @@ function ChatInput({
           placeholder={placeholder}
           value={text}
           disabled={disabled}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value);
+            onTyping?.();
+          }}
           onKeyDown={handleKeyDown}
           className="resize-none! bg-transparent! p-0! text-sm!"
         />
@@ -56,12 +123,14 @@ function ChatInput({
             {files.map((file, i) => (
               <span
                 key={`${file.name}-${i}`}
-                className="flex max-w-48 items-center gap-1.5 rounded-lg bg-white px-2 py-1 text-[11px] text-slate-700 ring-1 ring-indigo-100"
+                className="theme-surface flex max-w-48 items-center gap-1.5 rounded-lg bg-white px-2 py-1 text-[11px] text-slate-700 ring-1 ring-indigo-100"
               >
                 <span className="truncate">{file.name}</span>
+
                 <button
                   type="button"
                   aria-label={`Remove ${file.name}`}
+                  disabled={isCompressing}
                   onClick={() => removeFile(i)}
                   className="flex cursor-pointer text-slate-400 hover:text-red-500"
                 >
@@ -72,11 +141,17 @@ function ChatInput({
           </div>
         )}
 
+        {imageError && (
+          <p className="mt-2 text-xs text-red-500" role="alert">
+            {imageError}
+          </p>
+        )}
+
         <div className="mt-3 flex items-center justify-between">
           <button
             type="button"
-            aria-label="Attach file"
-            disabled={disabled}
+            aria-label="Attach image"
+            disabled={disabled || isCompressing}
             onClick={() => fileRef.current?.click()}
             className="flex size-8 cursor-pointer items-center justify-center rounded-lg text-xl text-slate-600 transition-colors hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -85,7 +160,7 @@ function ChatInput({
           <input
             ref={fileRef}
             type="file"
-            multiple
+            accept="image/jpeg,image/png,image/webp"
             hidden
             onChange={handleFiles}
           />
@@ -94,9 +169,9 @@ function ChatInput({
             type="primary"
             size="large"
             disabled={!canSend}
-            loading={loading}
+            loading={loading || isCompressing}
             icon={<MdOutlineSend />}
-            iconPosition="end"
+            iconPlacement="end"
             onClick={handleSend}
             className="bg-indigo-800! text-white! px-5! text-sm! font-semibold! hover:bg-indigo-900! disabled:opacity-60!"
           >

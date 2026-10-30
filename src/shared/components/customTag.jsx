@@ -4,7 +4,7 @@ function CustomTag({ icon, color, text, className }) {
   return (
     <Tag
       variant="outlined"
-      className={`font-sans text-black! ${className}`}
+      className={`theme-tag font-sans ${className}`}
       color={color}
       icon={icon}
     >

@@ -14,7 +14,6 @@ import {
   MdDashboard,
   MdInventory,
   MdShoppingCart,
-  MdBarChart,
   MdMessage,
   MdSettings,
   MdNotificationsNone,
@@ -32,37 +31,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { clearLoginMarker } from "../../../shared/utils/authStorage";
 import { useTheme } from "../../../app/theme/useTheme";
 import ThemeToggle from "../../../shared/components/themeToggle";
+import { RiAdminFill } from "react-icons/ri";
+import { useStartChat, useUnreadCount } from "../../chat/hooks/useChat";
 
 const { Sider, Content } = Layout;
-
-const MENU_ITEMS = [
-  {
-    key: "/seller/dashboard",
-    icon: <MdDashboard size={18} />,
-    label: <Link to="/seller/dashboard">Overview</Link>,
-  },
-  {
-    key: "/seller/products",
-    icon: <MdInventory size={18} />,
-    label: <Link to="/seller/products">Products</Link>,
-  },
-
-  {
-    key: "/seller/orders",
-    icon: <MdShoppingCart size={18} />,
-    label: <Link to="/seller/orders">Orders</Link>,
-  },
-  {
-    key: "/seller/chat",
-    icon: <MdMessage size={18} />,
-    label: <Link to="/seller/chat">Messages</Link>,
-  },
-  {
-    key: "/seller/settings",
-    icon: <MdSettings size={18} />,
-    label: <Link to="/seller/settings">Store Settings</Link>,
-  },
-];
 
 function SellerLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -71,6 +43,9 @@ function SellerLayout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const startChat = useStartChat();
+  const unreadCount = useUnreadCount();
+
   const { isDarkMode } = useTheme();
   const handleLogout = async () => {
     const res = await logout();
@@ -78,6 +53,7 @@ function SellerLayout() {
       clearLoginMarker();
       dispatch(removeUser());
       queryClient.removeQueries({ queryKey: ["currentUser"] });
+      queryClient.clear();
       navigate("/");
       notification.success({
         title: "Logout successfully",
@@ -93,6 +69,47 @@ function SellerLayout() {
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mohsin",
   };
 
+  const MENU_ITEMS = [
+    {
+      key: "/seller/dashboard",
+      icon: <MdDashboard size={18} />,
+      label: <Link to="/seller/dashboard">Overview</Link>,
+    },
+    {
+      key: "/seller/products",
+      icon: <MdInventory size={18} />,
+      label: <Link to="/seller/products">Products</Link>,
+    },
+    {
+      key: "/seller/inventory",
+      icon: <MdInventory size={18} />,
+      label: <Link to="/seller/inventory">Inventory</Link>,
+    },
+    {
+      key: "/seller/orders",
+      icon: <MdShoppingCart size={18} />,
+      label: <Link to="/seller/orders">Orders</Link>,
+    },
+    {
+      key: "/seller/chat",
+      icon: <MdMessage size={18} />,
+      label: (
+        <Link to="/seller/chat">
+          Messages
+          <Badge
+            count={unreadCount.data}
+            className="ml-4!"
+            color="#4f46e5"
+          ></Badge>
+        </Link>
+      ),
+    },
+    {
+      key: "/seller/settings",
+      icon: <MdSettings size={18} />,
+      label: <Link to="/seller/settings">Store Settings</Link>,
+    },
+  ];
   const userMenuItems = [
     {
       key: "profile",
@@ -101,6 +118,15 @@ function SellerLayout() {
       onClick: () => navigate("/profile"),
     },
     { type: "divider" },
+    {
+      key: "chat-admin",
+      label: "Chat with Admin",
+      icon: <RiAdminFill />,
+      onClick: () =>
+        navigate(
+          user ? startChat.mutate({ admin: true }) : navigate("/auth/login"),
+        ),
+    },
     {
       key: "logout",
       label: "Logout",
@@ -288,7 +314,11 @@ function SellerLayout() {
 
               <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
                 <ThemeToggle />
-                <Badge dot color="red" offset={[-2, 2]}>
+                <Badge
+                  count={unreadCount.data}
+                  color="#4f46e5"
+                  offset={[-2, 2]}
+                >
                   <MdNotificationsNone
                     size={22}
                     className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"

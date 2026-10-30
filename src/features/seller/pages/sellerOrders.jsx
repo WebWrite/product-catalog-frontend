@@ -44,8 +44,6 @@ const SellerOrders = () => {
   const { data: orders = [], isLoading, isError, refetch } = useSellerOrders();
   const { mutate: updateStatus, isPending: isUpdating } =
     useUpdateOrderStatus();
-  console.log(orders);
-
   const q = keyword.trim().toLowerCase().replace("#", "");
   const visible = orders.filter(
     (o) =>
