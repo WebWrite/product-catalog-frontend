@@ -114,6 +114,11 @@ function AdminLayout() {
       icon: <MdHistory size={18} />,
       label: <Link to="/admin/activity">Activity</Link>,
     },
+    {
+      key: "/admin/profile",
+      icon: <MdPerson size={18} />,
+      label: <Link to="/admin/profile">Profile</Link>,
+    },
   ];
 
   const userMenuItems = [
@@ -121,7 +126,7 @@ function AdminLayout() {
       key: "profile",
       label: "Profile",
       icon: <MdPerson />,
-      onClick: () => navigate("/profile"),
+      onClick: () => navigate("/admin/profile"),
     },
     { type: "divider" },
     {

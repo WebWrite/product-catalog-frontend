@@ -12,6 +12,8 @@ import PaymentSuccess from "../../features/orders/pages/paymentSuccess";
 import PaymentCancelled from "../../features/orders/pages/paymentCancelled";
 
 import AdminLayout from "../../features/admin/layout/layout";
+const CustomerProfile = lazy(() => import("../../features/shop/pages/profile"));
+const AdminProfile = lazy(() => import("../../features/admin/pages/profile"));
 const Chat = lazy(() => import("../../features/chat/pages/chat"));
 const Activity = lazy(() => import("../../features/admin/pages/activity"));
 
@@ -209,6 +211,10 @@ export const router = createBrowserRouter([
         element: renderPage(CustomerManagement),
       },
       {
+        path: "profile",
+        element: renderPage(AdminProfile),
+      },
+      {
         path: "activity",
         element: renderPage(Activity),
       },
@@ -230,6 +236,20 @@ export const router = createBrowserRouter([
       {
         path: ":id",
         element: renderPage(Chat),
+      },
+    ],
+  },
+  {
+    path: "profile",
+    element: (
+      <ProtectedRoutes allowedRoles={["customer"]}>
+        <ShopLayout />
+      </ProtectedRoutes>
+    ),
+    children: [
+      {
+        path: "",
+        element: renderPage(CustomerProfile),
       },
     ],
   },
