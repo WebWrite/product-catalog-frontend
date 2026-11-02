@@ -116,15 +116,18 @@ function CustomerProfile() {
 
   return (
     <div className="min-h-screen w-full bg-[#f7f5ff] p-4 sm:p-6">
-      <section className="bg-white my-5 rounded-2xl p-6 font-sans flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="rounded-full h-13 w-13 text-sm font-semibold bg-gray-300 flex items-center justify-center shrink-0">
+      <section className="bg-white my-5 rounded-2xl p-4 sm:p-6 font-sans flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-6">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="rounded-full h-12 w-12 sm:h-13 sm:w-13 text-sm font-semibold bg-gray-300 flex items-center justify-center shrink-0">
             {initials(user?.name || "")}
           </div>
 
-          <div>
-            <h2 className="text-lg font-semibold">{user?.name}</h2>
-            <p className="text-xs text-gray-500">
+          <div className="min-w-0">
+            <h2 className="text-base sm:text-lg font-semibold truncate">
+              {user?.name}
+            </h2>
+
+            <p className="text-xs text-gray-500 mt-1">
               Member Since:{" "}
               <span className="font-medium text-indigo-600">
                 {user?.createdAt
@@ -136,22 +139,23 @@ function CustomerProfile() {
               </span>
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 mt-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-600">
-                  Account Role:
-                </span>
-                <Tag color="purple" className="rounded-full px-3 capitalize">
-                  {user?.role || "Admin"}
-                </Tag>
-              </div>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span className="text-xs font-semibold text-gray-600">
+                Account Role:
+              </span>
+
+              <Tag color="purple" className="rounded-full px-3 capitalize">
+                {user?.role || "Admin"}
+              </Tag>
             </div>
           </div>
         </div>
 
         <div className="bg-violet-50 rounded-lg p-4 text-center">
-          <h4>Cart</h4>
-          <p className="font-semibold text-3xl">{user?.cart ?? 0}</p>
+          <h4 className="text-sm font-medium">Cart</h4>
+          <p className="font-semibold text-2xl sm:text-3xl">
+            {user?.cart ?? 0}
+          </p>
         </div>
       </section>
 

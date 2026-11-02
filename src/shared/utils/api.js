@@ -1,5 +1,8 @@
 import axios from "axios";
-import { hasLoginMarker } from "./authStorage";
+import { clearLoginMarker, hasLoginMarker } from "./authStorage";
+import { router } from "../../app/router/route";
+import { store } from "../../app/store/store";
+import { removeUser } from "../../app/store/user/userSlice";
 
 const Backend_Url = import.meta.env.VITE_BACKEND_URL;
 
@@ -32,25 +35,29 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (
-      error.response.status === 401 &&
-      hasLoginMarker() &&
-      originalRequest &&
-      !originalRequest._retry &&
-      !originalRequest._skipAuthRefresh
-    ) {
-      originalRequest._retry = true;
+    if (error.response.status === 401 && !originalRequest?._skipAuthRefresh) {
+      if (hasLoginMarker() && originalRequest && !originalRequest._retry) {
+        originalRequest._retry = true;
 
-      const refreshed = await refreshToken();
+        const refreshed = await refreshToken();
 
-      if (refreshed) {
-        return api(originalRequest);
+        if (refreshed) {
+          return api(originalRequest);
+        }
       }
+
+      handleUnauthorized();
     }
 
     return Promise.reject(error);
   },
 );
+
+function handleUnauthorized() {
+  clearLoginMarker();
+  store.dispatch(removeUser());
+  router.navigate("/auth/login", { replace: true });
+}
 
 export async function refreshToken() {
   try {

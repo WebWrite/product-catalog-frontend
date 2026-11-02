@@ -14,12 +14,6 @@ function Recipient({ customer, shipping }) {
           <MdOutlinePersonOutline className="text-indigo-700" />
           Recipient &amp; Delivery
         </h2>
-        <button
-          type="button"
-          className="cursor-pointer text-xs font-semibold text-indigo-600"
-        >
-          Edit
-        </button>
       </div>
 
       <div className="mt-4 flex items-center gap-3 rounded-xl bg-indigo-50/60 p-3">
@@ -29,9 +23,6 @@ function Recipient({ customer, shipping }) {
         <div className="min-w-0">
           <p className="m-0 flex items-center gap-2 text-sm font-bold text-slate-900">
             {customer.name}
-            <Tag color="#EAEDFF" className="m-0! text-[9px]! text-indigo-700!">
-              LTV {customer.ltv}
-            </Tag>
           </p>
           <p className="m-0 truncate text-[11px] text-slate-600">
             {customer.email}
