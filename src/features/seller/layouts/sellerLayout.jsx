@@ -23,6 +23,7 @@ import {
   MdKeyboardArrowDown,
   MdSearch,
   MdViewInAr,
+  MdPersonOutline,
 } from "react-icons/md";
 import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
@@ -98,6 +99,11 @@ function SellerLayout() {
           ></Badge>
         </Link>
       ),
+    },
+    {
+      key: "/seller/profile",
+      icon: <MdPersonOutline size={18} />,
+      label: <Link to="/seller/profile">Profile</Link>,
     },
   ];
   const userMenuItems = [

@@ -12,6 +12,7 @@ import PaymentSuccess from "../../features/orders/pages/paymentSuccess";
 import PaymentCancelled from "../../features/orders/pages/paymentCancelled";
 
 import AdminLayout from "../../features/admin/layout/layout";
+import profile from "../../features/seller/pages/profile";
 const Chat = lazy(() => import("../../features/chat/pages/chat"));
 const Activity = lazy(() => import("../../features/admin/pages/activity"));
 
@@ -128,6 +129,10 @@ export const router = createBrowserRouter([
       {
         path: "orders",
         element: renderPage(SellerOrders),
+      },
+      {
+        path: "profile",
+        element: renderPage(profile),
       },
       ...chatRoutes,
     ],
