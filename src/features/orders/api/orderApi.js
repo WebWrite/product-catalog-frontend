@@ -8,9 +8,11 @@ export const createCODOrder = async (shippingAddress) => {
   return data;
 };
 
-export const getMyOrders = async () => {
-  const { data } = await api.get("/orders/my-orders");
-  return data.data.orders;
+export const getMyOrders = async (filters) => {
+  const { data } = await api.get("/orders/my-orders", {
+    params: filters,
+  });
+  return data.data;
 };
 
 export const cancelOrderItem = async ({ orderId, itemId }) => {

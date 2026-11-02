@@ -1,7 +1,7 @@
 import api from "../../../shared/utils/api";
 
-export async function getSellerOrders() {
-  const res = await api.get("/seller/orders");
+export async function getSellerOrders(filters) {
+  const res = await api.get("/seller/orders", { params: filters });
   return res.data.data.orders;
 }
 

@@ -2,7 +2,6 @@ import { Button, Steps, Tag } from "antd";
 import { money } from "../utils/currency";
 import {
   getOrderStage,
-  GetOrderStatus,
   canCancelOrderItem,
   PAYMENT_STATUS,
   sellerName,

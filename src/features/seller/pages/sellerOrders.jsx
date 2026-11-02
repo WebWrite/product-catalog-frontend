@@ -1,11 +1,10 @@
-import { useRef, useState } from "react";
-import { App, Button, Empty, Input, Result, Segmented, Skeleton } from "antd";
+import { useCallback, useRef, useState } from "react";
+import { App, Button, Empty, Grid, Pagination, Result, Skeleton } from "antd";
 import {
   MdOutlineLocalShipping,
   MdOutlinePayments,
   MdOutlinePendingActions,
   MdOutlineReceiptLong,
-  MdSearch,
 } from "react-icons/md";
 
 import {
@@ -15,46 +14,44 @@ import {
 import AnalyticalCard from "../../admin/components/analyticalCard";
 import confirmCancelItem from "../../../shared/components/confirmCancelItem";
 import SellerOrderDetail from "../components/sellerOrderDetail";
-import { FLOW, getOrderStage } from "../../orders/constant/constant";
 import { liveTotal } from "../constants/productConstants";
 import { money } from "../../../shared/utils/currency";
 import OrderCard from "../../../shared/components/orderCard";
-
-const FILTERS = [
-  { value: "all", label: "All" },
-  { value: "pending", label: "Pending" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" },
-];
-
-const matchesFilter = (order, filter) => {
-  if (filter === "all") return true;
-  const stage = getOrderStage(order);
-  return filter === "cancelled" ? stage === -1 : FLOW[stage] === filter;
-};
+import SellerOrderFilters from "../components/sellerOrderFilters";
 
 const SellerOrders = () => {
   const { notification } = App.useApp();
   const detailRef = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
-  const [filter, setFilter] = useState("all");
-  const [keyword, setKeyword] = useState("");
+  const [page, setPage] = useState(1);
 
-  const { data: orders = [], isLoading, isError, refetch } = useSellerOrders();
+  const [filters, setFilters] = useState({
+    search: "",
+    paymentMethod: "",
+    paymentStatus: "",
+  });
+
+  const handleFilterChange = useCallback((changes) => {
+    setFilters((prev) => ({ ...prev, ...changes }));
+    setPage(1);
+    setSelectedId(null);
+  }, []);
+
+  const { data, isLoading, isError, refetch } = useSellerOrders({
+    page,
+    limit: 10,
+    ...filters,
+  });
+
+  const orders = data?.orders ?? [];
+  const pagination = data?.pagination;
+  const screens = Grid.useBreakpoint();
+
   const { mutate: updateStatus, isPending: isUpdating } =
     useUpdateOrderStatus();
-  const q = keyword.trim().toLowerCase().replace("#", "");
-  const visible = orders.filter(
-    (o) =>
-      matchesFilter(o, filter) &&
-      (!q ||
-        [o._id, o.customerId?.name, o.customerId?.email].some((v) =>
-          v?.toLowerCase().includes(q),
-        )),
-  );
 
-  const selected = visible.find((o) => o._id === selectedId) ?? visible[0];
+  const selected =
+    orders.find((order) => order._id === selectedId) ?? orders[0];
 
   const allItems = orders.flatMap((o) => o.items);
   const countItems = (status) =>
@@ -150,58 +147,70 @@ const SellerOrders = () => {
         />
       )}
 
-      {!isLoading && !isError && orders.length === 0 && (
-        <Empty
-          className="py-20"
-          description="No orders for your products yet."
-        />
-      )}
-
-      {!isLoading && !isError && orders.length > 0 && (
-        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[22rem_1fr]">
-          <div className="flex flex-col gap-3 lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1">
-            <Input
-              allowClear
-              variant="filled"
-              placeholder="Search order ID, customer, email"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              prefix={<MdSearch className="text-lg text-slate-500" />}
+      {!isLoading && !isError && (
+        <>
+          <div className="mt-6">
+            <SellerOrderFilters
+              filters={filters}
+              onChange={handleFilterChange}
             />
-            <div className="overflow-x-auto">
-              <Segmented
-                size="small"
-                value={filter}
-                onChange={setFilter}
-                options={FILTERS}
-              />
-            </div>
-
-            {visible.length === 0 && (
-              <Empty description="No orders match your filters" />
-            )}
-
-            {visible.map((order) => (
-              <OrderCard
-                key={order._id}
-                order={order}
-                active={order._id === selected?._id}
-                onSelect={() => handleSelect(order._id)}
-              />
-            ))}
           </div>
 
-          <div ref={detailRef} className="min-w-0 scroll-mt-24">
-            {selected && (
-              <SellerOrderDetail
-                order={selected}
-                onUpdate={handleUpdate}
-                onCancel={handleCancel}
-                isUpdating={isUpdating}
-              />
-            )}
-          </div>
-        </div>
+          {orders.length === 0 ? (
+            <Empty
+              className="py-20"
+              description={
+                filters.search || filters.paymentMethod || filters.paymentStatus
+                  ? "No orders match your filters."
+                  : "No orders for your products yet."
+              }
+            />
+          ) : (
+            <>
+              <div className="mt-6 grid items-start gap-6 lg:grid-cols-[22rem_1fr]">
+                <div className="flex flex-col gap-3 lg:sticky lg:top-24 lg:max-h-[calc(190vh-8rem)] lg:overflow-y-auto lg:pr-1">
+                  {orders.map((order) => (
+                    <OrderCard
+                      key={order._id}
+                      order={order}
+                      active={order._id === selected?._id}
+                      onSelect={() => handleSelect(order._id)}
+                    />
+                  ))}
+                </div>
+
+                <div ref={detailRef} className="min-w-0 scroll-mt-24">
+                  {selected && (
+                    <SellerOrderDetail
+                      order={selected}
+                      onUpdate={handleUpdate}
+                      onCancel={handleCancel}
+                      isUpdating={isUpdating}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {pagination?.total > 0 && (
+                <div className="mt-6 flex justify-center">
+                  <Pagination
+                    size={screens.md ? "default" : "small"}
+                    current={page}
+                    pageSize={pagination.limit}
+                    total={pagination.total}
+                    showSizeChanger={false}
+                    showLessItems
+                    responsive
+                    onChange={(nextPage) => {
+                      setPage(nextPage);
+                      setSelectedId(null);
+                    }}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </>
       )}
     </div>
   );

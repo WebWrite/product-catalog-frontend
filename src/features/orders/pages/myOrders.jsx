@@ -1,23 +1,43 @@
 import { useRef, useState } from "react";
-import { App, Button, Empty, Result, Skeleton } from "antd";
+import { App, Button, Empty, Pagination, Result, Skeleton } from "antd";
 import { useGetMyOrders } from "../hooks/useGetMyOrders";
 import { useCancelOrderItem } from "../hooks/useCancelOrderItem";
 import { useRetryStripePayment } from "../hooks/useRetryStripePayment";
 import confirmCancelItem from "../../../shared/components/confirmCancelItem";
 import OrderCard from "../../../shared/components/orderCard";
 import OrderDetail from "../../../shared/components/ordersList";
+import CustomerOrderFilters from "../components/customerorderFilters";
 
 const MyOrders = () => {
   const { notification } = App.useApp();
   const detailRef = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+    search: "",
+    paymentMethod: "",
+    paymentStatus: "",
+  });
 
-  const { data: orders = [], isLoading, isError, refetch } = useGetMyOrders();
+  const { data, isLoading, isError, refetch } = useGetMyOrders(filters);
+
+  const orders = data?.orders ?? [];
+  const pagination = data?.pagination;
   const { mutate: cancelItem, isPending: isCancelling } = useCancelOrderItem();
   const { mutate: retryPayment, isPending: isRetrying } =
     useRetryStripePayment();
 
   const selected = orders.find((o) => o._id === selectedId) ?? orders[0];
+
+  const handleFilterChange = (changes) => {
+    setSelectedId(null);
+    setFilters((prev) => ({
+      ...prev,
+      ...changes,
+      page: 1,
+    }));
+  };
 
   const handleSelect = (id) => {
     setSelectedId(id);
@@ -30,7 +50,10 @@ const MyOrders = () => {
     confirmCancelItem((callbacks) =>
       cancelItem({ orderId, itemId }, callbacks),
     );
-
+  const handlePageChange = (page, limit) => {
+    setSelectedId(null);
+    setFilters((prev) => ({ ...prev, page, limit }));
+  };
   const handleRetryPayment = (orderId) =>
     retryPayment(orderId, {
       onError: (error) =>
@@ -50,6 +73,9 @@ const MyOrders = () => {
         Track the status of every item you ordered
       </p>
 
+      <div className="mt-6">
+        <CustomerOrderFilters filters={filters} onChange={handleFilterChange} />
+      </div>
       {isLoading && (
         <div className="mt-6 grid gap-6 lg:grid-cols-[22rem_1fr]">
           <Skeleton active paragraph={{ rows: 8 }} />
@@ -77,28 +103,46 @@ const MyOrders = () => {
       )}
 
       {!isLoading && !isError && selected && (
-        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[22rem_1fr]">
-          <div className="flex flex-col gap-3 lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1">
-            {orders.map((order) => (
-              <OrderCard
-                key={order._id}
-                order={order}
-                active={order._id === selected._id}
-                onSelect={() => handleSelect(order._id)}
+        <>
+          <div className="mt-6 grid items-start gap-6 lg:grid-cols-[22rem_1fr]">
+            <div className="flex flex-col gap-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]">
+              <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+                {orders.map((order) => (
+                  <OrderCard
+                    key={order._id}
+                    order={order}
+                    active={order._id === selected._id}
+                    onSelect={() => handleSelect(order._id)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div ref={detailRef} className="min-w-0 scroll-mt-24">
+              <OrderDetail
+                order={selected}
+                onCancel={handleCancel}
+                onRetry={handleRetryPayment}
+                isCancelling={isCancelling}
+                isRetrying={isRetrying}
               />
-            ))}
+            </div>
           </div>
 
-          <div ref={detailRef} className="min-w-0 scroll-mt-24">
-            <OrderDetail
-              order={selected}
-              onCancel={handleCancel}
-              onRetry={handleRetryPayment}
-              isCancelling={isCancelling}
-              isRetrying={isRetrying}
-            />
-          </div>
-        </div>
+          {pagination && pagination.total > 0 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                current={pagination.page}
+                pageSize={pagination.limit}
+                total={pagination.total}
+                showSizeChanger={false}
+                showLessItems
+                responsive
+                onChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
