@@ -15,7 +15,6 @@ import {
   MdInventory,
   MdShoppingCart,
   MdMessage,
-  MdSettings,
   MdNotificationsNone,
   MdMenu as MdMenuIcon,
   MdLogout,

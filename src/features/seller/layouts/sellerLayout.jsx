@@ -15,7 +15,6 @@ import {
   MdInventory,
   MdShoppingCart,
   MdMessage,
-  MdSettings,
   MdNotificationsNone,
   MdMenu as MdMenuIcon,
   MdLogout,
@@ -24,6 +23,7 @@ import {
   MdSearch,
   MdViewInAr,
   MdPersonOutline,
+  MdHistory,
 } from "react-icons/md";
 import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
@@ -99,6 +99,11 @@ function SellerLayout() {
           ></Badge>
         </Link>
       ),
+    },
+    {
+      key: "/seller/activity",
+      icon: <MdHistory size={18} />,
+      label: <Link to="/seller/activity">Activity</Link>,
     },
     {
       key: "/seller/profile",
