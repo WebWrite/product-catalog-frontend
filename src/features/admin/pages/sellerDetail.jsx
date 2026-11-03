@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { App, Button, Form, Input, Result, Select, Tag } from "antd";
+import { App, Button, Form, Input, Modal, Result, Select, Tag } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MdArrowBack, MdOutlineStorefront } from "react-icons/md";
+import { MdArrowBack, MdLockReset, MdOutlineStorefront } from "react-icons/md";
 import { getAdminSellerById, updateAdminSeller } from "../api/api";
+import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
 
 const STORE_TYPES = [
   "Clothing",
@@ -24,6 +26,8 @@ function SellerDetail() {
   const { notification } = App.useApp();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
+  const [passwordForm] = Form.useForm();
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const sellerQuery = useQuery({
     queryKey: ["admin", "seller", id],
     queryFn: () => getAdminSellerById(id),
@@ -35,6 +39,7 @@ function SellerDetail() {
       queryClient.invalidateQueries({ queryKey: ["admin", "seller", id] });
       queryClient.invalidateQueries({ queryKey: ["admin", "sellers"] });
       form.setFieldsValue({
+        name: seller.userId?.name,
         storeName: seller.storeName,
         storeType: seller.storeType,
         status: seller.userId?.status,
@@ -53,6 +58,30 @@ function SellerDetail() {
       });
     },
   });
+  const passwordMutation = useMutation({
+    mutationFn: (password) => updateAdminSeller(id, { password }),
+    onSuccess: () => {
+      setPasswordOpen(false);
+      passwordForm.resetFields();
+      notification.success({
+        title: "Password updated",
+        description: "Seller password was changed successfully.",
+        placement: "bottomRight",
+      });
+    },
+    onError: () => {
+      notification.error({
+        title: "Password update failed",
+        description: "Unable to change the seller password.",
+        placement: "bottomRight",
+      });
+    },
+  });
+
+  const handleSavePassword = async () => {
+    const values = await passwordForm.validateFields();
+    passwordMutation.mutate(values.password);
+  };
 
   if (sellerQuery.isLoading) {
     return <div className="p-6 text-sm text-slate-500">Loading seller...</div>;
@@ -110,12 +139,26 @@ function SellerDetail() {
             requiredMark={false}
             className="mt-5"
             initialValues={{
+              name: seller.userId?.name,
               storeName: seller.storeName,
               storeType: seller.storeType,
               status,
             }}
-            onFinish={(values) => updateMutation.mutate(values)}
+            onFinish={(values) =>
+              updateMutation.mutate({ ...values, name: values.name.trim() })
+            }
           >
+            <Form.Item
+              label="Owner Name"
+              name="name"
+              rules={[
+                { required: true, message: "Owner name is required" },
+                { min: 2, message: "At least 2 characters" },
+                { max: 100, message: "Name must be less than 100 characters" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
             <Form.Item
               label="Store Name"
               name="storeName"
@@ -175,8 +218,63 @@ function SellerDetail() {
               {owner.isVerified ? "Yes" : "No"}
             </p>
           </div>
+          <Button
+            icon={<MdLockReset />}
+            onClick={() => setPasswordOpen(true)}
+            className="mt-4 w-full bg-indigo-50! text-indigo-700!"
+          >
+            Change Password
+          </Button>
         </aside>
       </div>
+
+      <Modal
+        title="Change seller password"
+        open={passwordOpen}
+        okText="Save Password"
+        confirmLoading={passwordMutation.isPending}
+        onOk={handleSavePassword}
+        onCancel={() => {
+          setPasswordOpen(false);
+          passwordForm.resetFields();
+        }}
+      >
+        <Form layout="vertical" form={passwordForm}>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              { required: true, message: "Password is required" },
+              { max: 128, message: "Password must be less than 128 character" },
+              {
+                validator: (_, value) =>
+                  !value || PASSWORD_CHECKS.every((check) => check.test(value))
+                    ? Promise.resolve()
+                    : Promise.reject(new Error("Password is too weak")),
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item
+            label="Confirm Password"
+            name="confirmPassword"
+            dependencies={["password"]}
+            rules={[
+              { required: true, message: "Confirm Password is required" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  return !value || value === getFieldValue("password")
+                    ? Promise.resolve()
+                    : Promise.reject(new Error("Passwords do not match"));
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { Tag } from "antd";
 import { MdOutlinePersonOutline, MdOutlinePlace } from "react-icons/md";
 
 function Recipient({ customer, shipping }) {
