@@ -11,7 +11,12 @@ import ChatInput from "../components/chatInput";
 import { initials } from "../../../shared/utils/initialsName";
 import { formatDate } from "../../../shared/utils/formatDate";
 import { emit, socket } from "../../../shared/utils/socket";
-import { useConversations } from "../hooks/useChat";
+import {
+  applyMessageToConversations,
+  markConversationRead,
+  setActiveRoomId,
+  useConversations,
+} from "../hooks/useChat";
 import { IoCloseCircle } from "react-icons/io5";
 import { uplaodAttachment } from "../api/api";
 
@@ -73,7 +78,7 @@ function Chat() {
         .then((res) => {
           if (cancelled) return;
           setMessages(res.messages);
-          qc.invalidateQueries({ queryKey: ["conversations"] });
+          markConversationRead(qc, id);
           qc.invalidateQueries({ queryKey: ["chat-unread"] });
         })
         .catch((err) => !cancelled && notifyError("Unable to open chat", err))
@@ -89,6 +94,10 @@ function Chat() {
   }, [id]);
 
   useEffect(() => {
+    setActiveRoomId(id);
+    return () => setActiveRoomId(null);
+  }, [id]);
+  useEffect(() => {
     if (!id) return;
 
     const onNew = (msg) => {
@@ -96,7 +105,7 @@ function Chat() {
       setMessages((prev) =>
         prev.some((m) => m._id === msg._id) ? prev : [...prev, msg],
       );
-      qc.invalidateQueries({ queryKey: ["conversations"] });
+      applyMessageToConversations(qc, msg, user.id);
       if (String(msg.senderId) !== String(user.id)) {
         emit("mark_seen", { messageId: msg._id }).catch(() => {});
       }

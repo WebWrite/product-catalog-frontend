@@ -34,6 +34,7 @@ import { clearLoginMarker } from "../../../shared/utils/authStorage";
 import { useTheme } from "../../../app/theme/useTheme";
 import ThemeToggle from "../../../shared/components/themeToggle";
 import { useUnreadCount } from "../../chat/hooks/useChat";
+import { AiOutlineAudit } from "react-icons/ai";
 
 const { Sider, Content } = Layout;
 
@@ -114,6 +115,16 @@ function AdminLayout() {
       icon: <MdHistory size={18} />,
       label: <Link to="/admin/activity">Activity</Link>,
     },
+    {
+      key: "/admin/audit",
+      icon: <AiOutlineAudit size={18} />,
+      label: <Link to="/admin/audit">Audit</Link>,
+    },
+    {
+      key: "/admin/profile",
+      icon: <MdPerson size={18} />,
+      label: <Link to="/admin/profile">Profile</Link>,
+    },
   ];
 
   const userMenuItems = [
@@ -121,7 +132,7 @@ function AdminLayout() {
       key: "profile",
       label: "Profile",
       icon: <MdPerson />,
-      onClick: () => navigate("/profile"),
+      onClick: () => navigate("/admin/profile"),
     },
     { type: "divider" },
     {
@@ -288,17 +299,19 @@ function AdminLayout() {
 
               <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
                 <ThemeToggle />
-                <Badge
-                  count={unreadCount.data}
-                  color="blue"
-                  size="small"
-                  offset={[-2, 2]}
-                >
-                  <MdNotificationsNone
-                    size={22}
-                    className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"
-                  />
-                </Badge>
+                <Link to={"/admin/chat"}>
+                  <Badge
+                    count={unreadCount.data}
+                    color="blue"
+                    size="small"
+                    offset={[-2, 2]}
+                  >
+                    <MdNotificationsNone
+                      size={22}
+                      className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"
+                    />
+                  </Badge>
+                </Link>
                 <Dropdown
                   menu={{ items: userMenuItems }}
                   placement="bottomRight"

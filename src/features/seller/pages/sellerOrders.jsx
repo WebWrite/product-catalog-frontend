@@ -9,12 +9,12 @@ import {
 
 import {
   useSellerOrders,
+  useSellerOrderStats,
   useUpdateOrderStatus,
 } from "../hooks/useSellerProducts";
 import AnalyticalCard from "../../admin/components/analyticalCard";
 import confirmCancelItem from "../../../shared/components/confirmCancelItem";
 import SellerOrderDetail from "../components/sellerOrderDetail";
-import { liveTotal } from "../constants/productConstants";
 import { money } from "../../../shared/utils/currency";
 import OrderCard from "../../../shared/components/orderCard";
 import SellerOrderFilters from "../components/sellerOrderFilters";
@@ -42,6 +42,11 @@ const SellerOrders = () => {
     limit: 10,
     ...filters,
   });
+  const {
+    data: orderStats,
+    isLoading: isStatsLoading,
+    isError: isStatsError,
+  } = useSellerOrderStats();
 
   const orders = data?.orders ?? [];
   const pagination = data?.pagination;
@@ -53,28 +58,27 @@ const SellerOrders = () => {
   const selected =
     orders.find((order) => order._id === selectedId) ?? orders[0];
 
-  const allItems = orders.flatMap((o) => o.items);
-  const countItems = (status) =>
-    allItems.filter((i) => i.status === status).length;
-  const revenue = orders.reduce((sum, o) => sum + liveTotal(o), 0);
-
   const stats = [
     {
       icon: MdOutlineReceiptLong,
       title: "Total Orders",
-      amount: orders.length,
+      amount: isStatsLoading ? "..." : (orderStats?.totalOrders ?? 0),
     },
     {
       icon: MdOutlinePendingActions,
-      title: "To Process",
-      amount: countItems("pending"),
+      title: "Items Under Process",
+      amount: isStatsLoading ? "..." : (orderStats?.processingItems ?? 0),
     },
     {
       icon: MdOutlineLocalShipping,
-      title: "To Deliver",
-      amount: countItems("confirmed"),
+      title: "Item Delivered",
+      amount: isStatsLoading ? "..." : (orderStats?.deliveredItems ?? 0),
     },
-    { icon: MdOutlinePayments, title: "Sales Value", amount: money(revenue) },
+    {
+      icon: MdOutlinePayments,
+      title: "Sales Value",
+      amount: isStatsLoading ? "..." : money(orderStats?.totalSales ?? 0),
+    },
   ];
 
   const handleSelect = (id) => {
@@ -123,7 +127,7 @@ const SellerOrders = () => {
             key={s.title}
             icon={<s.icon className="size-4" />}
             title={s.title}
-            amount={s.amount}
+            amount={isStatsError ? "Unavailable" : s.amount}
           />
         ))}
       </div>

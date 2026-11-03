@@ -16,7 +16,6 @@ import { setuser } from "../../../app/store/user/userSlice";
 import api, { login } from "../../../shared/utils/api";
 import CustomTag from "../../../shared/components/customTag";
 import { clearCart } from "../../../app/store/cart/cart";
-import { mergeCart } from "../../cart/api/cartApi";
 import { setLoginMarker } from "../../../shared/utils/authStorage";
 import { IoHome } from "react-icons/io5";
 import ThemeToggle from "../../../shared/components/themeToggle";
@@ -32,51 +31,33 @@ function Login() {
   const [step, setStep] = useState("email");
 
   const mutation = useMutation({
-    mutationFn: login,
-    onSuccess: async (data) => {
+    mutationFn: (credentials) =>
+      login({
+        ...credentials,
+        ...(cart.items.length > 0 ? { items: cart.items } : {}),
+      }),
+
+    onSuccess: (data) => {
       const loginUser = data.data.user;
+
       setLoginMarker();
 
-      await queryClient.cancelQueries({ queryKey: ["currentUser"] });
-      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      if (cart.items.length > 0 && loginUser.role == "customer") {
+        dispatch(clearCart());
+      }
 
-      if (loginUser.role === "admin" || loginUser.role === "seller") {
-        dispatch(setuser(loginUser));
-        queryClient.setQueryData(["currentUser"], loginUser);
-        navigate(
-          loginUser.role === "admin" ? "/admin/dashboard" : "/seller/dashboard",
-        );
+      dispatch(setuser(loginUser));
+      queryClient.setQueryData(["currentUser"], loginUser);
+      queryClient.invalidateQueries({
+        queryKey: ["cart"],
+        refetchType: "all",
+      });
+
+      if (loginUser.role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (loginUser.role === "seller") {
+        navigate("/seller/dashboard");
       } else {
-        if (cart?.items?.length >= 1) {
-          try {
-            const response = await mergeCart(cart.items);
-            if (response?.success !== false) dispatch(clearCart());
-          } catch (e) {
-            console.error("Cart merge failed", e);
-          }
-        }
-
-        let latestUser = loginUser;
-        try {
-          const me = await api.get("/user/me");
-          latestUser = me.data?.user ?? loginUser;
-        } catch (e) {
-          console.error("Failed to refresh user", e);
-        }
-
-        dispatch(setuser(latestUser));
-
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: ["currentUser"],
-            refetchType: "all",
-          }),
-          queryClient.invalidateQueries({
-            queryKey: ["cart"],
-            refetchType: "all",
-          }),
-        ]);
-
         navigate("/");
       }
 
@@ -87,30 +68,44 @@ function Login() {
         showProgress: true,
         placement: "bottomRight",
       });
+
       form.resetFields();
     },
 
     onError: async (error, variables) => {
       const { email } = variables;
-      console.log(error.response);
+
       if (
         error.response?.status === 403 &&
         error.response?.data?.message ===
           "Verify your email to access resources"
       ) {
-        const res = await api.post("/auth/resend-email-otp", { email });
-        if (res.status !== 200) return;
+        try {
+          await api.post("/auth/resend-email-otp", { email });
 
-        notification.success({
-          description: `OTP is sent to ${email}`,
-          pauseOnHover: true,
-          showProgress: true,
-          placement: "bottomRight",
-        });
-        navigate("/auth/verify-otp", {
-          state: { comeFrom: "register", email },
-        });
-        return;
+          notification.success({
+            description: `OTP is sent to ${email}`,
+            pauseOnHover: true,
+            showProgress: true,
+            placement: "bottomRight",
+          });
+
+          navigate("/auth/verify-otp", {
+            state: { comeFrom: "register", email },
+          });
+
+          return;
+        } catch (otpError) {
+          notification.error({
+            title: "OTP Failed",
+            description:
+              otpError.response?.data?.message ||
+              "Unable to resend verification OTP",
+            placement: "bottomRight",
+          });
+
+          return;
+        }
       }
 
       notification.error({

@@ -1,5 +1,6 @@
 import axios from "axios";
-import { hasLoginMarker } from "./authStorage";
+import { clearLoginMarker, hasLoginMarker } from "./authStorage";
+import { router } from "../../app/router/route";
 
 const Backend_Url = import.meta.env.VITE_BACKEND_URL;
 
@@ -46,6 +47,9 @@ api.interceptors.response.use(
       if (refreshed) {
         return api(originalRequest);
       }
+      clearLoginMarker();
+
+      router.navigate("/auth/login", { replace: true });
     }
 
     return Promise.reject(error);

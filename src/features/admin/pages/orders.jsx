@@ -224,7 +224,7 @@ function OrdersFulfillment() {
           pagination={false}
           scroll={{ x: 900 }}
           locale={{ emptyText: "No orders match your filters" }}
-          className="[&_.ant-table-thead>tr>th]:bg-white!  [&_.ant-table-tbody>tr>td]:pl-4! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-thead>tr>th]:p-4!"
+          className="  [&_.ant-table-tbody>tr>td]:pl-4! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-thead>tr>th]:p-4!"
         />
 
         <div className="border-t border-slate-100 px-4 py-3">

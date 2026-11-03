@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 
 import { useCurrentUser } from "../../features/auth/hooks/useCurrentUser";
@@ -15,24 +15,20 @@ import { useChatSocket } from "../../features/chat/hooks/useChat";
 
 function AppInitializer() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const { data, isLoading, isError } = useCurrentUser();
   const isLoggedIn = hasLoginMarker();
   useChatSocket();
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      dispatch(removeUser());
-      return;
-    }
-
     if (data) {
       dispatch(setuser(data));
-    } else if (isError) {
+    } else if (isError && isLoggedIn && !user) {
       dispatch(removeUser());
       clearLoginMarker();
     }
-  }, [data, isError, isLoggedIn, dispatch]);
+  }, [data, isError, isLoggedIn, user, dispatch]);
 
   if (isLoggedIn && isLoading) {
     return <PageLoader />;

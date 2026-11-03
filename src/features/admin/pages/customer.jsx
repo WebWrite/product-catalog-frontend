@@ -253,7 +253,7 @@ function CustomerManagement() {
                 dataSource={customers}
                 loading={customersQuery.isLoading}
                 scroll={{ x: 600 }}
-                className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-table-tbody>tr.row-inactive>td]:bg-red-50/60! [&_.ant-table-thead>tr>th]:p-4!"
+                className=" [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-tbody>tr.row-active>td]:bg-indigo-50! [&_.ant-table-tbody>tr.row-inactive>td]:bg-red-50/60! [&_.ant-table-thead>tr>th]:p-4!"
                 onRow={(item) => ({
                   className: `cursor-pointer ${item._id === inspectedId ? "row-active" : ""}`,
                   onClick: () => setInspectedId(item._id),
