@@ -1,71 +1,115 @@
-import { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  Modal,
-  Select,
-  Skeleton,
-  Result,
-  Tag,
-  message,
-} from "antd";
-import {
-  UserOutlined,
-  ShopOutlined,
-  AppstoreOutlined,
-  KeyOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { useState } from "react";
+import { App, Button, Card, Result, Skeleton, Tag } from "antd";
+import { KeyOutlined, LockOutlined } from "@ant-design/icons";
 
 import { initials } from "../../../shared/utils/initialsName";
-import { useGetSellerProfile } from "../hooks/useSellerprofile";
 
-const STORE_OPTIONS = [
-  "Clothing",
-  "Electronics",
-  "Beauty",
-  "Furniture",
-  "Sports",
-  "Toys",
-  "Food",
-].map((type) => ({
-  value: type,
-  label: type,
-}));
+import {
+  useGetSellerProfile,
+  useUpdateSellerProfile,
+  useChangeSellerPassword,
+} from "../hooks/useSellerprofile";
 
-function SellerProfile() {
-  const [profileForm] = Form.useForm();
-  const [passwordForm] = Form.useForm();
+import SellerProfileForm from "../components/sellerProfileForm";
+import ChangePasswordModal from "../components/changepasswordModal";
+
+function Profile() {
+  const { notification } = App.useApp();
 
   const [passwordModal, setPasswordModal] = useState(false);
 
   const { data: profile, isLoading, isError, refetch } = useGetSellerProfile();
 
-  // Populate form when API data arrives
-  useEffect(() => {
-    if (!profile) return;
+  const updateProfileMutation = useUpdateSellerProfile();
+  const changePasswordMutation = useChangeSellerPassword();
 
-    profileForm.setFieldsValue({
-      name: profile.name || "",
-      storeName: profile.sellerProfile?.storeName || "",
-      storeType: profile.sellerProfile?.storeType || "",
+  if (isLoading) {
+    return <Skeleton active paragraph={{ rows: 5 }} />;
+  }
+
+  if (isError || !profile) {
+    return (
+      <Result
+        status="error"
+        title="Unable to load seller profile"
+        extra={<Button onClick={() => refetch()}>Try Again</Button>}
+      />
+    );
+  }
+  const handleProfileUpdate = (values) => {
+    const changes = {};
+
+    if (values.name.trim() !== (profile.name || "")) {
+      changes.name = values.name.trim();
+    }
+
+    if (values.storeName.trim() !== (profile.sellerProfile?.storeName || "")) {
+      changes.storeName = values.storeName.trim();
+    }
+
+    if (values.storeType !== (profile.sellerProfile?.storeType || "")) {
+      changes.storeType = values.storeType;
+    }
+
+    if (Object.keys(changes).length === 0) {
+      notification.info({
+        title: "No changes detected",
+        description: "Please update at least one profile field before saving.",
+        placement: "top",
+      });
+      return;
+    }
+
+    updateProfileMutation.mutate(changes, {
+      onSuccess: () => {
+        notification.success({
+          title: "Profile updated",
+          description: "Your profile was updated successfully.",
+          placement: "top",
+        });
+      },
+
+      onError: (error) => {
+        notification.error({
+          title: "Profile update failed",
+          description:
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to update profile.",
+          placement: "top",
+        });
+      },
     });
-  }, [profile, profileForm]);
+  };
 
-  const handlePasswordChange = () => {
-    message.info("Password API is not connected yet.");
+  const handlePasswordChange = (values, onSuccess) => {
+    changePasswordMutation.mutate(values, {
+      onSuccess: () => {
+        notification.success({
+          title: "Password changed",
+          description: "Your password was changed successfully.",
+          placement: "top",
+        });
+
+        onSuccess();
+      },
+      onError: (error) => {
+        notification.error({
+          title: "Password change failed",
+          description:
+            error.response?.data?.message || "Failed to change password.",
+          placement: "top",
+        });
+      },
+    });
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--bg)] p-4 sm:p-6">
-        <div className="mb-5">
-          <Skeleton active paragraph={{ rows: 2 }} />
-        </div>
+        <Skeleton active paragraph={{ rows: 2 }} />
 
-        <div className="grid gap-4 lg:grid-cols-[2.2fr_1fr]">
+        <div className="mt-5 grid gap-4 lg:grid-cols-[2.2fr_1fr]">
           <Skeleton active paragraph={{ rows: 7 }} />
           <Skeleton active paragraph={{ rows: 4 }} />
         </div>
@@ -142,56 +186,12 @@ function SellerProfile() {
 
       <div className="mx-auto w-full max-w-7xl">
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[2.2fr_1fr]">
-          {/* Seller Details */}
-          <Card className="profile-card" styles={{ body: { padding: 24 } }}>
-            <div className="mb-6">
-              <h2 className="mb-1 text-base font-bold text-[var(--text-h)]">
-                Seller Details
-              </h2>
+          <SellerProfileForm
+            profile={profile}
+            isSaving={updateProfileMutation.isPending}
+            onSubmit={handleProfileUpdate}
+          />
 
-              <p className="text-xs text-[var(--text)]">
-                Your personal details and store information
-              </p>
-            </div>
-
-            <Form
-              form={profileForm}
-              layout="vertical"
-              className="[&_.ant-form-item-label>label]:!text-[var(--text-h)]"
-            >
-              <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
-                {/* Seller Name */}
-                <Form.Item label="Seller Name" name="name">
-                  <Input
-                    prefix={<UserOutlined className="text-[var(--text)]" />}
-                    readOnly
-                    className="profile-field h-10"
-                  />
-                </Form.Item>
-
-                {/* Store Name */}
-                <Form.Item label="Store Name" name="storeName">
-                  <Input
-                    prefix={<ShopOutlined className="text-[var(--text)]" />}
-                    readOnly
-                    className="profile-field h-10"
-                  />
-                </Form.Item>
-
-                {/* Store Type */}
-                <Form.Item label="Store Type" name="storeType">
-                  <Select
-                    disabled
-                    options={STORE_OPTIONS}
-                    suffixIcon={<AppstoreOutlined />}
-                    className="w-full [&_.ant-select-selector]:!border-[var(--border)] [&_.ant-select-selector]:!bg-[var(--workspace-surface)] [&_.ant-select-selection-item]:!text-[var(--text-h)]"
-                  />
-                </Form.Item>
-              </div>
-            </Form>
-          </Card>
-
-          {/* Password Section */}
           <Card
             className="profile-card h-fit"
             styles={{ body: { padding: 24 } }}
@@ -220,122 +220,15 @@ function SellerProfile() {
           </Card>
         </div>
 
-        {/* Password Modal */}
-        <Modal
-          title={
-            <div className="flex items-center gap-2 text-[var(--text-h)]">
-              <KeyOutlined className="text-blue-500" />
-              <span>Change Account Password</span>
-            </div>
-          }
-          className="[&_.ant-modal-content]:!border [&_.ant-modal-content]:!border-[var(--border)] [&_.ant-modal-content]:!bg-[var(--code-bg)] [&_.ant-modal-header]:!bg-transparent [&_.ant-modal-title]:!text-[var(--text-h)] [&_.ant-modal-close]:!text-[var(--text)]"
+        <ChangePasswordModal
           open={passwordModal}
-          onCancel={() => {
-            setPasswordModal(false);
-            passwordForm.resetFields();
-          }}
-          footer={null}
-          centered
-          destroyOnHidden
-        >
-          <p className="mb-5 text-sm text-[var(--text)]">
-            Update your password to keep your account secure.
-          </p>
-
-          <Form
-            form={passwordForm}
-            layout="vertical"
-            className="[&_.ant-form-item-label>label]:!text-[var(--text-h)]"
-            onFinish={handlePasswordChange}
-          >
-            <Form.Item
-              label="Current Password"
-              name="currentPassword"
-              rules={[
-                {
-                  required: true,
-                  message: "Enter your current password",
-                },
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined className="text-[var(--text)]" />}
-                placeholder="Enter current password"
-                size="large"
-                className="profile-field"
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="New Password"
-              name="newPassword"
-              rules={[
-                {
-                  required: true,
-                  message: "Enter your new password",
-                },
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined className="text-[var(--text)]" />}
-                placeholder="Enter new password"
-                size="large"
-                className="profile-field"
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Confirm New Password"
-              name="confirmPassword"
-              dependencies={["newPassword"]}
-              rules={[
-                {
-                  required: true,
-                  message: "Please confirm your password",
-                },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || value === getFieldValue("newPassword")) {
-                      return Promise.resolve();
-                    }
-
-                    return Promise.reject(new Error("Passwords do not match"));
-                  },
-                }),
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined className="text-[var(--text)]" />}
-                placeholder="Confirm new password"
-                size="large"
-                className="profile-field"
-              />
-            </Form.Item>
-
-            <div className="mt-6 flex justify-end gap-2">
-              <Button
-                onClick={() => {
-                  setPasswordModal(false);
-                  passwordForm.resetFields();
-                }}
-                className="theme-outline-button rounded-full px-5"
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="profile-primary-button rounded-full px-5"
-              >
-                Update Password
-              </Button>
-            </div>
-          </Form>
-        </Modal>
+          isSaving={changePasswordMutation.isPending}
+          onClose={() => setPasswordModal(false)}
+          onSubmit={handlePasswordChange}
+        />
       </div>
     </div>
   );
 }
 
-export default SellerProfile;
+export default Profile;

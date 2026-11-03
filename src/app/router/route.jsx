@@ -12,10 +12,9 @@ import PaymentSuccess from "../../features/orders/pages/paymentSuccess";
 import PaymentCancelled from "../../features/orders/pages/paymentCancelled";
 
 import AdminLayout from "../../features/admin/layout/layout";
-import profile from "../../features/seller/pages/profile";
 const Chat = lazy(() => import("../../features/chat/pages/chat"));
 const Activity = lazy(() => import("../../features/admin/pages/activity"));
-
+const profile = lazy(() => import("../../features/seller/pages/profile"));
 const CustomerManagement = lazy(
   () => import("../../features/admin/pages/customer"),
 );

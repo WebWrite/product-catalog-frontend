@@ -111,7 +111,7 @@ function SellerLayout() {
       key: "profile",
       label: "Profile",
       icon: <MdPerson />,
-      onClick: () => navigate("/profile"),
+      onClick: () => navigate("/seller/profile"),
     },
     { type: "divider" },
     {
