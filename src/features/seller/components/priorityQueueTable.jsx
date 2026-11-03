@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Table, Tooltip } from "antd";
+import { Button, Pagination, Table, Tooltip } from "antd";
 import { MdEdit, MdOpenInNew } from "react-icons/md";
 import { useSellerProducts } from "../hooks/useSellerProducts";
 import { money } from "../../../shared/utils/currency";
@@ -41,9 +41,13 @@ function StatusPill({ status }) {
 
 function PriorityQueueTable() {
   const navigate = useNavigate();
-  const [selectedKeys, setSelectedKeys] = useState([]);
 
-  const { data, isLoading, isError } = useSellerProducts();
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  const { data, isLoading, isError } = useSellerProducts(pagination);
 
   const products = data?.products ?? [];
   const total = data?.pagination?.total ?? 0;
@@ -157,26 +161,36 @@ function PriorityQueueTable() {
           Failed to load products.
         </div>
       ) : (
-        <Table
-          rowKey="_id"
-          columns={columns}
-          dataSource={products}
-          loading={isLoading}
-          scroll={{ x: 680 }}
-          rowClassName="group cursor-pointer"
-          rowSelection={{
-            selectedRowKeys: selectedKeys,
-            onChange: setSelectedKeys,
-          }}
-          onClick={() => navigate("/seller/products")}
-          locale={{
-            emptyText:
-              products.length === 0
-                ? "No products yet."
-                : "No products match your filters",
-          }}
-          className="[&_.ant-table-thead>tr>th]:text-[11px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-thead>tr>th]:before:hidden! [&_.ant-table-tbody>tr:last-child>td]:border-b-0!"
-        />
+        <>
+          <Table
+            rowKey="_id"
+            columns={columns}
+            dataSource={products}
+            loading={isLoading}
+            pagination={false}
+            scroll={{ x: 680 }}
+            rowClassName="group cursor-pointer"
+            onRow={() => ({
+              onClick: () => navigate("/seller/products"),
+            })}
+            locale={{
+              emptyText:
+                products.length === 0
+                  ? "No products yet."
+                  : "No products match your filters",
+            }}
+            className="[&_.ant-table-thead>tr>th]:text-[11px]! [&_.ant-table-thead>tr>th]:font-semibold! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-thead>tr>th]:before:hidden! [&_.ant-table-tbody>tr:last-child>td]:border-b-0!"
+          />
+          <div className="flex justify-center border-t border-slate-800 px-4 py-4">
+            <Pagination
+              current={pagination.page}
+              pageSize={pagination.limit}
+              total={total}
+              showSizeChanger={false}
+              onChange={(page, limit) => setPagination({ page, limit })}
+            />
+          </div>
+        </>
       )}
     </div>
   );

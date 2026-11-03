@@ -100,11 +100,12 @@ export function useSellerProductStats() {
   });
 }
 
-export function useSellerOrders() {
+export function useSellerOrders(filters) {
   return useQuery({
-    queryKey: ORDERS_QUERY_KEY,
-    queryFn: getSellerOrders,
+    queryKey: [...ORDERS_QUERY_KEY, filters],
+    queryFn: () => getSellerOrders(filters),
     staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
   });
 }
 
