@@ -102,11 +102,19 @@ export async function updateAdminCustomer(id, payload) {
   return response.data.customer;
 }
 
-export async function getAdminActivityLogs(params = {}) {
+export async function getAdminAudits(params = {}) {
   const response = await api.get("/admin/activity-logs", { params });
 
   return {
     logs: response.data.logs,
     pagination: response.data.pagination,
+  };
+}
+
+export async function getActivityLogs(params = {}) {
+  const response = await api.get("/user/activity-logs", { params });
+  return {
+    logs: response.data.data.logs,
+    pagination: response.data.data.pagination,
   };
 }

@@ -8,11 +8,16 @@ import {
   bulkDeleteSellerProducts,
   getSellerProductStats,
 } from "../api/products";
-import { getSellerOrders, updateSellerOrderStatus } from "../api/orders";
+import {
+  getSellerOrders,
+  getSellerOrderStats,
+  updateSellerOrderStatus,
+} from "../api/orders";
 
 const QUERY_KEY = ["seller-products"];
 const STATS_QUERY_KEY = ["seller-product-stats"];
 const ORDERS_QUERY_KEY = ["seller-orders"];
+const ORDER_STATS_QUERY_KEY = ["seller-order-stats"];
 
 export function useSellerProducts(filters) {
   return useQuery({
@@ -109,6 +114,15 @@ export function useSellerOrders(filters) {
   });
 }
 
+export function useSellerOrderStats() {
+  return useQuery({
+    queryKey: ORDER_STATS_QUERY_KEY,
+    queryFn: getSellerOrderStats,
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 2,
+  });
+}
+
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
 
@@ -117,6 +131,7 @@ export function useUpdateOrderStatus() {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ORDERS_QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: ORDER_STATS_QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: STATS_QUERY_KEY }),
       ]);

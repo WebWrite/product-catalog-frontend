@@ -244,7 +244,7 @@ function SellerManagement() {
             showTotal: (total, range) =>
               `Showing ${range[0]}-${range[1]} of ${total} merchants`,
           }}
-          className="[&_.ant-table-thead>tr>th]:bg-white! [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-thead>tr>th]:p-4! [&_.ant-pagination]:px-4! [&_.ant-table-tbody>tr>td]:pl-4!"
+          className=" [&_.ant-table-thead>tr>th]:text-[10px]! [&_.ant-table-thead>tr>th]:tracking-wider [&_.ant-table-thead>tr>th]:p-4! [&_.ant-pagination]:px-4! [&_.ant-table-tbody>tr>td]:pl-4!"
         />
       </div>
     </div>

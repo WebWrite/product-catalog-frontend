@@ -5,6 +5,11 @@ export async function getSellerOrders(filters) {
   return res.data.data.orders;
 }
 
+export async function getSellerOrderStats() {
+  const res = await api.get("/seller/orders/stats");
+  return res.data.data;
+}
+
 export async function updateSellerOrderStatus(payload) {
   const res = await api.patch("/seller/orders/item-status", payload);
   return res.data;

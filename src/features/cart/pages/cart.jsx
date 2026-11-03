@@ -102,7 +102,7 @@ function CartPage() {
         name: i.productId?.name,
         unitPrice: i.productId?.price ?? 0,
         sellerName: i.productId?.sellerId?.name ?? "Unknown Seller",
-        size: i.size,
+        size: i.size ?? null,
         quantity: Number(i.quantity ?? 0),
         stock: Number(i.productId?.stock ?? 0),
         inStock: Number(i.productId?.stock ?? 0) > 0,
@@ -115,7 +115,7 @@ function CartPage() {
 
         return [
           {
-            id: `${i.productId}-${i.size}`,
+            id: `${i.productId}-${i.size ?? "default"}`,
             productId: i.productId,
             name: product.name,
             unitPrice: product.price ?? 0,
@@ -123,7 +123,7 @@ function CartPage() {
               product.seller?.storeName ||
               product.sellerId?.name ||
               "Unknown Seller",
-            size: i.size,
+            size: i.size ?? null,
             quantity: Number(i.quantity ?? 0),
             stock: Number(product.stock ?? 0),
             inStock: Number(product.stock ?? 0) > 0,
@@ -144,7 +144,11 @@ function CartPage() {
       editItem.mutate({ item: item.id, quantity });
     } else {
       dispatch(
-        updateItem({ productId: item.productId, size: item.size, quantity }),
+        updateItem({
+          productId: item.productId,
+          size: item.size ?? null,
+          quantity,
+        }),
       );
     }
   };
@@ -157,7 +161,12 @@ function CartPage() {
     if (isLoggedIn) {
       deleteItem.mutate({ item: item.id });
     } else {
-      dispatch(removeItem({ productId: item.productId, size: item.size }));
+      dispatch(
+        removeItem({
+          productId: item.productId,
+          size: item.size ?? null,
+        }),
+      );
     }
   };
 
@@ -177,35 +186,32 @@ function CartPage() {
       });
       return;
     }
-    if (!isLoggedIn) {
-      notification.warning({
-        description: "Please log in or register  to proceed to checkout.",
-        placement: "bottomRight",
-        pauseOnHover: true,
-        showProgress: true,
-      });
-      navigate("/auth/register");
-      return;
-    }
 
     const unavailableItems = items.filter(
       (item) => item.stock <= 0 || item.quantity > item.stock,
     );
 
     if (unavailableItems.length > 0) {
-      const description = unavailableItems
-        .map((item) =>
-          item.stock > 0
-            ? `${item.name}: only ${item.stock} item${item.stock === 1 ? "" : "s"} available`
-            : `${item.name} is out of stock`,
-        )
-        .join(". ");
-
       notification.error({
         title: "Insufficient stock",
-        description,
+        description: unavailableItems
+          .map((item) =>
+            item.stock > 0
+              ? `${item.name}: only ${item.stock} items available`
+              : `${item.name} is out of stock`,
+          )
+          .join(". "),
         placement: "bottomRight",
       });
+      return;
+    }
+
+    if (!isLoggedIn) {
+      notification.warning({
+        description: "Please log in or register to proceed to checkout.",
+        placement: "bottomRight",
+      });
+      navigate("/auth/register");
       return;
     }
 

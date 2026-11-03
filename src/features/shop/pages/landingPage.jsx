@@ -149,7 +149,7 @@ function LandingPage() {
               Explore Products <MdArrowForward className="text-base" />
             </Link>
             <Link
-              to="/categories"
+              to="/shop"
               className="flex h-10 items-center rounded-lg bg-white px-5 text-xs font-semibold text-slate-800 shadow-sm ring-1 ring-slate-100 transition-colors hover:bg-indigo-50"
             >
               Browse Categories

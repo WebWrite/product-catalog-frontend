@@ -23,6 +23,7 @@ import {
   MdKeyboardArrowDown,
   MdSearch,
   MdViewInAr,
+  MdHistory,
 } from "react-icons/md";
 import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
@@ -98,6 +99,11 @@ function SellerLayout() {
           ></Badge>
         </Link>
       ),
+    },
+    {
+      key: "/seller/activity",
+      icon: <MdHistory size={18} />,
+      label: <Link to="/seller/activity">Activity</Link>,
     },
   ];
   const userMenuItems = [
@@ -281,16 +287,18 @@ function SellerLayout() {
 
               <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
                 <ThemeToggle />
-                <Badge
-                  count={unreadCount.data}
-                  color="#4f46e5"
-                  offset={[-2, 2]}
-                >
-                  <MdNotificationsNone
-                    size={22}
-                    className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"
-                  />
-                </Badge>
+                <Link to={"/seller/chat"}>
+                  <Badge
+                    count={unreadCount.data}
+                    color="#4f46e5"
+                    offset={[-2, 2]}
+                  >
+                    <MdNotificationsNone
+                      size={22}
+                      className="text-slate-400 cursor-pointer hover:text-indigo-400 transition-colors"
+                    />
+                  </Badge>
+                </Link>
                 <Dropdown
                   menu={{ items: userMenuItems }}
                   placement="bottomRight"
