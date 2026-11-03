@@ -112,10 +112,8 @@ function ProductDetail() {
       const item = {
         id,
         quantity,
+        size: selectedSizeValue ?? null,
       };
-      if (selectedSizeValue) {
-        item.size = selectedSizeValue;
-      }
       addItemMutation.mutate(item);
     } else {
       if (quantity > maxQuantity) {
@@ -136,10 +134,8 @@ function ProductDetail() {
       const item = {
         productId: id,
         quantity,
+        size: selectedSizeValue ?? null,
       };
-      if (selectedSizeValue) {
-        item.size = selectedSizeValue;
-      }
       dispatch(addItem(item));
     }
   };

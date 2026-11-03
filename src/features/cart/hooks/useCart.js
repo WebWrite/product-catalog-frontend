@@ -18,6 +18,7 @@ export const useCartQuery = () => {
     queryKey: ["cart"],
     queryFn: getCart,
     enabled: isCustomer,
+    refetchOnWindowFocus: false,
   });
 };
 

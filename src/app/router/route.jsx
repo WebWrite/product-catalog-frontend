@@ -12,6 +12,7 @@ import PaymentSuccess from "../../features/orders/pages/paymentSuccess";
 import PaymentCancelled from "../../features/orders/pages/paymentCancelled";
 
 import AdminLayout from "../../features/admin/layout/layout";
+const Audit = lazy(() => import("../../features/admin/pages/audit"));
 const CustomerProfile = lazy(() => import("../../features/shop/pages/profile"));
 const AdminProfile = lazy(() => import("../../features/admin/pages/profile"));
 const Chat = lazy(() => import("../../features/chat/pages/chat"));
@@ -128,6 +129,10 @@ export const router = createBrowserRouter([
         element: renderPage(EditProduct),
       },
       {
+        path: "activity",
+        element: renderPage(Activity),
+      },
+      {
         path: "orders",
         element: renderPage(SellerOrders),
       },
@@ -213,6 +218,10 @@ export const router = createBrowserRouter([
       {
         path: "profile",
         element: renderPage(AdminProfile),
+      },
+      {
+        path: "audit",
+        element: renderPage(Audit),
       },
       {
         path: "activity",

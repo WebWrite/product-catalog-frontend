@@ -15,7 +15,6 @@ import {
 import api from "../../../shared/utils/api";
 import { setuser } from "../../../app/store/user/userSlice";
 import { clearCart } from "../../../app/store/cart/cart";
-import { mergeCart } from "../../cart/api/cartApi";
 import { setLoginMarker } from "../../../shared/utils/authStorage";
 
 const RESEND_SECONDS = 30;
@@ -53,57 +52,40 @@ function Verification() {
         comeFrom === "login"
           ? "auth/verify-login-otp"
           : "auth/verify-email-otp";
-      return api.post(url, { email, otp: code });
+
+      return api.post(url, {
+        email,
+        otp: code,
+        ...(comeFrom === "login" && cart.items.length > 0
+          ? { items: cart.items }
+          : {}),
+      });
     },
-    onSuccess: async (res) => {
+
+    onSuccess: (res) => {
       setOtp("");
 
       if (comeFrom === "login") {
         const loginUser = res.data.user;
+
         setLoginMarker();
 
-        await queryClient.cancelQueries({ queryKey: ["currentUser"] });
-        await queryClient.cancelQueries({ queryKey: ["cart"] });
+        dispatch(setuser(loginUser));
+        queryClient.setQueryData(["currentUser"], loginUser);
+        if (cart.items.length > 0 && loginUser.role == "customer") {
+          dispatch(clearCart());
+        }
 
-        if (loginUser.role === "admin" || loginUser.role === "seller") {
-          dispatch(setuser(loginUser));
-          queryClient.setQueryData(["currentUser"], loginUser);
-          navigate(
-            loginUser.role === "admin"
-              ? "/admin/dashboard"
-              : "/seller/dashboard",
-          );
+        queryClient.invalidateQueries({
+          queryKey: ["cart"],
+          refetchType: "all",
+        });
+
+        if (loginUser.role === "admin") {
+          navigate("/admin/dashboard");
+        } else if (loginUser.role === "seller") {
+          navigate("/seller/dashboard");
         } else {
-          if (cart?.items?.length >= 1) {
-            try {
-              const response = await mergeCart(cart.items);
-              if (response?.success !== false) dispatch(clearCart());
-            } catch (e) {
-              console.error("Cart merge failed", e);
-            }
-          }
-
-          let latestUser = loginUser;
-          try {
-            const me = await api.get("/user/me");
-            latestUser = me.data?.user ?? loginUser;
-          } catch (e) {
-            console.error("Failed to refresh user", e);
-          }
-
-          dispatch(setuser(latestUser));
-
-          await Promise.all([
-            queryClient.invalidateQueries({
-              queryKey: ["currentUser"],
-              refetchType: "all",
-            }),
-            queryClient.invalidateQueries({
-              queryKey: ["cart"],
-              refetchType: "all",
-            }),
-          ]);
-
           navigate("/");
         }
 
@@ -114,6 +96,7 @@ function Verification() {
           showProgress: true,
           placement: "bottomRight",
         });
+
         return;
       }
 
@@ -122,10 +105,13 @@ function Verification() {
         description: "Your account is ready. Please sign in.",
         placement: "bottomRight",
       });
+
       navigate("/auth/login");
     },
+
     onError: (error) => {
       setOtp("");
+
       notification.error({
         title: "Verification Failed",
         description: error.response?.data?.message || "Invalid code",
