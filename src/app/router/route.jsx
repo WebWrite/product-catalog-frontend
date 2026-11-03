@@ -17,7 +17,7 @@ const CustomerProfile = lazy(() => import("../../features/shop/pages/profile"));
 const AdminProfile = lazy(() => import("../../features/admin/pages/profile"));
 const Chat = lazy(() => import("../../features/chat/pages/chat"));
 const Activity = lazy(() => import("../../features/admin/pages/activity"));
-
+const profile = lazy(() => import("../../features/seller/pages/profile"));
 const CustomerManagement = lazy(
   () => import("../../features/admin/pages/customer"),
 );
@@ -135,6 +135,10 @@ export const router = createBrowserRouter([
       {
         path: "orders",
         element: renderPage(SellerOrders),
+      },
+      {
+        path: "profile",
+        element: renderPage(profile),
       },
       ...chatRoutes,
     ],

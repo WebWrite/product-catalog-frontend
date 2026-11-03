@@ -23,7 +23,7 @@ import {
   MdKeyboardArrowDown,
   MdSearch,
   MdViewInAr,
-  MdHistory,
+  MdPersonOutline,
 } from "react-icons/md";
 import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
@@ -101,9 +101,9 @@ function SellerLayout() {
       ),
     },
     {
-      key: "/seller/activity",
-      icon: <MdHistory size={18} />,
-      label: <Link to="/seller/activity">Activity</Link>,
+      key: "/seller/profile",
+      icon: <MdPersonOutline size={18} />,
+      label: <Link to="/seller/profile">Profile</Link>,
     },
   ];
   const userMenuItems = [
@@ -111,7 +111,7 @@ function SellerLayout() {
       key: "profile",
       label: "Profile",
       icon: <MdPerson />,
-      onClick: () => navigate("/profile"),
+      onClick: () => navigate("/seller/profile"),
     },
     { type: "divider" },
     {
