@@ -1,11 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { App, AutoComplete, Button, Checkbox, Form, Input } from "antd";
-import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MdArrowForward, MdBadge, MdOutlineMail } from "react-icons/md";
 import PasswordStrength from "./passwordStrength";
 import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
+import api from "../../../shared/utils/api";
 
 function BuyerRegister() {
   const { notification } = App.useApp();
@@ -29,8 +29,7 @@ function BuyerRegister() {
   };
 
   const handleSubmit = async (data) => {
-    const Backend_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await axios.post(`${Backend_URL}/auth/register-customer`, {
+    const res = await api.post("/auth/register-customer", {
       name: data.name,
       password: data.password,
       email: data.email,

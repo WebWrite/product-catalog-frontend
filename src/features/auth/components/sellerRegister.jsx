@@ -1,6 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
 import { App, AutoComplete, Button, Checkbox, Form, Input, Select } from "antd";
-import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -12,6 +11,7 @@ import {
 } from "react-icons/md";
 import PasswordStrength from "./passwordStrength";
 import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
+import api from "../../../shared/utils/api";
 
 const STORE_TYPES = [
   { value: "fashion", label: "Fashion & Apparel" },
@@ -69,8 +69,7 @@ function SellerRegister() {
   };
 
   const handleSubmit = async (data) => {
-    const Backend_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await axios.post(`${Backend_URL}/auth/register-seller`, {
+    const res = await api.post("/auth/register-seller", {
       name: data.name,
       email: data.email,
       password: data.password,
