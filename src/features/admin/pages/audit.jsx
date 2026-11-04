@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import ActivityFilters from "../components/activityFilters";
 import ActivityDetailsCard from "../components/activityDetailsCard";
 import { getAdminAudits } from "../api/api";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 
 const EMPTY_FILTERS = {
   search: "",
@@ -34,6 +35,7 @@ const Audit = () => {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const debouncedSearch = useDebounce(filters.search, 500);
 
   const dateFrom = filters.range?.[0]?.format("YYYY-MM-DD");
   const dateTo = filters.range?.[1]?.format("YYYY-MM-DD");
@@ -41,7 +43,7 @@ const Audit = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [
       "adminActivityLogs",
-      filters.search,
+      debouncedSearch,
       filters.role,
       filters.target,
       dateFrom,
@@ -51,7 +53,7 @@ const Audit = () => {
     ],
     queryFn: () =>
       getAdminAudits({
-        search: filters.search.trim() || undefined,
+        search: debouncedSearch.trim() || undefined,
         role: filters.role === "all" ? undefined : filters.role,
         target: filters.target === "all" ? undefined : filters.target,
         dateFrom,
