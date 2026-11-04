@@ -2,9 +2,7 @@ import axios from "axios";
 import { clearLoginMarker, hasLoginMarker } from "./authStorage";
 import { router } from "../../app/router/route";
 
-const Backend_Url = import.meta.env.PROD
-  ? "/api/v1"
-  : import.meta.env.VITE_BACKEND_URL || "/api/v1";
+const Backend_Url = import.meta.env.VITE_BACKEND_URL || "/api";
 
 const api = axios.create({
   baseURL: Backend_Url,
