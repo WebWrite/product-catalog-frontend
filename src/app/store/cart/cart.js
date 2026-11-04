@@ -1,8 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const saved = localStorage.getItem("cart");
+export const GUEST_CART_KEY = "cart";
+export const GUEST_CART_EXPIRY_KEY = "cartExpiresAt";
+export const GUEST_CART_TTL = 7 * 24 * 60 * 60 * 1000;
+
+const saved = localStorage.getItem(GUEST_CART_KEY);
+const expiresAt = Number(localStorage.getItem(GUEST_CART_EXPIRY_KEY));
+const hasExpired = expiresAt > 0 && expiresAt <= Date.now();
+
+if (hasExpired) {
+  localStorage.removeItem(GUEST_CART_KEY);
+  localStorage.removeItem(GUEST_CART_EXPIRY_KEY);
+}
+
 const initialState = {
-  items: saved ? JSON.parse(saved) : [],
+  items: hasExpired || !saved ? [] : JSON.parse(saved),
 };
 
 const cartSlice = createSlice({

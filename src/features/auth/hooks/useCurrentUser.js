@@ -15,7 +15,7 @@ export const useCurrentUser = () => {
     queryKey: ["currentUser"],
     queryFn: fetchCurrentUser,
     enabled: isLoggedIn,
-    staleTime: 10 * 1000,
+    staleTime: 1 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: false,
   });

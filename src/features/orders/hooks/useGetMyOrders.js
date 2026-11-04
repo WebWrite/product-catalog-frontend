@@ -5,4 +5,5 @@ export const useGetMyOrders = (filters) =>
   useQuery({
     queryKey: ["my-orders", filters],
     queryFn: () => getMyOrders(filters),
+    refetchOnWindowFocus: false,
   });

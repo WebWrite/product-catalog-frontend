@@ -9,6 +9,7 @@ export const useGetSellerProfile = () =>
   useQuery({
     queryKey: ["seller-profile"],
     queryFn: getSellerProfile,
+    refetchOnWindowFocus: false,
   });
 
 export const useUpdateSellerProfile = () => {

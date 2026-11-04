@@ -59,6 +59,7 @@ const Audit = () => {
         page: currentPage,
         limit: PAGE_SIZE,
       }),
+    refetchOnWindowFocus: false,
   });
 
   const logs = data?.logs ?? [];

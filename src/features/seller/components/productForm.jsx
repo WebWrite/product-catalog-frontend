@@ -18,6 +18,7 @@ import {
 import { productFieldRule } from "../validations/productSchema";
 
 import imageCompression from "browser-image-compression";
+import RichTextEditor from "../../../shared/components/tiptap";
 
 const { TextArea } = Input;
 
@@ -297,12 +298,7 @@ function ProductForm({ mode, product, onSubmit, isPending = false }) {
             rules={[productFieldRule("description")]}
             validateTrigger="onBlur"
           >
-            <TextArea
-              rows={4}
-              placeholder="Describe your product..."
-              maxLength={5000}
-              showCount
-            />
+            <RichTextEditor />
           </Form.Item>
 
           <div className="flex flex-col md:flex-row gap-4">

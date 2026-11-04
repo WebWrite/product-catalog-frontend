@@ -64,6 +64,7 @@ function ProductCatalog() {
   const summaryQuery = useQuery({
     queryKey: ["admin", "products", "summary"],
     queryFn: getAdminProductSummary,
+    refetchOnWindowFocus: false,
   });
   const productsQuery = useQuery({
     queryKey: [
@@ -78,11 +79,13 @@ function ProductCatalog() {
         search: debouncedKeyword,
         ...(status !== "all" ? { status } : {}),
       }),
+    refetchOnWindowFocus: false,
   });
   const inspectedQuery = useQuery({
     queryKey: ["admin", "product", inspectedId],
     queryFn: () => getAdminProductById(inspectedId),
     enabled: !!inspectedId,
+    refetchOnWindowFocus: false,
   });
   const deleteMutation = useMutation({
     mutationFn: deleteAdminProduct,

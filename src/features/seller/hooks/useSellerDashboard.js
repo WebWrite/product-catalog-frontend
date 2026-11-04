@@ -14,6 +14,7 @@ export function useSellerDashboard() {
     queryKey: DASHBOARD_QUERY_KEY,
     queryFn: getSellerDashboard,
     staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -22,6 +23,7 @@ export function useSellerMonthlySales() {
     queryKey: MONTHLY_SALES_QUERY_KEY,
     queryFn: getSellerMonthlySales,
     staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -30,5 +32,6 @@ export function useSellerInventoryHealth() {
     queryKey: INVENTORY_HEALTH_QUERY_KEY,
     queryFn: getSellerInventoryHealth,
     staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   });
 }

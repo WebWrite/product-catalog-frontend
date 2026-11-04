@@ -19,6 +19,7 @@ import {
   PRICE_MAX,
   PRICE_MIN,
 } from "../utils/constant";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 
 function ExplorePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -52,27 +53,14 @@ function ExplorePage() {
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);
 
-  const [debouncedKeyword, setDebouncedKeyword] = useState(
-    searchParams.get("search") || "",
-  );
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedKeyword(filters.keyword);
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [filters.keyword]);
-
-  const queryFilters = {
-    ...filters,
-    keyword: debouncedKeyword,
-  };
+  const debouncedFilters = useDebounce(filters, 400);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["products", queryFilters],
-    queryFn: () => getProducts({ ...queryFilters, limit: PAGE_SIZE }),
+    queryKey: ["products", debouncedFilters],
+    queryFn: () => getProducts({ ...debouncedFilters, limit: PAGE_SIZE }),
     placeholderData: keepPreviousData,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const products = data?.data?.products ?? [];

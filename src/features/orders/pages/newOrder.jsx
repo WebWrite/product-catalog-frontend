@@ -32,6 +32,7 @@ const NewOrder = () => {
             placement: "bottomRight",
           });
           queryClient.invalidateQueries({ queryKey: ["cart"] });
+          queryClient.invalidateQueries({ queryKey: ["products"] });
           navigate("/orders/myorders");
         },
         onError: (error) => {

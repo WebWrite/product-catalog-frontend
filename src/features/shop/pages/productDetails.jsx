@@ -44,6 +44,8 @@ function ProductDetail() {
     queryKey: ["product", id],
     queryFn: () => getProductsById(id),
     enabled: !!id,
+    staleTime: 3 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const product = data;
@@ -53,6 +55,8 @@ function ProductDetail() {
     queryFn: () =>
       getProducts({ ...DEFAULT_FILTERS, category: product.category, limit: 5 }),
     enabled: !!product?.category,
+    staleTime: 3 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) return <ProductSkeleton />;
@@ -337,18 +341,54 @@ function ProductDetail() {
           </div>
         </div>
 
-        <section className="mt-12 bg-white rounded-lg px-4 py-6">
+        <section className="mt-12 bg-white text-black rounded-lg px-4 py-6">
           <div className="border-b border-slate-200">
             <span className="inline-block border-b-2 border-indigo-700 pb-2 text-sm font-semibold text-indigo-700">
               Description
             </span>
           </div>
-          <h2 className="theme-heading m-0 mt-6 text-xl font-bold">
-            {product.name}
-          </h2>
-          <p className="theme-muted mt-4 max-w-3xl whitespace-pre-line text-sm leading-relaxed">
-            {product.description}
-          </p>
+
+          <div
+            className=" mt-6
+                        [&_p]:my-3
+                        [&_h1]:mb-4
+                        [&_h1]:text-3xl
+                        [&_h1]:font-bold
+                        [&_h2]:mb-3
+                        [&_h2]:text-2xl
+                        [&_h2]:font-semibold
+                        [&_h3]:mb-2
+                        [&_h3]:text-xl
+                        [&_h3]:font-semibold
+                        [&_ul]:my-3
+                        [&_ul]:list-disc
+                        [&_ul]:pl-6
+                        [&_ol]:my-3
+                        [&_ol]:list-decimal
+                        [&_ol]:pl-6
+                        [&_blockquote]:my-4
+                        [&_blockquote]:border-l-4
+                        [&_blockquote]:border-violet-500
+                        [&_blockquote]:pl-4
+                        [&_blockquote]:italic
+                        [&_pre]:my-4
+                        [&_pre]:overflow-x-auto
+                        [&_pre]:rounded-lg
+                        [&_pre]:bg-[#181b2a]
+                        [&_pre]:p-4
+                        [&_pre]:text-white
+                        [&_code]:rounded
+                        [&_code]:bg-muted
+                        [&_code]:px-1.5
+                        [&_code]:py-0.5
+                        [&_a]:text-violet-500
+                        [&_a]:underline
+                        [&_hr]:my-6
+                      "
+            dangerouslySetInnerHTML={{
+              __html: product.description || "",
+            }}
+          />
         </section>
 
         <section className="mt-12 flex flex-col gap-4 rounded-2xl bg-violet-100 p-5 shadow-sm ring-1 ring-slate-100 sm:flex-row sm:items-center sm:justify-between">

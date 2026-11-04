@@ -51,6 +51,7 @@ function OrderDetail() {
     queryKey: ["admin", "order", orderId],
     queryFn: () => getAdminOrderById(orderId),
     enabled: !!orderId,
+    refetchOnWindowFocus: false,
   });
   const statusMutation = useMutation({
     mutationFn: updateAdminOrderItemStatus,

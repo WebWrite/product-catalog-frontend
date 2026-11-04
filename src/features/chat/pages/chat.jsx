@@ -18,6 +18,7 @@ import {
   useConversations,
 } from "../hooks/useChat";
 import { uplaodAttachment } from "../api/api";
+import { IoCloseCircle } from "react-icons/io5";
 
 function Chat() {
   const user = useSelector((state) => state.user);
@@ -27,12 +28,16 @@ function Chat() {
     { value: "all", label: "All" },
     { value: "unread", label: "Unread" },
     ...(!isAdmin ? [{ value: "admin", label: "Admin" }] : []),
+    ...(isAdmin ? [{ value: "customer", label: "Customer" }] : []),
+    ...(isAdmin ? [{ value: "seller", label: "Seller" }] : []),
   ];
 
   const TAB_TEST = {
     all: () => true,
     unread: (c) => c.unreadCount > 0,
     admin: (c) => c.otherUser?.role === "admin",
+    customer: (c) => c.otherUser?.role === "customer",
+    seller: (c) => c.otherUser?.role === "seller",
   };
   const { id } = useParams();
   const { pathname } = useLocation();

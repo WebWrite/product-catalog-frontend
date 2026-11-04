@@ -32,6 +32,7 @@ function SellerDetail() {
     queryKey: ["admin", "seller", id],
     queryFn: () => getAdminSellerById(id),
     enabled: !!id,
+    refetchOnWindowFocus: false,
   });
   const updateMutation = useMutation({
     mutationFn: (values) => updateAdminSeller(id, values),
