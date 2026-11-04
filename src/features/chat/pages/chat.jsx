@@ -17,14 +17,16 @@ import {
   setActiveRoomId,
   useConversations,
 } from "../hooks/useChat";
-import { IoCloseCircle } from "react-icons/io5";
 import { uplaodAttachment } from "../api/api";
 
 function Chat() {
+  const user = useSelector((state) => state.user);
+  const isAdmin = user?.role?.toLowerCase() === "admin";
+
   const TABS = [
     { value: "all", label: "All" },
     { value: "unread", label: "Unread" },
-    { value: "admin", label: "Admin" },
+    ...(!isAdmin ? [{ value: "admin", label: "Admin" }] : []),
   ];
 
   const TAB_TEST = {
@@ -38,7 +40,6 @@ function Chat() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { notification } = App.useApp();
-  const user = useSelector((state) => state.user);
   const messageScrollRef = useRef(null);
   const typingTimer = useRef(null);
   const [messages, setMessages] = useState([]);
