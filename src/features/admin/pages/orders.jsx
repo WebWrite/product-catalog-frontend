@@ -93,6 +93,7 @@ function OrdersFulfillment() {
         search: debouncedKeyword.trim(),
         ...(payment !== "all" ? { payment } : {}),
       }),
+    refetchOnWindowFocus: false,
   });
 
   const filter = (setter) => (value) => {

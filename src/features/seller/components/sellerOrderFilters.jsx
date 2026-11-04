@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Input, Select } from "antd";
 import { MdSearch } from "react-icons/md";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 
 const PAYMENT_METHODS = [
   { label: "All methods", value: "" },
@@ -17,18 +18,17 @@ const PAYMENT_STATUSES = [
 
 const SellerOrderFilters = ({ filters, onChange }) => {
   const [keyword, setKeyword] = useState(filters.search);
+  const debouncedSearch = useDebounce(keyword, 350);
+  useEffect(() => {
+    setKeyword(filters.search);
+  }, [filters.search]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      const search = keyword.trim();
-
-      if (search !== filters.search) {
-        onChange({ search });
-      }
-    }, 350);
-
-    return () => clearTimeout(timeout);
-  }, [keyword, filters.search, onChange]);
+    const search = debouncedSearch.trim();
+    if (search !== filters.search) {
+      onChange({ search });
+    }
+  }, [debouncedSearch, filters.search, onChange]);
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-[1.5fr_1fr_1fr]">

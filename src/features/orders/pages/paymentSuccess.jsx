@@ -12,6 +12,7 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ["cart"] });
+    queryClient.invalidateQueries({ queryKey: ["products"] });
   });
 
   return (

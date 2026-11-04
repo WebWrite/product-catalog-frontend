@@ -48,6 +48,7 @@ function SellerManagement() {
   const summaryQuery = useQuery({
     queryKey: ["admin", "sellers", "summary"],
     queryFn: getAdminSellerSummary,
+    refetchOnWindowFocus: false,
   });
   const sellersQuery = useQuery({
     queryKey: ["admin", "sellers", { ...filters, search: debouncedSearch }],
@@ -59,6 +60,7 @@ function SellerManagement() {
         status: filters.status,
         ...(filters.category !== "all" ? { category: filters.category } : {}),
       }),
+    refetchOnWindowFocus: false,
   });
 
   const updateFilters = (patch) =>

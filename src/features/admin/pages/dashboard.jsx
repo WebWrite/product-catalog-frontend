@@ -19,18 +19,22 @@ function AdminDashboard() {
   const summaryQuery = useQuery({
     queryKey: ["admin", "dashboard", "summary"],
     queryFn: getDashboardSummary,
+    refetchOnWindowFocus: false,
   });
   const revenueQuery = useQuery({
     queryKey: ["admin", "dashboard", "revenue"],
     queryFn: getDashboardRevenue,
+    refetchOnWindowFocus: false,
   });
   const categoriesQuery = useQuery({
     queryKey: ["admin", "dashboard", "top-categories"],
     queryFn: getTopCategories,
+    refetchOnWindowFocus: false,
   });
   const ordersQuery = useQuery({
     queryKey: ["admin", "orders", { page: 1, limit: 10 }],
     queryFn: () => getAdminOrders({ page: 1, limit: 10 }),
+    refetchOnWindowFocus: false,
   });
 
   const summary = summaryQuery.data ?? {};

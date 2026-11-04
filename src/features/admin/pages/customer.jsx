@@ -70,6 +70,7 @@ function CustomerManagement() {
   const summaryQuery = useQuery({
     queryKey: ["admin", "customers", "summary"],
     queryFn: getAdminCustomerSummary,
+    refetchOnWindowFocus: false,
   });
   const customersQuery = useQuery({
     queryKey: ["admin", "customers", { ...filters, search: debouncedSearch }],
@@ -80,6 +81,7 @@ function CustomerManagement() {
         search: debouncedSearch.trim(),
         ...(filters.status !== "all" ? { status: filters.status } : {}),
       }),
+    refetchOnWindowFocus: false,
   });
   const selectedCustomer = (customersQuery.data?.customers ?? []).find(
     (customer) => customer._id === inspectedId,
@@ -88,6 +90,7 @@ function CustomerManagement() {
     queryKey: ["admin", "customer", inspectedId, "orders"],
     queryFn: () => getAdminCustomerOrders(inspectedId),
     enabled: !!inspectedId,
+    refetchOnWindowFocus: false,
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }) => updateAdminCustomer(id, payload),

@@ -13,6 +13,7 @@ function UpdateProduct() {
     queryKey: ["admin", "product", productId],
     queryFn: () => getAdminProductById(productId),
     enabled: !!productId,
+    refetchOnWindowFocus: false,
   });
   const updateMutation = useMutation({
     mutationFn: (payload) => updateAdminProduct(productId, payload),

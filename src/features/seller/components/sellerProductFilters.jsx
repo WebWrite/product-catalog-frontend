@@ -5,6 +5,7 @@ import {
   PRODUCT_CATEGORIES,
   PRODUCT_SORT_OPTIONS,
 } from "../constants/productConstants";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 
 const CATEGORIES = PRODUCT_CATEGORIES;
 const SORT_OPTIONS = PRODUCT_SORT_OPTIONS;
@@ -19,22 +20,18 @@ const STOCK_OPTIONS = [
 function SellerProductFilters({ filters, onChange }) {
   const { token } = theme.useToken();
   const [searchInput, setSearchInput] = useState(filters.search);
+  const debouncedSearch = useDebounce(searchInput, 350);
 
   useEffect(() => {
     setSearchInput(filters.search);
   }, [filters.search]);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const search = searchInput.trim();
-
-      if (search !== filters.search) {
-        onChange({ search });
-      }
-    }, 350);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchInput, filters.search, onChange]);
+    const search = debouncedSearch.trim();
+    if (search !== filters.search) {
+      onChange({ search });
+    }
+  }, [debouncedSearch, filters.search, onChange]);
 
   const controlStyle = {
     height: 40,

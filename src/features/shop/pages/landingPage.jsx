@@ -108,6 +108,7 @@ function LandingPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
+    staleTime: 3 * 60 * 1000,
   });
 
   const products = data?.data.products ?? [];

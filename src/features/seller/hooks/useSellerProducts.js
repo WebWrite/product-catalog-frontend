@@ -111,6 +111,7 @@ export function useSellerOrders(filters) {
     queryFn: () => getSellerOrders(filters),
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -120,6 +121,7 @@ export function useSellerOrderStats() {
     queryFn: getSellerOrderStats,
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: false,
   });
 }
 
