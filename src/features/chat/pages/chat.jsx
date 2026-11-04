@@ -279,7 +279,7 @@ function Chat() {
       </aside>
 
       <section
-        className={`min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-l border-gray-200 lg:flex ${
+        className={`min-h-0 min-w-0 flex-1 flex-col  overflow-hidden border-l border-gray-200 lg:flex ${
           id ? "flex" : "hidden"
         }`}
       >
@@ -320,7 +320,7 @@ function Chat() {
 
             <div
               ref={messageScrollRef}
-              className="theme-chat-background min-h-0 flex-1 overflow-y-auto overscroll-contain bg-purple-50"
+              className="theme-chat-background thin-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain bg-purple-50"
             >
               <div className="flex flex-col gap-5 p-4 sm:p-6">
                 {loadingRoom && <Skeleton active />}

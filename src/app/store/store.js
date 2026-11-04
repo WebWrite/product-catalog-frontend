@@ -49,7 +49,6 @@ if (storedExpiry > Date.now() && previousCartItems.length > 0) {
 
 store.subscribe(() => {
   const items = store.getState().cart.items;
-
   if (items === previousCartItems) return;
 
   previousCartItems = items;

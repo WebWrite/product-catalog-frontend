@@ -109,6 +109,7 @@ function LandingPage() {
     queryKey: ["products"],
     queryFn: getProducts,
     staleTime: 3 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const products = data?.data.products ?? [];

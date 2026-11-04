@@ -113,7 +113,7 @@ function ProductDetailCard({
           aria-label="Close product details"
           onClick={onClose}
           icon={<MdClose size={20} />}
-          className="!flex !h-8 !w-8 !items-center !justify-center !p-0"
+          className="flex! h-8! w-8! items-center! justify-center! p-0!"
           style={{ color: token.colorTextSecondary }}
         />
       </div>
@@ -130,7 +130,7 @@ function ProductDetailCard({
             <img
               src={product.image.url}
               alt={product.name}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
           )}
         </div>
@@ -138,7 +138,7 @@ function ProductDetailCard({
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           <div className="flex min-w-0 flex-col gap-1.5">
             <h2
-              className="m-0 break-words text-lg font-bold capitalize md:text-xl"
+              className="m-0 wrap-break-word text-lg font-bold capitalize md:text-xl"
               style={{ color: token.colorText }}
             >
               {product.name}
@@ -155,12 +155,13 @@ function ProductDetailCard({
               {state.label}
             </span>
 
-            <p
-              className="m-0 mt-1 max-w-prose whitespace-pre-line break-words text-sm"
+            <div
+              className="mt-1 max-h-32 max-w-prose thin-scrollbar overflow-y-auto wrap-break-word pr-2 text-sm [&_a]:text-violet-500 [&_a]:underline [&_blockquote]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:pl-3 [&_blockquote]:italic [&_code]:rounded [&_code]:bg-slate-200 [&_code]:px-1 [&_h1]:mb-2 [&_h1]:text-xl [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:mb-1 [&_h3]:font-semibold [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded [&_pre]:p-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
               style={{ color: token.colorTextSecondary }}
-            >
-              {product.description || "No description added."}
-            </p>
+              dangerouslySetInnerHTML={{
+                __html: product.description || "No description added.",
+              }}
+            />
           </div>
 
           <div className="m-0 grid grid-cols-1 gap-2 sm:grid-cols-2 md:gap-3 xl:grid-cols-3">

@@ -13,6 +13,9 @@ function SellerProductRow({
 }) {
   const stock = Number(product.stock) || 0;
   const stockStatus = getStockStatus(stock);
+  const description =
+    new DOMParser().parseFromString(product.description || "", "text/html")
+      .body.textContent?.trim() || "No description added.";
 
   return (
     <div
@@ -62,7 +65,7 @@ function SellerProductRow({
           </span>
 
           <span className="line-clamp-1 text-[10px] text-slate-500 md:text-[11px]">
-            {product.description}
+            {description}
           </span>
 
           <div className="mt-1 flex flex-wrap items-center gap-1.5 md:hidden">
