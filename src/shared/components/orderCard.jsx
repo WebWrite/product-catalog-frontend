@@ -23,20 +23,20 @@ function OrderCard({ order, active, onSelect }) {
           : "border-transparent ring-slate-100 hover:ring-indigo-200"
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="m-0 flex items-center gap-2 text-sm font-bold text-slate-900">
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="m-0 flex min-w-0 items-center gap-2 text-sm font-bold text-slate-900">
             {shortId(order)}
             {/* <Tag color={status.color} className="m-0! text-[10px]!">
               {status.label}
             </Tag> */}
           </p>
-          <p className="m-0 mt-1 text-[11px] text-slate-500">
+          <p className="m-0 mt-1 truncate text-[11px] text-slate-500" title={`${order.shippingAddress?.fullName ?? ""} • ${order.shippingAddress?.city ?? ""}`}>
             {order.shippingAddress?.fullName} • {order.shippingAddress?.city}
           </p>
         </div>
-        <div className="text-right">
-          <p className="m-0 text-base font-bold text-slate-900">
+        <div className="min-w-0 max-w-[42%] shrink-0 text-right">
+          <p className="m-0 truncate text-base font-bold text-slate-900" title={money(order.total)}>
             {money(order.total)}
           </p>
           <p

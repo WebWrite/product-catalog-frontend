@@ -53,7 +53,7 @@ function SellerDashboard() {
   }, [hasError]);
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6 w-full min-w-0 max-w-[1600px] mx-auto p-4 sm:p-8 ">
+    <div className="mx-auto flex w-full min-w-0 max-w-[1600px] flex-col gap-4 overflow-hidden p-3 sm:gap-5 sm:p-5 lg:gap-6 lg:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
         <div className="w-full md:w-auto min-w-0">
           <h1 className="text-[20px] sm:text-[22px] md:text-[24px] lg:text-[28px] xl:text-[32px] font-bold text-slate-100 m-0 tracking-tight">
@@ -113,7 +113,7 @@ function SellerDashboard() {
             </div>
           </div>
 
-          <div style={{ width: "100%", height: 260 }}>
+          <div className="h-[220px] w-full sm:h-[260px]">
             <ResponsiveContainer>
               <AreaChart
                 data={chartData}

@@ -28,8 +28,8 @@ import { useNavigate } from "react-router-dom";
 
 function Card({ title, icon, children }) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-      <h2 className="m-0 flex items-center gap-2 text-sm font-bold text-slate-900">
+    <section className="min-w-0 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-5">
+      <h2 className="m-0 flex min-w-0 items-center gap-2 text-sm font-bold text-slate-900">
         <span className="text-base text-indigo-700">{icon}</span>
         {title}
       </h2>
@@ -41,8 +41,10 @@ function Card({ title, icon, children }) {
 function Row({ label, value, valueClass = "text-slate-900" }) {
   return (
     <div className="flex items-center justify-between gap-3 text-xs">
-      <span className="text-slate-600">{label}</span>
-      <span className={`text-right font-semibold ${valueClass}`}>{value}</span>
+      <span className="min-w-0 text-slate-600">{label}</span>
+      <span className={`min-w-0 truncate text-right font-semibold ${valueClass}`} title={value}>
+        {value}
+      </span>
     </div>
   );
 }
@@ -78,8 +80,8 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="flex flex-wrap items-start justify-between gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-        <div>
+      <section className="flex min-w-0 flex-wrap items-start justify-between gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:gap-4 sm:p-5">
+        <div className="min-w-0 flex-1">
           <h1 className="m-0 flex flex-wrap items-center gap-3 text-xl font-bold text-slate-900 sm:text-2xl">
             Order {shortId(order)}
           </h1>
@@ -87,7 +89,7 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
             Placed {formatDate(order.createdAt)} • {order.paymentMethod}
           </p>
         </div>
-        <div className="rounded-xl bg-indigo-50 px-4 py-2 text-right">
+        <div className="max-w-full shrink-0 rounded-xl bg-indigo-50 px-3 py-2 text-right sm:px-4">
           <p className="m-0 text-[10px] font-semibold uppercase tracking-wider text-slate-600">
             Your Items Total
           </p>
@@ -104,12 +106,14 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
           </p>
         ) : (
           <>
-            <Steps
-              size="small"
-              current={stage}
-              status={stage === STEPS.length - 1 ? "finish" : "process"}
-              items={STEPS.map((title) => ({ title }))}
-            />
+            <div className="overflow-x-auto pb-1">
+              <Steps
+                size="small"
+                current={stage}
+                status={stage === STEPS.length - 1 ? "finish" : "process"}
+                items={STEPS.map((title) => ({ title }))}
+              />
+            </div>
             {bulk && (
               <Tooltip title={blocked ? blockedReason : ""}>
                 <span className="mt-4 block">
@@ -237,8 +241,8 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="m-0 flex flex-wrap items-center gap-2 text-sm font-bold text-slate-900">
-                    {item.name}
+                  <p className="m-0 flex min-w-0 flex-wrap items-center gap-2 text-sm font-bold text-slate-900">
+                    <span className="min-w-0 truncate" title={item.name}>{item.name}</span>
                     {item.size && (
                       <Tag
                         color="#EAEDFF"

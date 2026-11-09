@@ -113,7 +113,7 @@ const SellerOrders = () => {
     );
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl p-4 sm:p-8  ">
+    <div className="mx-auto min-h-screen w-full min-w-0 max-w-7xl overflow-x-hidden p-3 sm:p-5 lg:p-8">
       <h1 className="m-0 text-2xl font-bold text-slate-900 sm:text-3xl">
         Orders &amp; Fulfillment
       </h1>
@@ -121,7 +121,7 @@ const SellerOrders = () => {
         Process, ship and track every order that contains your products
       </p>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-5 grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => (
           <AnalyticalCard
             key={s.title}
@@ -133,7 +133,7 @@ const SellerOrders = () => {
       </div>
 
       {isLoading && (
-        <div className="mt-6 grid gap-6 lg:grid-cols-[22rem_1fr]">
+        <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
           <Skeleton active paragraph={{ rows: 8 }} />
           <Skeleton active paragraph={{ rows: 12 }} />
         </div>
@@ -171,7 +171,7 @@ const SellerOrders = () => {
             />
           ) : (
             <>
-              <div className="mt-6 grid items-start gap-6 lg:grid-cols-[22rem_1fr]">
+              <div className="mt-6 grid min-w-0 items-start gap-5 lg:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)] lg:gap-6">
                 <div className="flex flex-col gap-3 lg:sticky lg:top-24 lg:max-h-[calc(190vh-8rem)] lg:overflow-y-auto lg:pr-1">
                   {orders.map((order) => (
                     <OrderCard

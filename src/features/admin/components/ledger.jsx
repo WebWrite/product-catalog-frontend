@@ -12,37 +12,34 @@ function Row({ label, value, className = "" }) {
   );
 }
 
-const isActive = (i) => i.status !== "refunded" && i.status !== "cancelled";
+const isActive = (i) => i.status !== "cancelled";
 const lineTotal = (i) => i.qty * i.unitPrice;
 
 function Ledger({ items, subtotal: orderSubtotal, shippingCost, total }) {
   const subtotal =
     orderSubtotal ?? items.reduce((n, i) => n + lineTotal(i), 0);
   const tax = subtotal * TAX_RATE;
-  const refunds = items
-    .filter((i) => i.status === "refunded")
-    .reduce((n, i) => n + lineTotal(i), 0);
-  const netPaid = total ?? subtotal + (shippingCost ?? SHIPPING) + tax - refunds;
+  const netPaid = total ?? subtotal + (shippingCost ?? SHIPPING) + tax;
 
   const sellers = [...new Set(items.map((i) => i.seller))].map((name) => {
     const own = items.filter((i) => i.seller === name);
     const live = own.filter(isActive);
     const gross = live.reduce((n, i) => n + lineTotal(i), 0);
     const commission = gross * COMMISSION_RATE;
-    const allShipped =
-      live.length > 0 && live.every((i) => i.status === "shipped");
+    const allDelivered =
+      live.length > 0 && live.every((i) => i.status === "delivered");
     return {
       name,
       count: own.length,
       commission,
       payout: gross - commission,
-      state: live.length === 0 ? "clawed" : allShipped ? "ready" : "hold",
+      state: live.length === 0 ? "clawed" : allDelivered ? "ready" : "hold",
     };
   });
 
   const STATE = {
     ready: { text: "Ready for Release", cls: "text-indigo-700" },
-    hold: { text: "Escrow Hold (Unshipped)", cls: "text-red-600" },
+    hold: { text: "Escrow Hold (Awaiting Delivery)", cls: "text-red-600" },
     clawed: { text: "Clawed back", cls: "text-red-600" },
   };
 
@@ -63,13 +60,6 @@ function Ledger({ items, subtotal: orderSubtotal, shippingCost, total }) {
           value={money(shippingCost ?? SHIPPING)}
         />
         <Row label="State Sales Tax (NY 8.875%)" value={money(tax)} />
-        {refunds > 0 && (
-          <Row
-            label="Item Refund (Pure Linen Lab)"
-            value={`-${money(refunds)}`}
-            className="rounded-md bg-red-50 px-2 py-1 [&_span]:text-red-600!"
-          />
-        )}
       </div>
 
       <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-4">

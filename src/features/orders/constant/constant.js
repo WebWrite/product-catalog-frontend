@@ -74,7 +74,10 @@ export const getAdminOrderItemStatuses = (
     (method === "COD" && status === "pending") ||
     (method === "STRIPE" && payment === "completed" && status === "confirmed")
   ) {
-    allowed.push("delivered", "cancelled");
+    allowed.push("delivered");
+    if (status === "pending") {
+      allowed.push("cancelled");
+    }
   }
 
   return allowed;

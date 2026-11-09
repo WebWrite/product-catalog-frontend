@@ -86,7 +86,13 @@ function CartPage() {
     }
   }, [areGuestProductsError, isLoggedIn]);
   const isBlockedRole = role === "admin" || role === "seller";
-  if (isBlockedRole) return <Navigate to="/auth/login" replace />;
+  if (isBlockedRole)
+    return (
+      <Navigate
+        to={`${role == "seller" ? "/seller/dashboard" : "/admin/dashboard"}`}
+        replace
+      />
+    );
 
   if (isLoggedIn && isLoading) return <Loader />;
   if (!isLoggedIn && areGuestProductsLoading) return <Loader />;
