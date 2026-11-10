@@ -10,4 +10,21 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
   ],
+
+  server: {
+    headers: {
+      "Content-Security-Policy": [
+        "default-src 'self'",
+        "script-src 'self' ",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' blob: https://res.cloudinary.com https://placehold.co https://images.unsplash.com",
+        "connect-src 'self' http://localhost:5000 ws://localhost:5000 ws://localhost:5173",
+        "worker-src 'self' blob:",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "frame-ancestors 'none'",
+      ].join("; "),
+    },
+  },
 });
