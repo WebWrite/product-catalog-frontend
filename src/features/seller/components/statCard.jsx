@@ -1,3 +1,5 @@
+import { Tooltip } from "antd";
+
 function StatCard({
   title,
   value,
@@ -7,6 +9,8 @@ function StatCard({
   isAlert,
   iconClassName = "",
 }) {
+  const displayValue = String(value);
+
   return (
     <div
       className="flex  min-w-0 flex-col rounded-2xl border border-slate-800 p-3 shadow-sm sm:p-4 lg:p-5"
@@ -31,13 +35,17 @@ function StatCard({
         )}
       </div>
 
-      <div className="mb-3 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 sm:mb-4">
-        <h2 className="m-0 break-words text-2xl font-bold leading-none text-slate-100 sm:text-[28px] lg:text-[32px]">
-          {value}
-        </h2>
+      <div className="mb-3 flex min-w-0 flex-nowrap items-baseline gap-x-2 gap-y-1 sm:mb-4">
+        <Tooltip title={displayValue} mouseEnterDelay={0.2}>
+          <div className="min-w-0 flex-1" tabIndex={0}>
+            <h2 className="m-0 truncate text-2xl font-bold leading-none text-slate-100 sm:text-[28px] lg:text-[32px]">
+              {displayValue}
+            </h2>
+          </div>
+        </Tooltip>
 
         {subtext && (
-          <span className="text-xs font-semibold text-slate-400 sm:text-sm">
+          <span className="shrink-0 text-xs font-semibold text-slate-400 sm:text-sm">
             {subtext}
           </span>
         )}

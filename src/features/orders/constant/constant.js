@@ -70,11 +70,17 @@ export const getAdminOrderItemStatuses = (
   const method = paymentMethod?.toUpperCase();
   const payment = paymentStatus?.toLowerCase();
 
-  if (
-    (method === "COD" && status === "pending") ||
-    (method === "STRIPE" && payment === "completed" && status === "confirmed")
+  if (status === "pending") {
+    allowed.push("cancelled");
+    if (method === "COD") {
+      allowed.push("delivered");
+    }
+  } else if (
+    method === "STRIPE" &&
+    payment === "completed" &&
+    status === "confirmed"
   ) {
-    allowed.push("delivered", "cancelled");
+    allowed.push("delivered");
   }
 
   return allowed;

@@ -8,8 +8,6 @@ export const STATUS = {
   pending: { label: "Pending", color: "default" },
   confirmed: { label: "Confirmed", color: "cyan" },
   delivered: { label: "Delivered", color: "green" },
-  shipped: { label: "Shipped", color: "blue" },
-  processing: { label: "Processing", color: "orange" },
   cancelled: { label: "Cancelled", color: "default" },
 };
 

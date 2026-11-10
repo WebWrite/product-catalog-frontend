@@ -31,8 +31,8 @@ const SellerOrderFilters = ({ filters, onChange }) => {
   }, [debouncedSearch, filters.search, onChange]);
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-[1.5fr_1fr_1fr]">
-      <div className="col-span-2 lg:col-span-1">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr]">
+      <div className="sm:col-span-2 lg:col-span-1">
         <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-300">
           Search
         </label>

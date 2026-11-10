@@ -42,9 +42,10 @@ export async function updateSellerProduct({ productId, data }) {
   formData.append("stock", String(data.stock));
   formData.append("status", data.status);
 
-  (data.sizes ?? []).forEach((size) => {
-    formData.append("sizes", size);
-  });
+  if (data.sizes?.length) {
+    data.sizes.forEach((s) => formData.append("sizes[]", s));
+  }
+
   if (data.image) {
     formData.append("image", data.image);
   }

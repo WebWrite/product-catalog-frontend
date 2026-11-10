@@ -1,6 +1,7 @@
 import axios from "axios";
 import { clearLoginMarker, hasLoginMarker } from "./authStorage";
 import { router } from "../../app/router/route";
+import { notification } from "antd";
 
 const Backend_Url = import.meta.env.VITE_BACKEND_URL || "/api";
 
@@ -42,12 +43,21 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-      const refreshed = await refreshToken();
-
-      if (refreshed) {
+      const result = await refreshToken();
+      if (result.success) {
         return api(originalRequest);
       }
       clearLoginMarker();
+
+      if (result.message === "Your account has Inactive by admin") {
+        notification.error({
+          message: "Account Deactivated",
+          description: result.message,
+          placement: "bottomRight",
+          duration: 4,
+          key: "account-inactive",
+        });
+      }
 
       router.navigate("/auth/login", { replace: true });
     }
@@ -66,9 +76,15 @@ export async function refreshToken() {
       },
     );
 
-    return response.data?.success !== false;
-  } catch {
-    return false;
+    return {
+      success: response.data?.success !== false,
+      message: response.data?.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message,
+    };
   }
 }
 
@@ -79,11 +95,17 @@ export async function login(credentials) {
 }
 
 export async function logout() {
-  return await api.post("/auth/logout");
+  return await api.post(
+    "/auth/logout",
+    {},
+    {
+      _skipAuthRefresh: true,
+    },
+  );
 }
 
 export async function getMe() {
-  let res = await api.get("/user/me");
+  const res = await api.get("/user/me");
   return res.data.user;
 }
 

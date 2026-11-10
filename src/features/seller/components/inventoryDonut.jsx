@@ -1,4 +1,4 @@
-import { Progress } from "antd";
+import { Progress, Tooltip } from "antd";
 
 function InventoryDonut({ data, isLoading }) {
   const healthyStock = data?.healthyStock;
@@ -7,19 +7,19 @@ function InventoryDonut({ data, isLoading }) {
 
   return (
     <div
-      className="p-6 rounded-2xl border border-slate-800 flex-1 shadow-sm flex flex-col"
+      className="flex min-w-0 flex-1 flex-col rounded-2xl border border-slate-800 p-4 shadow-sm sm:p-5 lg:p-6"
       style={{ background: "var(--workspace-surface)" }}
     >
-      <div className="mb-6">
-        <h3 className="m-0 font-bold text-lg text-slate-100">
+      <div className="mb-5 sm:mb-6">
+        <h3 className="m-0 text-lg font-bold text-slate-100">
           Inventory Health
         </h3>
-        <p className="text-xs text-slate-400 mt-1 font-medium">
+        <p className="mt-1 text-xs font-medium text-slate-400">
           Kiln yield vs active marketplace commitments
         </p>
       </div>
 
-      <div className="flex justify-center mb-8 relative">
+      <div className="relative mb-6 flex justify-center sm:mb-8">
         <Progress
           type="circle"
           percent={healthyStock?.percentage ?? 0}
@@ -40,42 +40,61 @@ function InventoryDonut({ data, isLoading }) {
         />
       </div>
 
-      <div className="space-y-4 mt-auto">
-        <div className="flex justify-between items-center text-sm">
-          <span className="flex items-center gap-2 text-slate-400 font-medium">
-            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>{" "}
-            Healthy Stock (&gt;5 items)
+      <div className="mt-auto space-y-4">
+        <div className="flex min-w-0 items-center justify-between gap-3 text-sm">
+          <span className="flex min-w-0 items-center gap-2 font-medium text-slate-400">
+            <span className="size-2.5 shrink-0 rounded-full bg-indigo-500"></span>{" "}
+            <span className="truncate">Healthy Stock (&gt;5 items)</span>
           </span>
-          <span className="font-bold text-slate-200">
-            {isLoading
-              ? "..."
-              : `${healthyStock?.percentage ?? 0}% (${healthyStock?.count ?? 0} SKUs)`}
-          </span>
+          <TooltipValue
+            value={
+              isLoading
+                ? "..."
+                : `${healthyStock?.percentage ?? 0}% (${healthyStock?.count ?? 0} SKUs)`
+            }
+          />
         </div>
-        <div className="flex justify-between items-center text-sm">
-          <span className="flex items-center gap-2 text-slate-400 font-medium">
-            <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>{" "}
-            Critical Low (&lt;4 items)
+        <div className="flex min-w-0 items-center justify-between gap-3 text-sm">
+          <span className="flex min-w-0 items-center gap-2 font-medium text-slate-400">
+            <span className="size-2.5 shrink-0 rounded-full bg-purple-500"></span>
+            <span className="truncate">Critical Low (&lt;4 items)</span>
           </span>
-          <span className="font-bold text-slate-200">
-            {isLoading
-              ? "..."
-              : `${lowStock?.percentage ?? 0}% (${lowStock?.count ?? 0} SKUs)`}
-          </span>
+          <TooltipValue
+            value={
+              isLoading
+                ? "..."
+                : `${lowStock?.percentage ?? 0}% (${lowStock?.count ?? 0} SKUs)`
+            }
+          />
         </div>
-        <div className="flex justify-between items-center text-sm">
-          <span className="flex items-center gap-2 text-slate-400 font-medium">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> Sold
-            Out
+        <div className="flex min-w-0 items-center justify-between gap-3 text-sm">
+          <span className="flex min-w-0 items-center gap-2 font-medium text-slate-400">
+            <span className="size-2.5 shrink-0 rounded-full bg-red-500"></span>
+            <span className="truncate">Sold Out</span>
           </span>
-          <span className="font-bold text-slate-200">
-            {isLoading
-              ? "..."
-              : `${soldOut?.percentage ?? 0}% (${soldOut?.count ?? 0} SKUs)`}
-          </span>
+          <TooltipValue
+            value={
+              isLoading
+                ? "..."
+                : `${soldOut?.percentage ?? 0}% (${soldOut?.count ?? 0} SKUs)`
+            }
+          />
         </div>
       </div>
     </div>
+  );
+}
+
+function TooltipValue({ value }) {
+  return (
+    <Tooltip title={value} mouseEnterDelay={0.2}>
+      <span
+        className="min-w-0 max-w-[52%] shrink-0 truncate text-right font-bold text-slate-200"
+        tabIndex={0}
+      >
+        {value}
+      </span>
+    </Tooltip>
   );
 }
 

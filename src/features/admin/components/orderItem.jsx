@@ -1,11 +1,10 @@
 import {
   MdLockOutline,
   MdOutlineInventory2,
-  MdOutlineLocalShipping,
   MdOutlineStorefront,
 } from "react-icons/md";
 import { money } from "../../../shared/utils/currency";
-import { Button, Select, Tag } from "antd";
+import { Select, Tag } from "antd";
 import {
   DELIEVERY_STATUS_OPTIONS,
   lineTotal,
@@ -115,28 +114,6 @@ function ItemRow({ item, onStatus, isUpdating = false }) {
           />
         </div>
 
-        {item.status === "processing" && (
-          <>
-            <Button
-              size="small"
-              type="primary"
-              icon={<MdOutlineLocalShipping />}
-              className="bg-indigo-700!"
-              onClick={() => onStatus(item.id, "shipped")}
-              loading={isUpdating}
-            >
-              Dispatch Item
-            </Button>
-            <Button
-              size="small"
-              danger
-              onClick={() => onStatus(item.id, "cancelled")}
-              disabled={isUpdating}
-            >
-              Cancel Item
-            </Button>
-          </>
-        )}
       </div>
     </div>
   );
