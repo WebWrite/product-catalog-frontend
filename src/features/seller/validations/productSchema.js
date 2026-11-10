@@ -42,6 +42,7 @@ export const productSchema = yup.object({
 
   sizes: yup
     .array()
+    .ensure()
     .of(yup.string().oneOf(PRODUCT_SIZES, "Select valid sizes."))
     .max(20, "You cannot select more than 20 sizes.")
     .default([]),
