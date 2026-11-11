@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, notification } from "antd";
@@ -12,6 +12,7 @@ import {
 import { getConversations, getUnreadCount } from "../api/api";
 import { refreshToken } from "../../../shared/utils/api";
 import { router } from "../../../app/router/route";
+import { removeUser } from "../../../app/store/user/userSlice";
 
 let activeRoomId = null;
 export const setActiveRoomId = (id) => {
@@ -58,6 +59,7 @@ export const markConversationRead = (qc, roomId) => {
 export const useChatSocket = () => {
   const user = useSelector((state) => state.user);
   const userId = user?.id;
+  const dispatch = useDispatch();
   const qc = useQueryClient();
 
   useEffect(() => {
@@ -109,6 +111,8 @@ export const useChatSocket = () => {
             key: "account-inactive",
           });
         }
+        dispatch(removeUser());
+        qc.removeQueries({ queryKey: ["currentUser"] });
         clearLoginMarker();
         router.navigate("/auth/login", { replace: true });
       }
@@ -122,7 +126,7 @@ export const useChatSocket = () => {
       socket.off("disconnect", onDisconnect);
       socket.disconnect();
     };
-  }, [userId, qc]);
+  }, [dispatch, userId, qc]);
 };
 
 export const useConversations = () => {
