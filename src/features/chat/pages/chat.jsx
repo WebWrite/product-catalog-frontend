@@ -19,6 +19,7 @@ import {
 } from "../hooks/useChat";
 import { uplaodAttachment } from "../api/api";
 import { IoCloseCircle } from "react-icons/io5";
+import { clearLoginMarker } from "../../../shared/utils/authStorage";
 
 function Chat() {
   const user = useSelector((state) => state.user);
@@ -183,6 +184,10 @@ function Chat() {
         throw new Error(result.message || "Message not sent");
       }
     } catch (err) {
+      if (err.message == "Your account has Inactive by admin") {
+        clearLoginMarker();
+        navigate("/auth/login");
+      }
       notifyError("Message not sent", err);
       throw err;
     }

@@ -2,32 +2,45 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App } from "antd";
+import { App, notification } from "antd";
 import { emit, socket } from "../../../shared/utils/socket";
 import { CHAT_BASE } from "../../../shared/utils/chatPath";
-import { hasLoginMarker } from "../../../shared/utils/authStorage";
+import {
+  clearLoginMarker,
+  hasLoginMarker,
+} from "../../../shared/utils/authStorage";
 import { getConversations, getUnreadCount } from "../api/api";
+import { refreshToken } from "../../../shared/utils/api";
+import { router } from "../../../app/router/route";
 
 let activeRoomId = null;
 export const setActiveRoomId = (id) => {
   activeRoomId = id ? String(id) : null;
 };
 
-export const applyMessageToConversations = (qc, msg, myId) => {
-  const roomId = String(msg.roomId);
+export const applyMessageToConversations = (qc, payload, myId) => {
+  const roomId = String(payload.roomId);
+
+  const cached = qc.getQueryData(["conversations"]);
+  const exists =
+    Array.isArray(cached) && cached.some((c) => String(c.roomId) === roomId);
+  if (!exists) {
+    qc.invalidateQueries({ queryKey: ["conversations"] });
+    return;
+  }
 
   qc.setQueryData(["conversations"], (old = []) => {
     const idx = old.findIndex((c) => String(c.roomId) === roomId);
     if (idx === -1) return old;
 
     const conv = old[idx];
-    const isMine = String(msg.senderId) === String(myId);
+    const isMine = String(payload.senderId) === String(myId);
     const isOpen = activeRoomId === roomId;
 
     const updated = {
       ...conv,
-      lastMessage: msg.text || (msg.attachment ? "Attachment" : ""),
-      lastMessageAt: msg.createdAt,
+      lastMessage: payload.text || (payload.attachment ? "Attachment" : ""),
+      lastMessageAt: payload.createdAt,
       unreadCount: isMine || isOpen ? 0 : (conv.unreadCount || 0) + 1,
     };
     return [updated, ...old.slice(0, idx), ...old.slice(idx + 1)];
@@ -53,23 +66,60 @@ export const useChatSocket = () => {
     socket.connect();
 
     const onNotification = (payload) => {
-      const msg = payload?.message ?? payload;
-      if (msg?.roomId && msg?._id) {
-        applyMessageToConversations(qc, msg, userId);
+      const msgId = payload?.messageId;
+      if (payload?.roomId && msgId) {
+        applyMessageToConversations(qc, payload, userId);
       }
 
-      if (msg?.roomId && msg?._id && String(msg.senderId) !== String(userId)) {
-        const isOpen = activeRoomId === String(msg.roomId);
+      if (
+        payload?.roomId &&
+        msgId &&
+        String(payload.senderId) !== String(userId)
+      ) {
+        const isOpen = activeRoomId === String(payload.roomId);
         if (!isOpen) {
           qc.setQueryData(["chat-unread"], (count) => Number(count ?? 0) + 1);
         }
       }
     };
+    let cancelled = false;
+    let refreshing = false;
+    const onDisconnect = async (reason) => {
+      console.log("refresh");
+      if (reason === "io client disconnect") return;
+      if (refreshing || cancelled) return;
 
+      refreshing = true;
+      const result = await refreshToken();
+      refreshing = false;
+
+      if (cancelled) return;
+
+      if (result.success) {
+        socket.connect();
+        qc.invalidateQueries({ queryKey: ["conversations"] });
+        qc.invalidateQueries({ queryKey: ["chat-unread"] });
+      } else {
+        if (result.message === "Your account has Inactive by admin") {
+          notification.error({
+            message: "Account Deactivated",
+            description: result.message,
+            placement: "bottomRight",
+            duration: 4,
+            key: "account-inactive",
+          });
+        }
+        clearLoginMarker();
+        router.navigate("/auth/login", { replace: true });
+      }
+    };
     socket.on("new_message_notification", onNotification);
+    socket.on("disconnect", onDisconnect);
 
     return () => {
+      cancelled = true;
       socket.off("new_message_notification", onNotification);
+      socket.off("disconnect", onDisconnect);
       socket.disconnect();
     };
   }, [userId, qc]);
