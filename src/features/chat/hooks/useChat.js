@@ -96,13 +96,13 @@ export const useChatSocket = () => {
       refreshing = false;
 
       if (cancelled) return;
-
+      console.log("this is result of refresh token", result);
       if (result.success) {
         socket.connect();
         qc.invalidateQueries({ queryKey: ["conversations"] });
         qc.invalidateQueries({ queryKey: ["chat-unread"] });
       } else {
-        if (result.message === "Your account has Inactive by admin") {
+        if (result.status === 403) {
           notification.error({
             message: "Account Deactivated",
             description: result.message,

@@ -78,11 +78,13 @@ export async function refreshToken() {
 
     return {
       success: response.data?.success !== false,
+      status: response.status,
       message: response.data?.message,
     };
   } catch (error) {
     return {
       success: false,
+      status: error.response?.status,
       message: error.response?.data?.message,
     };
   }
