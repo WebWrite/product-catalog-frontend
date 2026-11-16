@@ -14,11 +14,15 @@ const PAYMENT_STATUSES = [
   { label: "Pending", value: "pending" },
   { label: "Completed", value: "completed" },
   { label: "Failed", value: "failed" },
+  { label: "Refund Pending", value: "refund_pending" },
+  { label: "Refunded", value: "refunded" },
+  { label: "Refund Failed", value: "refund_failed" },
 ];
 
 const SellerOrderFilters = ({ filters, onChange }) => {
   const [keyword, setKeyword] = useState(filters.search);
   const debouncedSearch = useDebounce(keyword, 350);
+
   useEffect(() => {
     setKeyword(filters.search);
   }, [filters.search]);
