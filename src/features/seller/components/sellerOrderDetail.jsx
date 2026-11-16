@@ -17,6 +17,7 @@ import {
   PAYMENT_STATUS,
   shortId,
   statusTag,
+  isRefundPaymentStatus,
   STEPS,
 } from "../../orders/constant/constant";
 import { formatDate } from "../../../shared/utils/formatDate";
@@ -55,15 +56,18 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
   const payment = PAYMENT_STATUS[order.paymentStatus];
   const address = order.shippingAddress;
   const customer = order.customerId;
+  const hideItemStatus = isRefundPaymentStatus(order.paymentStatus);
 
   const blocked =
     order.paymentMethod?.toUpperCase() === "STRIPE" &&
     order.paymentStatus?.toLowerCase() !== "completed";
   const blockedReason = "Waiting for the customer's Stripe payment";
 
-  const bulkItems = order.items.filter((item) =>
-    getSellerNextStatus(order.paymentMethod, item.status, order.paymentStatus),
-  );
+  const bulkItems = hideItemStatus
+    ? []
+    : order.items.filter((item) =>
+        getSellerNextStatus(order.paymentMethod, item.status, order.paymentStatus),
+      );
   const bulk = bulkItems.length
     ? getSellerNextStatus(
         order.paymentMethod,
@@ -261,11 +265,13 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
-                  <Tag color={tag.color} className="m-0! text-[10px]!">
-                    {tag.label}
-                  </Tag>
+                  {!hideItemStatus && (
+                    <Tag color={tag.color} className="m-0! text-[10px]!">
+                      {tag.label}
+                    </Tag>
+                  )}
                   <div className="flex gap-2">
-                    {next && (
+                    {!hideItemStatus && next && (
                       <Tooltip title={blocked ? blockedReason : ""}>
                         <span>
                           <Button
@@ -283,7 +289,7 @@ function SellerOrderDetail({ order, onUpdate, onCancel, isUpdating }) {
                         </span>
                       </Tooltip>
                     )}
-                    {canCancel && (
+                    {!hideItemStatus && canCancel && (
                       <Button
                         danger
                         size="small"

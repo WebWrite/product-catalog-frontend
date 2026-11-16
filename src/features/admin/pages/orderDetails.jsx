@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Tag, message } from "antd";
+import { MdArrowBack } from "react-icons/md";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MdOutlineInventory2 } from "react-icons/md";
 import ItemRow from "../components/orderItem";
@@ -43,6 +45,11 @@ function normalizeOrder(order) {
     },
   };
 }
+
+const formatPaymentStatus = (status) =>
+  status
+    ? status.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
+    : "Unknown";
 
 function OrderDetail() {
   const { orderId } = useParams();
@@ -88,6 +95,12 @@ function OrderDetail() {
 
   return (
     <div className="mx-auto w-full max-w-6xl p-4 sm:p-8 ">
+      <Link
+        to="/admin/orders"
+        className="mb-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600"
+      >
+        <MdArrowBack /> Back to Orders
+      </Link>
       <h1 className="m-0 mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
         Order #{order.id}
       </h1>
@@ -98,6 +111,9 @@ function OrderDetail() {
         </span>
         <Tag color="#EAEDFF" className="m-0! text-[10px]! text-indigo-700!">
           {order.paymentMethod}
+        </Tag>
+        <Tag color="blue" className="m-0! text-[10px]!">
+          Payment: {formatPaymentStatus(order.paymentStatus)}
         </Tag>
       </p>
 

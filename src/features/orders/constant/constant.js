@@ -30,6 +30,11 @@ export const statusTag = (status) =>
     color: "default",
   };
 
+export const isRefundPaymentStatus = (paymentStatus) =>
+  ["refund_pending", "refund_failed", "refunded"].includes(
+    paymentStatus?.toLowerCase(),
+  );
+
 export const sellerName = (item) =>
   item.sellerId?.sellerProfile?.storeName || item.sellerId?.name;
 

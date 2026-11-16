@@ -118,6 +118,7 @@ function ProductDetail() {
         id,
         quantity,
         size: selectedSizeValue ?? null,
+        product,
       };
       addItemMutation.mutate(item);
     } else {

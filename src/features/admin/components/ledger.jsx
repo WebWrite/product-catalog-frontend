@@ -16,8 +16,7 @@ const isActive = (i) => i.status !== "cancelled";
 const lineTotal = (i) => i.qty * i.unitPrice;
 
 function Ledger({ items, subtotal: orderSubtotal, shippingCost, total }) {
-  const subtotal =
-    orderSubtotal ?? items.reduce((n, i) => n + lineTotal(i), 0);
+  const subtotal = orderSubtotal ?? items.reduce((n, i) => n + lineTotal(i), 0);
   const tax = subtotal * TAX_RATE;
   const netPaid = total ?? subtotal + (shippingCost ?? SHIPPING) + tax;
 
@@ -39,7 +38,7 @@ function Ledger({ items, subtotal: orderSubtotal, shippingCost, total }) {
 
   const STATE = {
     ready: { text: "Ready for Release", cls: "text-indigo-700" },
-    hold: { text: "Escrow Hold (Awaiting Delivery)", cls: "text-red-600" },
+    hold: { text: "Hold (Awaiting Delivery)", cls: "text-red-600" },
     clawed: { text: "Clawed back", cls: "text-red-600" },
   };
 
@@ -55,10 +54,7 @@ function Ledger({ items, subtotal: orderSubtotal, shippingCost, total }) {
 
       <div className="mt-4 flex flex-col gap-2.5">
         <Row label="Items subtotal" value={money(subtotal)} />
-        <Row
-          label="Shipping"
-          value={money(shippingCost ?? SHIPPING)}
-        />
+        <Row label="Shipping" value={money(shippingCost ?? SHIPPING)} />
         <Row label="State Sales Tax (NY 8.875%)" value={money(tax)} />
       </div>
 
