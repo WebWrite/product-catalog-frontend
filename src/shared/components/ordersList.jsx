@@ -7,6 +7,7 @@ import {
   sellerName,
   shortId,
   statusTag,
+  isRefundPaymentStatus,
   STEPS,
 } from "../../features/orders/constant/constant";
 import {
@@ -54,6 +55,7 @@ function OrderDetail({ order, onCancel, onRetry, isCancelling, isRetrying }) {
     order.paymentMethod === "STRIPE" &&
     ["pending", "failed"].includes(order.paymentStatus) &&
     hasPendingItem;
+  const hideItemStatus = isRefundPaymentStatus(order.paymentStatus);
 
   return (
     <div className="flex flex-col gap-4">
@@ -180,10 +182,12 @@ function OrderDetail({ order, onCancel, onRetry, isCancelling, isRetrying }) {
                   <p className="m-0 text-sm font-bold text-slate-900">
                     {money(item.itemTotal)}
                   </p>
-                  <Tag color={tag.color} className="m-0! text-[10px]!">
-                    {tag.label}
-                  </Tag>
-                  {canCancelOrderItem(item.status) && (
+                  {!hideItemStatus && (
+                    <Tag color={tag.color} className="m-0! text-[10px]!">
+                      {tag.label}
+                    </Tag>
+                  )}
+                  {!hideItemStatus && canCancelOrderItem(item.status) && (
                     <Button
                       danger
                       size="small"

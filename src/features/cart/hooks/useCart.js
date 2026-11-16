@@ -26,6 +26,57 @@ const useCartMutation = (mutationFn) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn,
+    onMutate: async (variables) => {
+      if (mutationFn !== addToCart) return undefined;
+
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousCart = queryClient.getQueryData(["cart"]);
+      queryClient.setQueryData(["cart"], (current) => {
+        const data = current ?? { success: true, cart: { items: [] } };
+        const items = data.cart?.items ?? [];
+        const existing = items.find(
+          (item) =>
+            (item.productId?._id ?? item.productId) === variables.id &&
+            (item.size ?? null) === (variables.size ?? null),
+        );
+
+        const nextItems = existing
+          ? items.map((item) =>
+              item === existing
+                ? {
+                    ...item,
+                    quantity: Number(item.quantity ?? 0) + variables.quantity,
+                  }
+                : item,
+            )
+          : [
+              ...items,
+              {
+                _id: `optimistic-${variables.id}-${variables.size ?? "default"}`,
+                productId: variables.product ?? variables.id,
+                quantity: variables.quantity,
+                size: variables.size ?? null,
+              },
+            ];
+
+        return { ...data, cart: { ...(data.cart ?? {}), items: nextItems } };
+      });
+
+      return { previousCart, hadPreviousCart: previousCart !== undefined };
+    },
+    onError: (error, _variables, context) => {
+      if (context?.hadPreviousCart) {
+        queryClient.setQueryData(["cart"], context.previousCart);
+      } else if (context) {
+        queryClient.removeQueries({ queryKey: ["cart"], exact: true });
+      }
+      notification.error({
+        description: error.response?.data?.message || "something went worng",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+    },
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["cart"] }),
@@ -35,14 +86,6 @@ const useCartMutation = (mutationFn) => {
         }),
       ]);
     },
-
-    onError: (error) =>
-      notification.error({
-        description: error.response?.data?.message || "something went worng",
-        pauseOnHover: true,
-        showProgress: true,
-        placement: "bottomRight",
-      }),
   });
 };
 
