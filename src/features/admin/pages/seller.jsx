@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Select, Table, Tag } from "antd";
+import { Alert, Button, Input, Select, Table, Tag } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import {
   MdOutlinePayments,
@@ -178,7 +178,13 @@ function SellerManagement() {
             key={stat.title}
             icon={<stat.icon className="size-4" />}
             title={stat.title}
-            amount={summaryQuery.isLoading ? "..." : stat.amount}
+            amount={
+              summaryQuery.isLoading
+                ? "..."
+                : summaryQuery.isError
+                  ? "—"
+                  : stat.amount
+            }
           />
         ))}
       </div>
@@ -224,6 +230,15 @@ function SellerManagement() {
         />
       </div>
 
+      {sellersQuery.isError && (
+        <Alert
+          className="mt-4"
+          type="error"
+          showIcon
+          message="Unable to load sellers"
+          description="Please try again after the request recovers."
+        />
+      )}
       <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
         <Table
           rowKey="_id"

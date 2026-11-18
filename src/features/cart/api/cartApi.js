@@ -1,7 +1,7 @@
 import api from "../../../shared/utils/api";
 
-export const getCart = async () => {
-  let res = await api.get("/cart");
+export const getCart = async (signal) => {
+  let res = await api.get("/cart", { signal });
   return res.data;
 };
 

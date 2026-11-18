@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { App, Button, Input, Pagination, Select, Table, Tag } from "antd";
+import {
+  Alert,
+  App,
+  Button,
+  Input,
+  Pagination,
+  Select,
+  Table,
+  Tag,
+} from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MdCheckCircleOutline,
@@ -226,7 +235,9 @@ function ProductCatalog() {
           amount={
             summaryQuery.isLoading
               ? "..."
-              : (summary.totalProduct ?? 0).toLocaleString()
+              : summaryQuery.isError
+                ? "—"
+                : (summary.totalProduct ?? 0).toLocaleString()
           }
           percent={100}
           barColor="#3730a3"
@@ -237,7 +248,9 @@ function ProductCatalog() {
           amount={
             summaryQuery.isLoading
               ? "..."
-              : (summary.activeProduct ?? 0).toLocaleString()
+              : summaryQuery.isError
+                ? "—"
+                : (summary.activeProduct ?? 0).toLocaleString()
           }
         />
         <AnalyticalCard
@@ -246,7 +259,9 @@ function ProductCatalog() {
           amount={
             summaryQuery.isLoading
               ? "..."
-              : (summary.outOfStock ?? 0).toLocaleString()
+              : summaryQuery.isError
+                ? "—"
+                : (summary.outOfStock ?? 0).toLocaleString()
           }
         />
       </div>
@@ -271,6 +286,15 @@ function ProductCatalog() {
         </div>
       </div>
 
+      {productsQuery.isError && (
+        <Alert
+          className="mt-4"
+          type="error"
+          showIcon
+          message="Unable to load products"
+          description="Please try again after the request recovers."
+        />
+      )}
       <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1fr_22rem]">
         <div className="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
           {selectedKeys.length > 0 && (

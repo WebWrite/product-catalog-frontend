@@ -5,16 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MdArrowBack, MdLockReset, MdOutlineStorefront } from "react-icons/md";
 import { getAdminSellerById, updateAdminSeller } from "../api/api";
 import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
-
-const STORE_TYPES = [
-  "Clothing",
-  "Electronics",
-  "Beauty",
-  "Furniture",
-  "Sports",
-  "Toys",
-  "Food",
-];
+import { STORE_OPTIONS } from "../../seller/validations/profile.validation";
 const SELLER_STATUSES = [
   { value: "active", label: "Active" },
   { value: "inactive", label: "Inactive" },
@@ -176,10 +167,7 @@ function SellerDetail() {
               rules={[{ required: true, message: "Store type is required" }]}
             >
               <Select
-                options={STORE_TYPES.map((type) => ({
-                  value: type,
-                  label: type,
-                }))}
+                options={STORE_OPTIONS}
               />
             </Form.Item>
             <Form.Item label="Status" name="status">

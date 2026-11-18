@@ -123,10 +123,13 @@ function SellerLayout() {
       key: "chat-admin",
       label: "Chat with Admin",
       icon: <RiAdminFill />,
-      onClick: () =>
-        navigate(
-          user ? startChat.mutate({ admin: true }) : navigate("/auth/login"),
-        ),
+      onClick: () => {
+        if (user) {
+          startChat.mutate({ admin: true });
+        } else {
+          navigate("/auth/login");
+        }
+      },
     },
     {
       key: "logout",

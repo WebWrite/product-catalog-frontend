@@ -13,13 +13,13 @@ const PaymentSuccess = () => {
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ["cart"] });
     queryClient.invalidateQueries({ queryKey: ["products"] });
-  });
+  }, [queryClient]);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center p-4 sm:p-6">
       <Result
-        status="success"
-        title="Payment Submitted"
+        status={sessionId ? "success" : "warning"}
+        title={sessionId ? "Payment Submitted" : "Payment Session Missing"}
         subTitle={
           sessionId
             ? "Thank you! Your payment is being confirmed."

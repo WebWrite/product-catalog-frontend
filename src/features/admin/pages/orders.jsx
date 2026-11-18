@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Input, Pagination, Select, Table } from "antd";
+import { Alert, Button, Input, Pagination, Select, Table } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import {
   MdCreditCard,
@@ -128,24 +128,38 @@ function OrdersFulfillment() {
     {
       icon: MdOutlineReceiptLong,
       title: "All Orders",
-      amount: summaryQuery.isLoading ? "..." : (summary.totalOrders ?? 0),
+      amount: summaryQuery.isLoading
+        ? "..."
+        : summaryQuery.isError
+          ? "—"
+          : (summary.totalOrders ?? 0),
     },
     {
       icon: MdOutlineLocalShipping,
       title: "Pending",
-      amount: summaryQuery.isLoading ? "..." : (summary.inTransit ?? 0),
+      amount: summaryQuery.isLoading
+        ? "..."
+        : summaryQuery.isError
+          ? "—"
+          : (summary.inTransit ?? 0),
     },
     {
       icon: MdOutlineLocalShipping,
       title: "Delivered",
-      amount: summaryQuery.isLoading ? "..." : (summary.deliveredOrders ?? 0),
+      amount: summaryQuery.isLoading
+        ? "..."
+        : summaryQuery.isError
+          ? "—"
+          : (summary.deliveredOrders ?? 0),
     },
     {
       icon: MdOutlinePayments,
       title: "Last Month Subtotal",
       amount: summaryQuery.isLoading
         ? "..."
-        : money(summary.lastMonthSubtotal ?? 0),
+        : summaryQuery.isError
+          ? "—"
+          : money(summary.lastMonthSubtotal ?? 0),
     },
   ];
 
@@ -200,6 +214,15 @@ function OrdersFulfillment() {
         </div>
       </div>
 
+      {ordersQuery.isError && (
+        <Alert
+          className="mt-4"
+          type="error"
+          showIcon
+          message="Unable to load orders"
+          description="Please try again after the request recovers."
+        />
+      )}
       <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-600">

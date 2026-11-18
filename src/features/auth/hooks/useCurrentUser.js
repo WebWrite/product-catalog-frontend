@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { getMe } from "../../../shared/utils/api";
 import { hasLoginMarker } from "../../../shared/utils/authStorage";
 
-export const fetchCurrentUser = async () => {
-  return getMe();
+export const fetchCurrentUser = async ({ signal }) => {
+  return getMe(signal);
 };
 
 export const useCurrentUser = () => {
@@ -17,6 +17,5 @@ export const useCurrentUser = () => {
     enabled: isLoggedIn,
     staleTime: 1 * 60 * 1000,
     refetchOnWindowFocus: false,
-    retry: false,
   });
 };

@@ -1,7 +1,7 @@
 import api from "../../../shared/utils/api";
 
-export async function getSellerProducts(params = {}) {
-  const res = await api.get("/seller/products", { params });
+export async function getSellerProducts(params = {}, signal) {
+  const res = await api.get("/seller/products", { params, signal });
   return {
     products: res.data.data,
     pagination: res.data.pagination,
@@ -68,7 +68,7 @@ export async function bulkDeleteSellerProducts(productIds) {
   return res.data;
 }
 
-export async function getSellerProductStats() {
-  const res = await api.get("/seller/products/stats");
+export async function getSellerProductStats(signal) {
+  const res = await api.get("/seller/products/stats", { signal });
   return res.data.data;
 }

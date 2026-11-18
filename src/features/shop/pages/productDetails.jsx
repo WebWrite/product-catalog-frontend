@@ -43,7 +43,7 @@ function ProductDetail() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["product", id],
-    queryFn: () => getProductsById(id),
+    queryFn: ({ signal }) => getProductsById(id, signal),
     enabled: !!id,
     staleTime: 3 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -53,8 +53,11 @@ function ProductDetail() {
 
   const { data: related } = useQuery({
     queryKey: ["products", "related", product?.category],
-    queryFn: () =>
-      getProducts({ ...DEFAULT_FILTERS, category: product.category, limit: 5 }),
+    queryFn: ({ signal }) =>
+      getProducts(
+        { ...DEFAULT_FILTERS, category: product.category, limit: 5 },
+        signal,
+      ),
     enabled: !!product?.category,
     staleTime: 3 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -108,6 +111,8 @@ function ProductDetail() {
     .slice(0, 4);
 
   const handleAddToCart = () => {
+    if (addItemMutation.isPending) return;
+
     if (sizes.length > 0 && !selectedSizeValue) {
       message.error("Please select a size.");
       return;
@@ -296,9 +301,11 @@ function ProductDetail() {
               disabled={
                 cartDisabled ||
                 outOfStock ||
+                addItemMutation.isPending ||
                 cartItemCount >= 25 ||
                 cartItemCount == maxQuantity
               }
+              loading={isLoggedIn && addItemMutation.isPending}
               onClick={handleAddToCart}
               className="mt-5 h-11! bg-indigo-700! text-xs! font-semibold! hover:bg-indigo-800! disabled:text-gray-500! disabled:bg-gray-100! disabled:opacity-100!"
             >

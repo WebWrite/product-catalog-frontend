@@ -16,7 +16,7 @@ export const useCartQuery = () => {
 
   return useQuery({
     queryKey: ["cart"],
-    queryFn: getCart,
+    queryFn: ({ signal }) => getCart(signal),
     enabled: isCustomer,
     refetchOnWindowFocus: false,
   });
@@ -77,14 +77,25 @@ const useCartMutation = (mutationFn) => {
         placement: "bottomRight",
       });
     },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["cart"] }),
-        queryClient.refetchQueries({
-          queryKey: ["currentUser"],
-          type: "active",
-        }),
-      ]);
+    onSuccess: async (result) => {
+      const nextCartCount = Array.isArray(result?.cart?.items)
+        ? result.cart.items.reduce(
+            (total, item) => total + Number(item.quantity ?? 0),
+            0,
+          )
+        : mutationFn === deleteAllCart
+          ? 0
+          : undefined;
+
+      if (nextCartCount !== undefined) {
+        queryClient.setQueryData(["currentUser"], (currentUser) =>
+          currentUser
+            ? { ...currentUser, cart: nextCartCount }
+            : currentUser,
+        );
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 };
@@ -101,8 +112,10 @@ export const useGuestCartProducts = () => {
 
   return useQuery({
     queryKey: ["guest-cart-products", ids],
-    queryFn: async () => {
-      const responses = await Promise.all(ids.map((id) => getProductsById(id)));
+    queryFn: async ({ signal }) => {
+      const responses = await Promise.all(
+        ids.map((id) => getProductsById(id, signal)),
+      );
       return responses.map((response) => response?.data ?? response);
     },
     enabled: !isLoggedIn && ids.length > 0,

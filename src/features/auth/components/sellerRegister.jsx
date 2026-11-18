@@ -12,40 +12,7 @@ import {
 import PasswordStrength from "./passwordStrength";
 import { PASSWORD_CHECKS } from "../../../shared/utils/constant";
 import api from "../../../shared/utils/api";
-
-const STORE_TYPES = [
-  { value: "fashion", label: "Fashion & Apparel" },
-  { value: "beauty", label: "Beauty & Cosmetics" },
-  { value: "health", label: "Health & Wellness" },
-  { value: "electronics", label: "Electronics & Gadgets" },
-  { value: "home-furniture", label: "Home & Furniture" },
-  { value: "jewelry", label: "Jewelry & Accessories" },
-  { value: "food-beverages", label: "Food & Beverages" },
-  { value: "grocery", label: "Grocery" },
-  { value: "sports-fitness", label: "Sports & Fitness" },
-  { value: "books-stationery", label: "Books & Stationery" },
-  { value: "toys-games", label: "Toys & Games" },
-  { value: "baby-kids", label: "Baby & Kids" },
-  { value: "automotive", label: "Automotive" },
-  { value: "pet-supplies", label: "Pet Supplies" },
-  { value: "shoes-footwear", label: "Shoes & Footwear" },
-  { value: "bags-luggage", label: "Bags & Luggage" },
-  { value: "watches", label: "Watches" },
-  { value: "art-crafts", label: "Art & Crafts" },
-  { value: "handmade", label: "Handmade Products" },
-  { value: "digital-products", label: "Digital Products" },
-  { value: "software-saas", label: "Software & SaaS" },
-  { value: "services", label: "Services" },
-  { value: "subscription-box", label: "Subscription Box" },
-  { value: "wholesale-b2b", label: "Wholesale & B2B" },
-  { value: "industrial-tools", label: "Industrial & Tools" },
-  { value: "home-garden", label: "Home & Garden" },
-  { value: "office-supplies", label: "Office Supplies" },
-  { value: "travel-outdoor", label: "Travel & Outdoor" },
-  { value: "luxury-premium", label: "Luxury & Premium" },
-  { value: "gifts-occasions", label: "Gifts & Occasions" },
-  { value: "other", label: "Other" },
-];
+import { STORE_TYPES } from "../../seller/validations/profile.validation";
 
 function SellerRegister() {
   const { notification } = App.useApp();
