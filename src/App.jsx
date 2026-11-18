@@ -6,7 +6,31 @@ import { ThemeProvider } from "./app/theme/themeProvider";
 import { useTheme } from "./app/theme/useTheme";
 import AppInitializer from "./app/initializer/AppInitializer";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (
+          error?.code === "ERR_CANCELED" ||
+          error?.name === "CanceledError"
+        ) {
+          return false;
+        }
+
+        const status = error?.response?.status;
+        const retryable =
+          !status || status === 408 || status === 429 || status >= 500;
+
+        return retryable && failureCount < 2;
+      },
+      retryDelay: (attemptIndex) =>
+        Math.min(1000 * 2 ** attemptIndex, 5000),
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
 function AppContent() {
   const { isDarkMode } = useTheme();
 

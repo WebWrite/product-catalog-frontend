@@ -22,7 +22,7 @@ const ORDER_STATS_QUERY_KEY = ["seller-order-stats"];
 export function useSellerProducts(filters) {
   return useQuery({
     queryKey: [...QUERY_KEY, filters],
-    queryFn: () => getSellerProducts(filters),
+    queryFn: ({ signal }) => getSellerProducts(filters, signal),
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
   });
@@ -59,10 +59,14 @@ export function useUpdateSellerStock() {
   return useMutation({
     mutationFn: ({ productId, stock }) =>
       updateSellerProductStock(productId, stock),
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: STATS_QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: ["products"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        }),
       ]);
     },
   });
@@ -99,7 +103,7 @@ export function useBulkDeleteSellerProducts() {
 export function useSellerProductStats() {
   return useQuery({
     queryKey: STATS_QUERY_KEY,
-    queryFn: getSellerProductStats,
+    queryFn: ({ signal }) => getSellerProductStats(signal),
     staleTime: 1000 * 60 * 2,
     gcTime: 1000 * 60 * 2,
   });

@@ -8,6 +8,7 @@ const Backend_Url = import.meta.env.VITE_BACKEND_URL || "/api";
 const api = axios.create({
   baseURL: Backend_Url,
   withCredentials: true,
+  timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -47,9 +48,15 @@ api.interceptors.response.use(
       if (result.success) {
         return api(originalRequest);
       }
+
+      const authenticationFailed = [401, 403].includes(result.status);
+      if (!authenticationFailed) {
+        return Promise.reject(error);
+      }
+
       clearLoginMarker();
 
-      if (result.message === "Your account has Inactive by admin") {
+      if (result.message == "Your account has Inactive by admin") {
         notification.error({
           message: "Account Deactivated",
           description: result.message,
@@ -91,9 +98,10 @@ export async function refreshToken() {
 }
 
 export async function login(credentials) {
-  return await api.post("/auth/login", credentials, {
+  const res = await api.post("/auth/login", credentials, {
     _skipAuthRefresh: true,
   });
+  return res;
 }
 
 export async function logout() {
@@ -106,8 +114,8 @@ export async function logout() {
   );
 }
 
-export async function getMe() {
-  const res = await api.get("/user/me");
+export async function getMe(signal) {
+  const res = await api.get("/user/me", { signal });
   return res.data.user;
 }
 

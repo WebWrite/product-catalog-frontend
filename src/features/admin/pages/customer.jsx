@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { App, Button, Form, Input, Modal, Select, Table, Tag } from "antd";
+import {
+  Alert,
+  App,
+  Button,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Table,
+  Tag,
+} from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MdOutlineGroups,
@@ -216,7 +226,13 @@ function CustomerManagement() {
             key={stat.title}
             icon={<stat.icon className="size-4" />}
             title={stat.title}
-            amount={summaryQuery.isLoading ? "..." : stat.amount}
+            amount={
+              summaryQuery.isLoading
+                ? "..."
+                : summaryQuery.isError
+                  ? "—"
+                  : stat.amount
+            }
           />
         ))}
       </div>
@@ -248,6 +264,15 @@ function CustomerManagement() {
               onClick={() => setFilters({ search: "", status: "all", page: 1 })}
             />
           </div>
+          {customersQuery.isError && (
+            <Alert
+              className="mt-4"
+              type="error"
+              showIcon
+              message="Unable to load customers"
+              description="Please try again after the request recovers."
+            />
+          )}
           <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
             <div className="overflow-x-auto">
               <Table

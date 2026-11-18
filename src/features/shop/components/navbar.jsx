@@ -147,12 +147,13 @@ function NavBar() {
             key: "chat-admin",
             label: "Chat with Admin",
             icon: <RiAdminFill />,
-            onClick: () =>
-              navigate(
-                user
-                  ? startChat.mutate({ admin: true })
-                  : navigate("/auth/login"),
-              ),
+            onClick: () => {
+              if (user) {
+                startChat.mutate({ admin: true });
+              } else {
+                navigate("/auth/login");
+              }
+            },
           },
         ]
       : []),
@@ -369,11 +370,11 @@ function NavBar() {
                 className="mt-2 w-full!"
                 onClick={() => {
                   setDrawerOpen(false);
-                  navigate(
-                    user
-                      ? startChat.mutate({ admin: true })
-                      : navigate("/auth/login"),
-                  );
+                  if (user) {
+                    startChat.mutate({ admin: true });
+                  } else {
+                    navigate("/auth/login");
+                  }
                 }}
               >
                 Chat with Admin

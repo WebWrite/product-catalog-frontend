@@ -88,7 +88,10 @@ function Chat() {
           markConversationRead(qc, id);
           qc.invalidateQueries({ queryKey: ["chat-unread"] });
         })
-        .catch((err) => !cancelled && notifyError("Unable to open chat", err))
+        .catch((err) => {
+          navigate(`${base}`);
+          !cancelled && notifyError("Unable to open chat", err);
+        })
         .finally(() => !cancelled && setLoadingRoom(false));
 
     join();
@@ -118,8 +121,10 @@ function Chat() {
       }
     };
 
-    const onTyping = ({ userId, isTyping }) => {
-      if (String(userId) !== String(user.id)) setOtherTyping(isTyping);
+    const onTyping = ({ roomId, userId, isTyping }) => {
+      if (String(roomId) !== String(id)) return;
+      if (String(userId) === String(user.id)) return;
+      setOtherTyping(isTyping);
     };
 
     const onMessageSeen = ({ roomId, messageId }) => {

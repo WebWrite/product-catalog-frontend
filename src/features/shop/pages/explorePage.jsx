@@ -57,7 +57,8 @@ function ExplorePage() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["products", debouncedFilters],
-    queryFn: () => getProducts({ ...debouncedFilters, limit: PAGE_SIZE }),
+    queryFn: ({ signal }) =>
+      getProducts({ ...debouncedFilters, limit: PAGE_SIZE }, signal),
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,

@@ -1,6 +1,6 @@
 import api from "../../../shared/utils/api";
 
-export const getProducts = async (filters) => {
+export const getProducts = async (filters = {}, signal) => {
   let res = await api.get("", {
     params: {
       search: filters.keyword || undefined,
@@ -12,11 +12,12 @@ export const getProducts = async (filters) => {
       page: filters.page,
       limit: filters.limit,
     },
+    signal,
   });
   return res.data;
 };
 
-export const getProductsById = async (id) => {
-  let res = await api.get(`/${id}`);
+export const getProductsById = async (id, signal) => {
+  let res = await api.get(`/${id}`, { signal });
   return res.data.product;
 };

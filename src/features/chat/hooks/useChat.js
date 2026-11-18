@@ -96,7 +96,6 @@ export const useChatSocket = () => {
       refreshing = false;
 
       if (cancelled) return;
-      console.log("this is result of refresh token", result);
       if (result.success) {
         socket.connect();
         qc.invalidateQueries({ queryKey: ["conversations"] });

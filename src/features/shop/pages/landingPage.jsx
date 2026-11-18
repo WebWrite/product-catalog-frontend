@@ -107,7 +107,7 @@ function LandingPage() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["products"],
-    queryFn: getProducts,
+    queryFn: ({ signal }) => getProducts({}, signal),
     staleTime: 3 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
