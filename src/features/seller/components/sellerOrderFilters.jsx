@@ -24,10 +24,6 @@ const SellerOrderFilters = ({ filters, onChange }) => {
   const debouncedSearch = useDebounce(keyword, 350);
 
   useEffect(() => {
-    setKeyword(filters.search);
-  }, [filters.search]);
-
-  useEffect(() => {
     const search = debouncedSearch.trim();
     if (search !== filters.search) {
       onChange({ search });
@@ -48,7 +44,7 @@ const SellerOrderFilters = ({ filters, onChange }) => {
           placeholder="Customer name or email"
           prefix={<MdSearch className="text-lg text-slate-500" />}
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={(event) => setKeyword(event.target.value)}
         />
       </div>
 

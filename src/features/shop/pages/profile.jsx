@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Card, Form, Input, Modal, Tag, message } from "antd";
 import {
   UserOutlined,
@@ -15,6 +15,7 @@ import { setuser } from "../../../app/store/user/userSlice";
 function CustomerProfile() {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const [profileForm] = Form.useForm();
   const [passwordForm] = Form.useForm();
@@ -26,12 +27,13 @@ function CustomerProfile() {
     const updatedUser = response?.user || response?.data?.user || response;
 
     if (updatedUser && typeof updatedUser === "object") {
-      dispatch(
-        setuser({
-          ...user,
-          ...updatedUser,
-        }),
-      );
+      const mergedUser = {
+        ...user,
+        ...updatedUser,
+      };
+
+      dispatch(setuser(mergedUser));
+      queryClient.setQueryData(["currentUser"], mergedUser);
     }
   };
 
