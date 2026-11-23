@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button, Result } from "antd";
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { clearCheckoutAttempt } from "../../../shared/utils/checkoutHelper";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -11,6 +12,7 @@ const PaymentSuccess = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    clearCheckoutAttempt();
     queryClient.invalidateQueries({ queryKey: ["cart"] });
     queryClient.invalidateQueries({ queryKey: ["products"] });
   }, [queryClient]);

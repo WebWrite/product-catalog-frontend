@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { App, Button, Empty, Pagination, Result, Skeleton } from "antd";
 import { useGetMyOrders } from "../hooks/useGetMyOrders";
 import { useCancelOrderItem } from "../hooks/useCancelOrderItem";
@@ -7,6 +7,7 @@ import confirmCancelItem from "../../../shared/components/confirmCancelItem";
 import OrderCard from "../../../shared/components/orderCard";
 import OrderDetail from "../../../shared/components/ordersList";
 import CustomerOrderFilters from "../components/customerorderFilters";
+import { clearCheckoutAttempt } from "../../../shared/utils/checkoutHelper";
 
 const MyOrders = () => {
   const { notification } = App.useApp();
@@ -64,6 +65,9 @@ const MyOrders = () => {
         }),
     });
 
+  useEffect(() => {
+    clearCheckoutAttempt();
+  }, []);
   return (
     <div className="mx-auto min-h-screen w-full max-w-7xl  p-4 ">
       <h1 className="m-0 text-2xl font-bold text-slate-900 sm:text-3xl">

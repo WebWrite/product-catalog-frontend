@@ -89,9 +89,7 @@ const useCartMutation = (mutationFn) => {
 
       if (nextCartCount !== undefined) {
         queryClient.setQueryData(["currentUser"], (currentUser) =>
-          currentUser
-            ? { ...currentUser, cart: nextCartCount }
-            : currentUser,
+          currentUser ? { ...currentUser, cart: nextCartCount } : currentUser,
         );
       }
 

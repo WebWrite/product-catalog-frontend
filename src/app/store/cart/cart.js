@@ -14,7 +14,18 @@ if (hasExpired) {
 }
 
 const initialState = {
-  items: hasExpired || !saved ? [] : JSON.parse(saved),
+  items: (() => {
+    if (hasExpired || !saved) return [];
+
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      localStorage.removeItem(GUEST_CART_KEY);
+      localStorage.removeItem(GUEST_CART_EXPIRY_KEY);
+      return [];
+    }
+  })(),
 };
 
 const cartSlice = createSlice({

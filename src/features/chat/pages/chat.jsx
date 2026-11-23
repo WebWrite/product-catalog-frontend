@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
@@ -63,25 +63,25 @@ function Chat() {
     (c) =>
       TAB_TEST[tab](c) && (!q || c.otherUser?.name?.toLowerCase().includes(q)),
   );
-  const notifyError = (title, err) =>
-    notification.error({
-      title,
-      description: err.message,
-      placement: "bottomRight",
-    });
+  const notifyError = useCallback(
+    (title, err) =>
+      notification.error({
+        title,
+        description: err.message,
+        placement: "bottomRight",
+      }),
+    [notification],
+  );
 
   useEffect(() => {
-    if (!id) {
-      setMessages([]);
-      return;
-    }
+    if (!id) return;
 
     let cancelled = false;
-    setLoadingRoom(true);
-    setMessages([]);
+    const join = () => {
+      setLoadingRoom(true);
+      setMessages([]);
 
-    const join = () =>
-      emit("join_room", { roomId: id })
+      return emit("join_room", { roomId: id })
         .then((res) => {
           if (cancelled) return;
           setMessages(res.messages);
@@ -93,6 +93,7 @@ function Chat() {
           !cancelled && notifyError("Unable to open chat", err);
         })
         .finally(() => !cancelled && setLoadingRoom(false));
+    };
 
     join();
     socket.on("connect", join);
@@ -101,7 +102,7 @@ function Chat() {
       cancelled = true;
       socket.off("connect", join);
     };
-  }, [id]);
+  }, [base, id, navigate, notifyError, qc]);
 
   useEffect(() => {
     setActiveRoomId(id);
@@ -159,7 +160,7 @@ function Chat() {
 
       setOtherTyping(false);
     };
-  }, [id, user.id]);
+  }, [id, qc, user.id]);
 
   useEffect(() => {
     const messageContainer = messageScrollRef.current;

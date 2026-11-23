@@ -1,11 +1,22 @@
 import api from "../../../shared/utils/api";
 
-export const createCODOrder = async (shippingAddress) => {
-  const { data } = await api.post("/orders/cod", {
-    shippingAddress,
-  });
+export const createCODOrder = async ({ shippingAddress, idempotencyKey }) => {
+  const response = await api.post(
+    "/orders/cod",
+    {
+      shippingAddress,
+    },
+    {
+      headers: {
+        "Idempotency-Key": idempotencyKey,
+      },
+    },
+  );
 
-  return data;
+  return {
+    ...(typeof response.data === "object" ? response.data : {}),
+    httpStatus: response.status,
+  };
 };
 
 export const getMyOrders = async (filters) => {
@@ -24,12 +35,26 @@ export const cancelOrderItem = async ({ orderId, itemId }) => {
   return data;
 };
 
-export const createStripeCheckout = async (shippingAddress) => {
-  const { data } = await api.post("/orders/stripe", {
-    shippingAddress,
-  });
+export const createStripeCheckout = async ({
+  shippingAddress,
+  idempotencyKey,
+}) => {
+  const response = await api.post(
+    "/orders/stripe",
+    {
+      shippingAddress,
+    },
+    {
+      headers: {
+        "Idempotency-Key": idempotencyKey,
+      },
+    },
+  );
 
-  return data;
+  return {
+    ...(typeof response.data === "object" ? response.data : {}),
+    httpStatus: response.status,
+  };
 };
 
 export const retryStripePayment = async (orderId) => {

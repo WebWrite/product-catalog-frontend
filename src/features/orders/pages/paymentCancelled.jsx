@@ -1,8 +1,14 @@
 import { Button, Result } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { clearCheckoutAttempt } from "../../../shared/utils/checkoutHelper";
 
 const PaymentCancelled = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    clearCheckoutAttempt();
+  }, []);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl items-center justify-center p-4 sm:p-6">

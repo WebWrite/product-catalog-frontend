@@ -23,10 +23,6 @@ function SellerProductFilters({ filters, onChange }) {
   const debouncedSearch = useDebounce(searchInput, 350);
 
   useEffect(() => {
-    setSearchInput(filters.search);
-  }, [filters.search]);
-
-  useEffect(() => {
     const search = debouncedSearch.trim();
     if (search !== filters.search) {
       onChange({ search });
