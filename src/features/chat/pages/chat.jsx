@@ -10,7 +10,7 @@ import ChatMessage from "../components/chatMessage";
 import ChatInput from "../components/chatInput";
 import { initials } from "../../../shared/utils/initialsName";
 import { formatDate } from "../../../shared/utils/formatDate";
-import { emit, socket } from "../../../shared/utils/socket";
+import { disconnectSocket, emit, socket } from "../../../shared/utils/socket";
 import {
   applyMessageToConversations,
   markConversationRead,
@@ -191,6 +191,7 @@ function Chat() {
       }
     } catch (err) {
       if (err.message == "Your account has Inactive by admin") {
+        disconnectSocket();
         clearLoginMarker();
         navigate("/auth/login");
       }

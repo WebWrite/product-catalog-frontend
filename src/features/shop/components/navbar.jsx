@@ -30,8 +30,8 @@ import {
 } from "react-icons/md";
 import { removeUser } from "../../../app/store/user/userSlice";
 import { useTheme } from "../../../app/theme/useTheme";
-import { logout } from "../../../shared/utils/api";
-import { clearLoginMarker } from "../../../shared/utils/authStorage";
+import { logoutClient } from "../../../shared/utils/logoutClient";
+
 import { useCartQuery } from "../../cart/hooks/useCart";
 import { useStartChat, useUnreadCount } from "../../chat/hooks/useChat";
 import { LuMessageSquareText } from "react-icons/lu";
@@ -97,12 +97,8 @@ function NavBar() {
   };
 
   const handleLogout = async () => {
-    const res = await logout();
+    const res = await logoutClient({ dispatch, queryClient, removeUser });
     if (res.status === 200) {
-      clearLoginMarker();
-      dispatch(removeUser());
-      queryClient.removeQueries({ queryKey: ["currentUser"] });
-      queryClient.clear();
       navigate("/");
       notification.success({
         title: "Logout successfully",

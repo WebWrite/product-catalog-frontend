@@ -98,7 +98,7 @@ function CartPage() {
   if (!isLoggedIn && areGuestProductsLoading) return <Loader />;
 
   const guestProductsById = new Map(
-    guestProducts.map((product) => [product?._id, product]),
+    guestProducts.map((product) => [String(product?._id), product]),
   );
 
   const items = isLoggedIn
@@ -115,7 +115,7 @@ function CartPage() {
         image: i.productId?.image?.url,
       }))
     : guestItems.flatMap((i) => {
-        const product = guestProductsById.get(i.productId);
+        const product = guestProductsById.get(String(i.productId));
 
         if (!product) return [];
 

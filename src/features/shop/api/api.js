@@ -21,3 +21,11 @@ export const getProductsById = async (id, signal) => {
   let res = await api.get(`/${id}`, { signal });
   return res.data.product;
 };
+
+export const getProductsByIds = async (ids, signal) => {
+  const res = await api.get("/by-ids", {
+    params: { ids: ids.join(",") },
+    signal,
+  });
+  return res.data.products ?? [];
+};

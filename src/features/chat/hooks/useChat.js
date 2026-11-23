@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, notification } from "antd";
-import { emit, socket } from "../../../shared/utils/socket";
+import { disconnectSocket, emit, socket } from "../../../shared/utils/socket";
 import { CHAT_BASE } from "../../../shared/utils/chatPath";
 import {
   clearLoginMarker,
@@ -110,6 +110,7 @@ export const useChatSocket = () => {
             key: "account-inactive",
           });
         }
+        disconnectSocket();
         dispatch(removeUser());
         qc.removeQueries({ queryKey: ["currentUser"] });
         clearLoginMarker();

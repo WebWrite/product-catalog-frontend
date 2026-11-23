@@ -8,7 +8,7 @@ import {
   getCart,
 } from "../api/cartApi";
 import { notification } from "antd";
-import { getProductsById } from "../../shop/api/api";
+import { getProductsByIds } from "../../shop/api/api";
 
 export const useCartQuery = () => {
   const user = useSelector((state) => state.user);
@@ -110,12 +110,7 @@ export const useGuestCartProducts = () => {
 
   return useQuery({
     queryKey: ["guest-cart-products", ids],
-    queryFn: async ({ signal }) => {
-      const responses = await Promise.all(
-        ids.map((id) => getProductsById(id, signal)),
-      );
-      return responses.map((response) => response?.data ?? response);
-    },
+    queryFn: ({ signal }) => getProductsByIds(ids, signal),
     enabled: !isLoggedIn && ids.length > 0,
   });
 };

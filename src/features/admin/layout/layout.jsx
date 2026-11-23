@@ -25,11 +25,10 @@ import {
   MdSupervisedUserCircle,
   MdHistory,
 } from "react-icons/md";
-import { logout } from "../../../shared/utils/api";
 import { removeUser } from "../../../app/store/user/userSlice";
 import { useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
-import { clearLoginMarker } from "../../../shared/utils/authStorage";
+import { logoutClient } from "../../../shared/utils/logoutClient";
 import { useTheme } from "../../../app/theme/useTheme";
 import ThemeToggle from "../../../shared/components/themeToggle";
 import { useUnreadCount } from "../../chat/hooks/useChat";
@@ -48,12 +47,8 @@ function AdminLayout() {
 
   const { isDarkMode } = useTheme();
   const handleLogout = async () => {
-    const res = await logout();
+    const res = await logoutClient({ dispatch, queryClient, removeUser });
     if (res.status === 200) {
-      clearLoginMarker();
-      dispatch(removeUser());
-      queryClient.removeQueries({ queryKey: ["currentUser"] });
-      queryClient.clear();
       navigate("/");
       notification.success({
         title: "Logout successfully",

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { clearLoginMarker, hasLoginMarker } from "./authStorage";
+import { disconnectSocket } from "./socket";
 import { router } from "../../app/router/route";
 import { notification } from "antd";
 
@@ -54,6 +55,7 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
 
+      disconnectSocket();
       clearLoginMarker();
 
       if (result.message == "Your account has Inactive by admin") {

@@ -8,6 +8,10 @@ export const socket = io(socketUrl, {
   autoConnect: false,
 });
 
+export const disconnectSocket = () => {
+  socket.disconnect();
+};
+
 export const emit = (event, payload) =>
   new Promise((res, rej) => {
     const onConnectError = (error) => {
