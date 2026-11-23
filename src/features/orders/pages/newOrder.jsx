@@ -25,7 +25,15 @@ const NewOrder = () => {
     useCreateStripeCheckout();
 
   const handleCheckoutReplay = (response) => {
+    const checkoutUrl = response?.data?.checkoutUrl;
+
     clearCheckoutAttempt();
+
+    if (checkoutUrl) {
+      window.location.assign(checkoutUrl);
+      return;
+    }
+
     notification.info({
       message: "Checkout already exists",
       description:
@@ -36,6 +44,7 @@ const NewOrder = () => {
       showProgress: true,
       placement: "bottomRight",
     });
+
     navigate("/orders/myorders");
   };
 
