@@ -5,6 +5,12 @@ import ShippingAddressForm from "../components/shippingAddressForm";
 import { useCreateCODOrder } from "../hooks/useCreateOrder";
 import { useCreateStripeCheckout } from "../hooks/useCreateStripeCheckout";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  clearCheckoutAttempt,
+  getCheckoutConflict,
+  getCheckoutAttempt,
+  isCheckoutReplay,
+} from "../../../shared/utils/checkoutHelper";
 
 const { Title, Text } = Typography;
 
@@ -18,33 +24,91 @@ const NewOrder = () => {
   const { mutate: createStripe, isPending: isStripePending } =
     useCreateStripeCheckout();
 
+  const handleCheckoutReplay = (response) => {
+    clearCheckoutAttempt();
+    notification.info({
+      message: "Checkout already exists",
+      description:
+        response?.message ||
+        response?.data?.message ||
+        "This checkout was already created. Redirecting to My Orders.",
+      pauseOnHover: true,
+      showProgress: true,
+      placement: "bottomRight",
+    });
+    navigate("/orders/myorders");
+  };
+
+  const handleCheckoutError = (error) => {
+    const conflict = getCheckoutConflict(error);
+
+    if (conflict === "IDEMPOTENCY_IN_PROGRESS") {
+      notification.warning({
+        message: "Checkout is still processing",
+        description: "Please wait and try again in a moment.",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+      return true;
+    }
+
+    if (conflict) {
+      clearCheckoutAttempt();
+      notification.error({
+        message: "Checkout conflict",
+        description:
+          error.response?.data?.message ||
+          "The cart or shipping address changed for this checkout.",
+        pauseOnHover: true,
+        showProgress: true,
+        placement: "bottomRight",
+      });
+      navigate("/orders/myorders");
+      return true;
+    }
+
+    return false;
+  };
+
   const handleCOD = async () => {
     try {
       const shippingAddress = await form.validateFields();
+      const attempt = getCheckoutAttempt();
+      createCOD(
+        { shippingAddress, idempotencyKey: attempt.key },
+        {
+          onSuccess: (response) => {
+            if (isCheckoutReplay(response)) {
+              handleCheckoutReplay(response);
+              return;
+            }
 
-      createCOD(shippingAddress, {
-        onSuccess: () => {
-          notification.success({
-            message: "Order placed successfully",
-            description: "Your Cash on Delivery order has been created.",
-            pauseOnHover: true,
-            showProgress: true,
-            placement: "bottomRight",
-          });
-          queryClient.invalidateQueries({ queryKey: ["cart"] });
-          queryClient.invalidateQueries({ queryKey: ["products"] });
-          navigate("/orders/myorders");
+            clearCheckoutAttempt();
+            notification.success({
+              message: "Order placed successfully",
+              description: "Your Cash on Delivery order has been created.",
+              pauseOnHover: true,
+              showProgress: true,
+              placement: "bottomRight",
+            });
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            navigate("/orders/myorders");
+          },
+          onError: (error) => {
+            if (handleCheckoutError(error)) return;
+
+            notification.error({
+              message: "Unable to place order",
+              description: error.response?.data?.message || "Please try again.",
+              pauseOnHover: true,
+              showProgress: true,
+              placement: "bottomRight",
+            });
+          },
         },
-        onError: (error) => {
-          notification.error({
-            message: "Unable to place order",
-            description: error.response?.data?.message || "Please try again.",
-            pauseOnHover: true,
-            showProgress: true,
-            placement: "bottomRight",
-          });
-        },
-      });
+      );
     } catch (error) {
       if (error.errorFields) return;
 
@@ -61,34 +125,46 @@ const NewOrder = () => {
   const handleStripe = async () => {
     try {
       const shippingAddress = await form.validateFields();
+      const attempt = getCheckoutAttempt();
 
-      createStripe(shippingAddress, {
-        onSuccess: (response) => {
-          const checkoutUrl = response.data.checkoutUrl;
+      createStripe(
+        { shippingAddress, idempotencyKey: attempt.key },
+        {
+          onSuccess: (response) => {
+            if (isCheckoutReplay(response)) {
+              handleCheckoutReplay(response);
+              return;
+            }
 
-          if (!checkoutUrl) {
+            const checkoutUrl = response.data.checkoutUrl;
+
+            if (!checkoutUrl) {
+              clearCheckoutAttempt();
+              notification.error({
+                message: "Unable to start payment",
+                description: "Stripe Checkout URL was not returned.",
+                pauseOnHover: true,
+                showProgress: true,
+                placement: "bottomRight",
+              });
+              return;
+            }
+
+            window.location.assign(checkoutUrl);
+          },
+          onError: (error) => {
+            if (handleCheckoutError(error)) return;
+
             notification.error({
               message: "Unable to start payment",
-              description: "Stripe Checkout URL was not returned.",
+              description: error.response?.data?.message || "Please try again.",
               pauseOnHover: true,
               showProgress: true,
               placement: "bottomRight",
             });
-            return;
-          }
-
-          window.location.assign(checkoutUrl);
+          },
         },
-        onError: (error) => {
-          notification.error({
-            message: "Unable to start payment",
-            description: error.response?.data?.message || "Please try again.",
-            pauseOnHover: true,
-            showProgress: true,
-            placement: "bottomRight",
-          });
-        },
-      });
+      );
     } catch (error) {
       if (error.errorFields) return;
 
