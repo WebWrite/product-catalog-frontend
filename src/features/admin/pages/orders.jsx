@@ -83,6 +83,7 @@ function OrdersFulfillment() {
   const summaryQuery = useQuery({
     queryKey: ["admin", "orders", "summary"],
     queryFn: getAdminOrderSummary,
+    refetchOnWindowFocus: false,
   });
   const ordersQuery = useQuery({
     queryKey: ["admin", "orders", { page, keyword: debouncedKeyword, payment }],

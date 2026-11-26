@@ -151,15 +151,11 @@ const SellerOrders = () => {
         />
       )}
 
+      <div className="mt-6">
+        <SellerOrderFilters filters={filters} onChange={handleFilterChange} />
+      </div>
       {!isLoading && !isError && (
         <>
-          <div className="mt-6">
-            <SellerOrderFilters
-              filters={filters}
-              onChange={handleFilterChange}
-            />
-          </div>
-
           {orders.length === 0 ? (
             <Empty
               className="py-20"
