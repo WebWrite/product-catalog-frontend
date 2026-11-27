@@ -27,4 +27,7 @@ export default defineConfig({
       ].join("; "),
     },
   },
+  build: {
+    sourcemap: false,
+  },
 });
