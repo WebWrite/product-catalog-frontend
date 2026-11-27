@@ -8,7 +8,7 @@ export const getProducts = async (filters = {}, signal) => {
       minPrice: filters.minPrice,
       maxPrice: filters.maxPrice,
       inStock: filters.inStock || undefined,
-      sortBy: filters.sortBy,
+      sortBy: filters.sortBy === "newest" ? undefined : filters.sortBy,
       page: filters.page,
       limit: filters.limit,
     },
