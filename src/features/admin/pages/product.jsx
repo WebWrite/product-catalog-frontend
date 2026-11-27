@@ -299,7 +299,7 @@ function ProductCatalog() {
         />
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100 xl:flex-row xl:items-center">
+      <div className="mt-4 flex  gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100 flex-wrap">
         <Input
           allowClear
           variant="filled"
@@ -309,32 +309,35 @@ function ProductCatalog() {
           prefix={<MdSearch className="text-lg text-slate-500" />}
           className="xl:max-w-64"
         />
-        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <Select
-            variant="filled"
-            value={category}
-            onChange={changeFilter(setCategory)}
-            options={CATEGORY_OPTIONS}
-          />
-          <Select
-            variant="filled"
-            value={status}
-            onChange={changeFilter(setStatus)}
-            options={STATUS_OPTIONS}
-          />
-          <Select
-            variant="filled"
-            value={inStock ? "in-stock" : "all"}
-            onChange={(value) => changeFilter(setInStock)(value === "in-stock")}
-            options={STOCK_OPTIONS}
-          />
-          <Select
-            variant="filled"
-            value={sortBy}
-            onChange={changeFilter(setSortBy)}
-            options={SORT_OPTIONS}
-          />
-        </div>
+
+        <Select
+          variant="filled"
+          value={category}
+          onChange={changeFilter(setCategory)}
+          options={CATEGORY_OPTIONS}
+          className="w-32!"
+        />
+        <Select
+          variant="filled"
+          value={status}
+          onChange={changeFilter(setStatus)}
+          options={STATUS_OPTIONS}
+          className="w-24!"
+        />
+        <Select
+          variant="filled"
+          value={inStock ? "in-stock" : "all"}
+          onChange={(value) => changeFilter(setInStock)(value === "in-stock")}
+          options={STOCK_OPTIONS}
+          className="w-24!"
+        />
+        <Select
+          variant="filled"
+          value={sortBy}
+          onChange={changeFilter(setSortBy)}
+          options={SORT_OPTIONS}
+          className="w-32!"
+        />
       </div>
 
       {productsQuery.isError && (
