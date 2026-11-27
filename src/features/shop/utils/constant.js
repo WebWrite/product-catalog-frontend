@@ -25,7 +25,7 @@ export const DEFAULT_FILTERS = {
   minPrice: PRICE_MIN,
   maxPrice: PRICE_MAX,
   inStock: false,
-  sortBy: "low-to-high",
+  sortBy: "newest",
   page: 1,
 };
 

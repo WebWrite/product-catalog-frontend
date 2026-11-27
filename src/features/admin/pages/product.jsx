@@ -28,11 +28,31 @@ import {
   deleteAdminProduct,
 } from "../api/api";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
+import { PRODUCT_CATEGORIES } from "../../seller/constants/productConstants";
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All Statuses" },
   { value: "active", label: "Active" },
   { value: "inactive", label: "Inactive" },
+];
+
+const CATEGORY_OPTIONS = [
+  { value: "all", label: "All Categories" },
+  ...PRODUCT_CATEGORIES.map((category) => ({
+    value: category,
+    label: category,
+  })),
+];
+
+const STOCK_OPTIONS = [
+  { value: "all", label: "All Stock" },
+  { value: "in-stock", label: "In Stock" },
+];
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest First" },
+  { value: "low-to-high", label: "Price: Low to High" },
+  { value: "high-to-low", label: "Price: High to Low" },
 ];
 
 const PAGE_SIZE = 15;
@@ -63,6 +83,9 @@ function ProductCatalog() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState("all");
+  const [category, setCategory] = useState("all");
+  const [inStock, setInStock] = useState(false);
+  const [sortBy, setSortBy] = useState("newest");
   const [page, setPage] = useState(1);
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [inspectedId, setInspectedId] = useState(null);
@@ -79,14 +102,24 @@ function ProductCatalog() {
     queryKey: [
       "admin",
       "products",
-      { page, keyword: debouncedKeyword, status },
+      {
+        page,
+        keyword: debouncedKeyword,
+        category,
+        status,
+        inStock,
+        sortBy,
+      },
     ],
     queryFn: () =>
       getAdminProducts({
         page,
         limit: PAGE_SIZE,
         search: debouncedKeyword,
+        ...(category !== "all" ? { category } : {}),
         ...(status !== "all" ? { status } : {}),
+        ...(inStock ? { inStock: true } : {}),
+        ...(sortBy !== "newest" ? { sortBy } : {}),
       }),
     refetchOnWindowFocus: false,
   });
@@ -270,18 +303,36 @@ function ProductCatalog() {
         <Input
           allowClear
           variant="filled"
-          placeholder="Filter by product name, SKU, or brand"
+          placeholder="Search product names"
           value={keyword}
           onChange={(e) => changeFilter(setKeyword)(e.target.value)}
           prefix={<MdSearch className="text-lg text-slate-500" />}
           className="xl:max-w-64"
         />
-        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <Select
+            variant="filled"
+            value={category}
+            onChange={changeFilter(setCategory)}
+            options={CATEGORY_OPTIONS}
+          />
           <Select
             variant="filled"
             value={status}
             onChange={changeFilter(setStatus)}
             options={STATUS_OPTIONS}
+          />
+          <Select
+            variant="filled"
+            value={inStock ? "in-stock" : "all"}
+            onChange={(value) => changeFilter(setInStock)(value === "in-stock")}
+            options={STOCK_OPTIONS}
+          />
+          <Select
+            variant="filled"
+            value={sortBy}
+            onChange={changeFilter(setSortBy)}
+            options={SORT_OPTIONS}
           />
         </div>
       </div>

@@ -31,7 +31,7 @@ function ExplorePage() {
     minPrice: Number(searchParams.get("minPrice")) || PRICE_MIN,
     maxPrice: Number(searchParams.get("maxPrice")) || PRICE_MAX,
     inStock: searchParams.get("inStock") === "true",
-    sortBy: searchParams.get("sortBy") || "low-to-high",
+    sortBy: searchParams.get("sortBy") || "newest",
     page: Number(searchParams.get("page")) || 1,
   });
 
@@ -48,7 +48,8 @@ function ExplorePage() {
     if (filters.maxPrice !== PRICE_MAX)
       params.set("maxPrice", filters.maxPrice);
     if (filters.inStock) params.set("inStock", "true");
-    if (filters.sortBy) params.set("sortBy", filters.sortBy);
+    if (filters.sortBy && filters.sortBy !== "newest")
+      params.set("sortBy", filters.sortBy);
     if (filters.page > 1) params.set("page", filters.page);
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);
@@ -165,6 +166,7 @@ function ExplorePage() {
               className="theme-sort-select w-32! sm:w-40!"
               onChange={(value) => updateFilters({ sortBy: value })}
               options={[
+                { value: "newest", label: "Newest First" },
                 { value: "high-to-low", label: "High to Low" },
                 { value: "low-to-high", label: "Low to High" },
               ]}
